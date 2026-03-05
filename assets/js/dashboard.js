@@ -68,6 +68,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- 0. Theme Toggle Logic ---
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const rootElement = document.documentElement;
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+
+    // Set initial theme
+    rootElement.setAttribute('data-theme', savedTheme);
+
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = rootElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            rootElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    }
+
     // --- 1. Router Logic (Sidebar Navigation) ---
     const navItems = document.querySelectorAll('.nav-item');
     const viewSections = document.querySelectorAll('.view-section');
@@ -221,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const matches = symptomsWithIcons.filter(s => 
+        const matches = symptomsWithIcons.filter(s =>
             s.name.toLowerCase().includes(query) && !aiState.selectedSymptoms.has(s.name)
         );
 
@@ -290,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const data = await response.json();
                 resultOverlay.style.display = 'flex';
-                
+
                 if (data.analysis) {
                     resultContent.innerHTML = data.analysis
                         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')

@@ -10,6 +10,73 @@
     --sidebar-width: 280px;
 }
 
+[data-theme="light"] {
+    --bg-main: #f8fafc;
+    --bg-sidebar: #ffffff;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f1f5f9;
+    --primary: #059669;
+    /* Darker green for text readability */
+    --text-light: #0f172a;
+    --text-muted: #475569;
+    --border-color: #cbd5e1;
+}
+
+[data-theme="light"] .theme-toggle-btn .sun-icon {
+    display: none;
+}
+
+[data-theme="dark"] .theme-toggle-btn .moon-icon {
+    display: none;
+}
+
+/* Default state when data-theme attribute might be missing */
+html:not([data-theme="light"]) .theme-toggle-btn .moon-icon {
+    display: none;
+}
+
+.theme-toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.theme-toggle-btn:hover {
+    color: var(--text-light);
+    background: rgba(128, 128, 128, 0.15);
+}
+
+[data-theme="light"] .btn-primary {
+    color: #ffffff;
+}
+
+[data-theme="light"] .action-icon {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .nav-item:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .sidebar-user-profile:hover {
+    background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] .smart-search-box input {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .card {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -405,13 +472,13 @@ textarea.form-control {
     max-height: 240px;
     overflow-y: auto;
     display: none;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .search-results-dropdown div {
     padding: 14px 20px;
     cursor: pointer;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .search-results-dropdown div:hover {
@@ -446,7 +513,9 @@ textarea.form-control {
     opacity: 0.7;
 }
 
-.chip .close:hover { opacity: 1; }
+.chip .close:hover {
+    opacity: 1;
+}
 
 /* Grid Suggestions */
 .label-text {
@@ -491,8 +560,14 @@ textarea.form-control {
     color: var(--primary);
 }
 
-.s-icon { font-size: 24px; }
-.s-label { font-size: 0.85rem; font-weight: 500; }
+.s-icon {
+    font-size: 24px;
+}
+
+.s-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
 
 /* Refined Inputs */
 .additional-input-grid {
@@ -516,7 +591,10 @@ textarea.form-control {
     margin-bottom: 12px;
 }
 
-#severity-val { font-weight: 700; color: #f59e0b; }
+#severity-val {
+    font-weight: 700;
+    color: #f59e0b;
+}
 
 .action-footer {
     display: flex;
@@ -546,7 +624,15 @@ textarea.form-control {
     animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
 
 .result-header {
     display: flex;
@@ -565,9 +651,20 @@ textarea.form-control {
 }
 
 @keyframes pulse {
-    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 229, 163, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(0, 229, 163, 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 229, 163, 0); }
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 229, 163, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(0, 229, 163, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 229, 163, 0);
+    }
 }
 
 .result-text-body {
@@ -593,7 +690,9 @@ textarea.form-control {
     line-height: 1.5;
 }
 
-.medical-disclaimer strong { color: #f59e0b; }
+.medical-disclaimer strong {
+    color: #f59e0b;
+}
 
 .form-control-minimal {
     width: 100%;
@@ -620,7 +719,7 @@ textarea.form-control {
     background: var(--primary);
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .ai-badge {
@@ -1176,8 +1275,8 @@ body {
     background: var(--text-light);
     border-radius: 2px;
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-                top 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        top 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     top: 0;
 }
