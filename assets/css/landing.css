@@ -11,6 +11,20 @@
     --accent-red: #ef4444;
     --radius-md: 12px;
     --radius-lg: 20px;
+    --orb-opacity: 0.15;
+}
+
+[data-theme="light"] {
+    --bg-dark: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f1f5f9;
+    --border-color: #e2e8f0;
+    --text-main: #0f172a;
+    --text-muted: #475569;
+    --primary-green: #059669;
+    --primary-purple: #7c3aed;
+    --accent-green: #047857;
+    --orb-opacity: 0.05;
 }
 
 * {
@@ -20,12 +34,64 @@
     font-family: 'Inter', sans-serif;
 }
 
+/* Theme Toggle Button Styles */
+.theme-toggle-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    width: 38px;
+    height: 38px;
+}
+
+.theme-toggle-btn:hover {
+    background: var(--bg-card-hover);
+}
+
+.theme-toggle-btn .sun-icon {
+    display: none;
+}
+
+[data-theme="light"] .theme-toggle-btn .moon-icon {
+    display: none;
+}
+
+[data-theme="light"] .theme-toggle-btn .sun-icon {
+    display: block;
+}
+
+/* Additional Light Mode Neatness Fixes */
+[data-theme="light"] .mock-window {
+    background: #ffffff !important;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+[data-theme="light"] .mock-window > div:last-child {
+    background: #f1f5f9 !important;
+}
+
+[data-theme="light"] .card {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .nav-links a {
+    color: var(--text-main);
+}
+
 body {
     background-color: var(--bg-dark);
     color: var(--text-main);
     line-height: 1.5;
     overflow-x: hidden;
-    background-image: radial-gradient(circle at 50% 0%, rgba(0, 229, 163, 0.15) 0%, transparent 50%);
+    background-image: radial-gradient(circle at 50% 0%, rgba(0, 229, 163, var(--orb-opacity)) 0%, transparent 50%);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Utility Classes */
