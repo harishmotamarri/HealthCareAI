@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - MediMind AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/landing.css">
+    <link rel="stylesheet" href="assets/css/auth.css">
+</head>
+
+<body class="auth-page">
+    <!-- Premium Background Orbs -->
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <nav id="navbar" class="scrolled">
+        <div class="container flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 font-bold"
+                style="font-size: 1.2rem; text-decoration: none; color: inherit;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-green)"
+                    stroke-width="2">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+                MediMind <span class="text-gradient">AI</span>
+            </a>
+            <div class="flex gap-4">
+                <a href="index.html" class="btn btn-outline" style="border:none;">Back to Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="card auth-card">
+            <div class="auth-header text-center">
+                <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 8px;">Welcome Back</h2>
+                <p class="text-muted" style="margin-bottom: 24px;">Login to access your AI doctor</p>
+            </div>
+            <form action="dashboard.html" class="flex flex-col gap-4">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="john@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                </div>
+                <div class="flex justify-between items-center" style="font-size: 0.85rem; padding: 4px 0;">
+                    <label class="flex items-center gap-2" style="cursor: pointer;">
+                        <input type="checkbox" style="accent-color: var(--primary-green);"> Remember me
+                    </label>
+                    <a href="#" class="text-gradient hover-underline"
+                        style="text-decoration: none; font-weight: 500;">Forgot Password?</a>
+                </div>
+                <button type="submit" class="btn btn-gradient"
+                    style="width: 100%; margin-top: 8px; font-size: 1.05rem; padding: 12px;">Login</button>
+            </form>
+            <div class="auth-footer text-center" style="margin-top: 24px; font-size: 0.9rem;">
+                <p class="text-muted">Don't have an account? <a href="signup.html" class="text-gradient"
+                        style="text-decoration: none; font-weight: 600;">Sign up</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
