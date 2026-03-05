@@ -34,8 +34,7 @@ const appRouter = {
         const targetNav = document.querySelector(`.nav-item[data-target="${targetViewId}"]`);
         if (targetNav) {
             targetNav.classList.add('active');
-            // Update Topbar Title
-            document.getElementById('current-page-title').textContent = targetNav.textContent.trim();
+            // Title stays as MediEase, no change needed here
         }
     },
 
@@ -111,13 +110,10 @@ document.addEventListener('DOMContentLoaded', () => {
             targetView.classList.add('active');
         }
 
-        // Highlight Sidebar and Change Title
+        // Highlight Sidebar (Title stays constant as MediEase)
         const matchingNav = document.querySelector(`.nav-item[data-target="${targetId}"]`);
         if (matchingNav) {
             matchingNav.classList.add('active');
-            topbarTitle.innerText = matchingNav.innerText.trim();
-        } else if (targetId === 'profile') {
-            topbarTitle.innerText = 'Profile';
         }
 
         // Close mobile sidebar on view switch
@@ -254,6 +250,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const closeResultBtn = document.getElementById('close-result');
+    if (closeResultBtn) {
+        closeResultBtn.addEventListener('click', () => {
+            resultOverlay.style.display = 'none';
+        });
+    }
+
     // Reset Flow
     document.getElementById('new-check-btn').addEventListener('click', () => {
         resultOverlay.style.display = 'none';
@@ -262,6 +265,43 @@ document.addEventListener('DOMContentLoaded', () => {
         updateGridSelection();
         symptomSearchInput.value = '';
     });
+
+    function formatAIResponse(text) {
+        // Clean white space
+        let formatted = text.trim();
+        
+        // Define section headers we expect
+        const sections = [
+            "Possible Issue",
+            "What It Means",
+            "What You Can Do",
+            "See a Doctor If"
+        ];
+
+        // Replace section names with styled icons + headings
+        const icons = {
+            "Possible Issue": "🔍",
+            "What It Means": "💡",
+            "What You Can Do": "✅",
+            "See a Doctor If": "⚠️"
+        };
+
+        sections.forEach(section => {
+            const regex = new RegExp(`(${section})`, 'gi');
+            formatted = formatted.replace(regex, `<h3>${icons[section]} $1</h3>`);
+        });
+
+        // Convert bullet points to list items
+        formatted = formatted.replace(/•\s*(.*?)(?=<br>|<h3>|$)/g, '<li>$1</li>');
+        
+        // Wrap groups of <li> in <ul>
+        formatted = formatted.replace(/(<li>.*?<\/li>)+/g, '<ul>$&</ul>');
+
+        // Bold refinement
+        formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+        return formatted;
+    }
 
     // API Call
     if (checkBtn) {
@@ -289,18 +329,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 const data = await response.json();
-                resultOverlay.style.display = 'flex';
                 
                 if (data.analysis) {
-                    resultContent.innerHTML = data.analysis
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\n/g, '<br>');
+                    resultContent.innerHTML = formatAIResponse(data.analysis.replace(/\n/g, '<br>'));
+                    resultOverlay.style.display = 'flex';
                 } else {
-                    resultContent.innerHTML = 'Sorry, I encountered an error during analysis. Please try again.';
+                    resultContent.innerHTML = '<h3>⚠️ Error</h3><p>Sorry, I encountered an error during analysis. Please try again.</p>';
+                    resultOverlay.style.display = 'flex';
                 }
             } catch (err) {
                 console.error(err);
-                resultContent.innerHTML = 'Failed to connect to MediEase AI. Please ensure the server is running.';
+                resultContent.innerHTML = '<h3>⚠️ Connection Error</h3><p>Failed to connect to MediEase AI. Please ensure the server is running.</p>';
+                resultOverlay.style.display = 'flex';
             } finally {
                 aiState.isAnalyzing = false;
                 checkBtn.innerHTML = 'Check My Symptoms';

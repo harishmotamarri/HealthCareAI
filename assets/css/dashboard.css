@@ -525,51 +525,153 @@ textarea.form-control {
     box-shadow: 0 8px 24px rgba(0, 229, 163, 0.2);
 }
 
-/* Result Overlay */
+/* Result Overlay - Redesigned for Premium Content-first Experience */
 .analysis-result-overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: var(--bg-sidebar);
-    z-index: 10;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(15, 21, 35, 0.95);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    padding: 30px;
+    display: none; /* Controlled by flex/none in JS */
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
 }
 
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.result-card {
+    background: var(--bg-sidebar);
+    width: 100%;
+    max-width: 650px;
+    max-height: 90vh;
+    border-radius: 24px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
 .result-header {
+    padding: 24px 30px;
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
+    gap: 16px;
+    position: relative;
+}
+
+.result-header .header-text h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-light);
+    margin-bottom: 4px;
+}
+
+.result-header .header-text p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
 }
 
 .pulse-indicator {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     background: var(--primary);
     border-radius: 50%;
-    box-shadow: 0 0 0 rgba(0, 229, 163, 0.4);
-    animation: pulse 1.5s infinite;
+    box-shadow: 0 0 0 0 rgba(0, 229, 163, 0.4);
+    animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 229, 163, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(0, 229, 163, 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 229, 163, 0); }
+    0% { box-shadow: 0 0 0 0 rgba(0, 229, 163, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(0, 229, 163, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 229, 163, 0); }
+}
+
+.close-btn {
+    position: absolute;
+    right: 20px;
+    top: 24px;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: var(--text-muted);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
 }
 
 .result-text-body {
     flex: 1;
     overflow-y: auto;
-    font-size: 1rem;
-    line-height: 1.7;
+    padding: 30px;
+    padding-top: 10px;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #e2e8f0;
+}
+
+.result-text-body h3 {
+    font-size: 1.15rem;
+    color: var(--primary);
+    margin: 25px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.result-text-body h3:first-of-type {
+    margin-top: 15px;
+}
+
+.result-text-body ul {
+    list-style: none;
+    padding: 0;
+}
+
+.result-text-body li {
+    margin-bottom: 12px;
+    position: relative;
+    padding-left: 28px;
+    color: var(--text-light);
+}
+
+.result-text-body li::before {
+    content: "•";
+    color: var(--primary);
+    position: absolute;
+    left: 5px;
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.result-footer {
+    padding: 24px 30px;
+    border-top: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.02);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.quick-disclaimer {
+    font-size: 0.8rem;
     color: var(--text-muted);
+    font-style: italic;
 }
 
 .medical-disclaimer {

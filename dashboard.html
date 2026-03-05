@@ -122,7 +122,7 @@
                 <div style="margin-top: 20px;"></div>
             </nav>
 
-            <div class="emergency-btn">Emergency — Call 911</div>
+            <div class="emergency-btn">Emergency — Call 108</div>
         </aside>
 
         <main class="main-content">
@@ -525,19 +525,28 @@
 
                         <!-- Result Section -->
                         <div id="symptom-result" class="analysis-result-overlay" style="display: none;">
-                            <div class="result-header">
-                                <div class="pulse-indicator"></div>
-                                <h4>AI Analysis Complete</h4>
-                            </div>
-                            <div id="symptom-analysis-content" class="result-text-body"></div>
-                            <div class="result-actions">
-                                <button id="new-check-btn" class="btn btn-outline">Start Over</button>
+                            <div class="result-card">
+                                <div class="result-header">
+                                    <div class="pulse-indicator"></div>
+                                    <div class="header-text">
+                                        <h4>MediEase AI Assessment</h4>
+                                        <p>Personalized health guidance</p>
+                                    </div>
+                                    <button id="close-result" class="close-btn">✕</button>
+                                </div>
+                                <div id="symptom-analysis-content" class="result-text-body">
+                                    <!-- Structured content will be injected here -->
+                                </div>
+                                <div class="result-footer">
+                                    <div class="quick-disclaimer">Not a substitute for medical advice.</div>
+                                    <button id="new-check-btn" class="btn btn-primary">Done</button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="medical-disclaimer">
-                        <p><strong>Disclaimer:</strong> This AI tool is for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment. In case of emergency, please contact 911 immediately.</p>
+                        <p><strong>Disclaimer:</strong> This AI tool is for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment. In case of emergency, please contact 108 immediately.</p>
                     </div>
                 </div>
             </div>
@@ -686,7 +695,7 @@
                         <p style="color: var(--text-muted); margin-top: 4px;">Get step-by-step emergency guidance</p>
                     </div>
                     <button class="btn btn-outline" style="color:#ef4444; border-color:rgba(239,68,68,0.5);">📞 Call
-                        911</button>
+                        108</button>
                 </div>
 
                 <div class="card">
@@ -739,7 +748,7 @@
                         <h4 style="color: #ef4444; margin-bottom: 8px;">⚠ Important</h4>
                         <p style="font-size: 0.9rem; line-height: 1.5;">For serious injuries, severe bleeding,
                             difficulty
-                            breathing, or any life-threatening emergency, <strong>call 911 immediately.</strong> This
+                            breathing, or any life-threatening emergency, <strong>call 108 immediately.</strong> This
                             guide
                             is for minor injuries only.</p>
                     </div>
