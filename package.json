@@ -1,0 +1,27 @@
+{
+  "name": "aicare",
+  "version": "1.0.0",
+  "description": "MediMind AI is a comprehensive frontend web application acting as a Personal AI Doctor UI dashboard. It transforms complex medical documents like prescriptions, lab reports, and symptoms into simple, actionable health insights.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harishmotamarri/HealthCareAI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/harishmotamarri/HealthCareAI/issues"
+  },
+  "homepage": "https://github.com/harishmotamarri/HealthCareAI#readme",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1"
+  }
+}

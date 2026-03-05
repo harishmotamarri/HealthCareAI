@@ -25,7 +25,7 @@
             <div
                 style="display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 1.1rem; color: var(--primary);">
                 <img src="assets/img/images.jpg" alt="MediEase Logo" width="28" height="28" style="border-radius: 4px;">
-                MediEase
+                <span id="topbar-title">MediEase</span>
             </div>
         </div>
         <div style="display: flex; gap: 20px; align-items: center;">
@@ -437,69 +437,108 @@
             </div>
 
             <div id="symptoms" class="view-section">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
-                    <div>
+                <div class="ai-checker-container">
+                    <div class="ai-checker-header">
                         <h1>Symptom Checker</h1>
-                        <p style="color:var(--text-muted); margin-top:4px;">Get AI-powered health guidance</p>
-                    </div>
-                    <button class="btn btn-outline">History</button>
-                </div>
-
-                <div class="card">
-                    <div class="input-group">
-                        <label>Describe how you're feeling</label>
-                        <textarea class="form-control"
-                            placeholder="e.g., I've been having a persistent headache for the past 2 days, along with mild fever and fatigue..."></textarea>
+                        <p>AI-powered health guidance</p>
                     </div>
 
-                    <div class="input-group">
-                        <label>Select common symptoms</label>
-                        <div class="pill-container">
-                            <div class="pill">Headache</div>
-                            <div class="pill">Fever</div>
-                            <div class="pill">Cough</div>
-                            <div class="pill">Fatigue</div>
-                            <div class="pill">Nausea</div>
-                            <div class="pill">Dizziness</div>
-                            <div class="pill">Chest Pain</div>
-                            <div class="pill selected">Shortness of Breath</div>
-                            <div class="pill">Sore Throat</div>
-                            <div class="pill">Body Aches</div>
-                            <div class="pill">Runny Nose</div>
-                            <div class="pill">Stomach Pain</div>
-                            <div class="pill">Back Pain</div>
+                    <div class="ai-assistant-card">
+                        <div class="assistant-intro">
+                            <div class="assistant-avatar">✨</div>
+                            <div class="assistant-message">
+                                <h3>"Hi! I can help assess your symptoms. Tell me what you're feeling today."</h3>
+                            </div>
                         </div>
-                    </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px;">
-                        <div class="input-group">
-                            <label>How long have you had these symptoms?</label>
-                            <select class="form-control">
-                                <option>1-3 days</option>
-                                <option>Less than a day</option>
-                                <option>About a week</option>
-                            </select>
+                        <div class="checker-interaction-zone">
+                            <!-- Large Search Bar -->
+                            <div class="smart-search-box">
+                                <span class="search-icon">🔍</span>
+                                <input type="text" id="symptom-search" placeholder="Search symptoms (e.g. headache, fever, cough)" autocomplete="off">
+                                <div id="search-suggestions" class="search-results-dropdown"></div>
+                            </div>
+
+                            <!-- Selected Symptoms Chips -->
+                            <div id="active-symptoms-list" class="symptom-chips-container">
+                                <!-- Chips will be injected here via JS -->
+                            </div>
+
+                            <!-- Suggested Symptoms with Icons -->
+                            <div class="suggestions-section">
+                                <p class="label-text">Common Symptoms</p>
+                                <div class="symptom-grid">
+                                    <button class="symptom-card-btn" data-symptom="Headache">
+                                        <span class="s-icon">🤕</span>
+                                        <span class="s-label">Headache</span>
+                                    </button>
+                                    <button class="symptom-card-btn" data-symptom="Fever">
+                                        <span class="s-icon">🌡️</span>
+                                        <span class="s-label">Fever</span>
+                                    </button>
+                                    <button class="symptom-card-btn" data-symptom="Cough">
+                                        <span class="s-icon">🌬️</span>
+                                        <span class="s-label">Cough</span>
+                                    </button>
+                                    <button class="symptom-card-btn" data-symptom="Fatigue">
+                                        <span class="s-icon">🛌</span>
+                                        <span class="s-label">Fatigue</span>
+                                    </button>
+                                    <button class="symptom-card-btn" data-symptom="Nausea">
+                                        <span class="s-icon">🤢</span>
+                                        <span class="s-label">Nausea</span>
+                                    </button>
+                                    <button class="symptom-card-btn" data-symptom="Chest Pain">
+                                        <span class="s-icon">🫀</span>
+                                        <span class="s-label">Chest Pain</span>
+                                    </button>
+                                    <button class="symptom-card-btn" data-symptom="Dizziness">
+                                        <span class="s-icon">😵</span>
+                                        <span class="s-label">Dizziness</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Severity & Details (Refined for UI) -->
+                            <div class="additional-input-grid">
+                                <div class="input-card">
+                                    <label>Discomfort Level: <span id="severity-val">5/10</span></label>
+                                    <input type="range" id="severity-slider" min="1" max="10" value="5" class="modern-slider">
+                                </div>
+                                <div class="input-card">
+                                    <label>How long? (Optional)</label>
+                                    <select id="symptom-duration" class="form-control-minimal">
+                                        <option value="1-3 days">1-3 days</option>
+                                        <option value="Less than 24h">Less than 24 hours</option>
+                                        <option value="About a week">About a week</option>
+                                        <option value="Longer">Longer</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="action-footer">
+                                <button id="check-symptoms-btn" class="btn btn-primary btn-hero">
+                                    Check My Symptoms
+                                </button>
+                            </div>
                         </div>
-                        <div class="input-group">
-                            <label>Severity level <span style="float:right; color:#f59e0b;">5/10 -
-                                    Moderate</span></label>
-                            <input type="range" min="1" max="10" value="5" class="range-slider">
-                            <div
-                                style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
-                                <span>Mild</span><span>Severe</span>
+
+                        <!-- Result Section -->
+                        <div id="symptom-result" class="analysis-result-overlay" style="display: none;">
+                            <div class="result-header">
+                                <div class="pulse-indicator"></div>
+                                <h4>AI Analysis Complete</h4>
+                            </div>
+                            <div id="symptom-analysis-content" class="result-text-body"></div>
+                            <div class="result-actions">
+                                <button id="new-check-btn" class="btn btn-outline">Start Over</button>
                             </div>
                         </div>
                     </div>
 
-                    <button class="btn btn-primary"
-                        style="width: 100%; justify-content: center; padding: 14px; font-size: 1rem; margin-top: 16px;">+
-                        Check My Symptoms</button>
-                </div>
-
-                <div class="disclaimer-box">
-                    <h4 style="color: #f59e0b; margin-bottom: 4px;">⚠ Medical Disclaimer</h4>
-                    <p>This AI-powered tool provides general health information and is not a substitute for professional
-                        medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider.</p>
+                    <div class="medical-disclaimer">
+                        <p><strong>Disclaimer:</strong> This AI tool is for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment. In case of emergency, please contact 911 immediately.</p>
+                    </div>
                 </div>
             </div>
 

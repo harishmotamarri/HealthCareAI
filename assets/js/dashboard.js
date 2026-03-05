@@ -143,15 +143,175 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- 2. Symptom Checker Pills ---
-    const pills = document.querySelectorAll('.pill');
-    pills.forEach(pill => {
-        pill.addEventListener('click', () => {
-            pill.classList.toggle('selected');
+    // --- 2. Symptom Checker - AI Assistant Redesign logic ---
+    const aiState = {
+        selectedSymptoms: new Set(),
+        severity: 5,
+        duration: '1-3 days',
+        isAnalyzing: false
+    };
+
+    const symptomSearchInput = document.getElementById('symptom-search');
+    const suggestionsBox = document.getElementById('search-suggestions');
+    const activeChipsContainer = document.getElementById('active-symptoms-list');
+    const checkBtn = document.getElementById('check-symptoms-btn');
+    const resultOverlay = document.getElementById('symptom-result');
+    const resultContent = document.getElementById('symptom-analysis-content');
+    const severitySlider = document.getElementById('severity-slider');
+    const severityVal = document.getElementById('severity-val');
+
+    const symptomsWithIcons = [
+        { name: "Headache", icon: "🤕" },
+        { name: "Fever", icon: "🌡️" },
+        { name: "Cough", icon: "🌬️" },
+        { name: "Fatigue", icon: "🛌" },
+        { name: "Nausea", icon: "🤢" },
+        { name: "Chest Pain", icon: "🫀" },
+        { name: "Dizziness", icon: "😵" },
+        { name: "Sore Throat", icon: "🗣️" },
+        { name: "Body Aches", icon: "💪" },
+        { name: "Shortness of Breath", icon: "🫁" }
+    ];
+
+    function renderChips() {
+        if (aiState.selectedSymptoms.size === 0) {
+            activeChipsContainer.innerHTML = '';
+            return;
+        }
+
+        activeChipsContainer.innerHTML = Array.from(aiState.selectedSymptoms).map(symptom => `
+            <div class="chip">
+                <span>${symptom}</span>
+                <span class="close" onclick="window.removeAISymptom('${symptom}')">✕</span>
+            </div>
+        `).join('');
+    }
+
+    function toggleAISymptom(symptom) {
+        if (aiState.selectedSymptoms.has(symptom)) {
+            aiState.selectedSymptoms.delete(symptom);
+        } else {
+            aiState.selectedSymptoms.add(symptom);
+        }
+        renderChips();
+        updateGridSelection();
+    }
+
+    function updateGridSelection() {
+        document.querySelectorAll('.symptom-card-btn').forEach(btn => {
+            const sym = btn.getAttribute('data-symptom');
+            btn.classList.toggle('selected', aiState.selectedSymptoms.has(sym));
+        });
+    }
+
+    window.removeAISymptom = (s) => toggleAISymptom(s);
+
+    // Grid Buttons
+    document.querySelectorAll('.symptom-card-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            toggleAISymptom(btn.getAttribute('data-symptom'));
         });
     });
 
+    // Search Logic
+    symptomSearchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        if (!query) {
+            suggestionsBox.style.display = 'none';
+            return;
+        }
+
+        const matches = symptomsWithIcons.filter(s => 
+            s.name.toLowerCase().includes(query) && !aiState.selectedSymptoms.has(s.name)
+        );
+
+        if (matches.length > 0) {
+            suggestionsBox.innerHTML = matches.map(s => `<div>${s.icon} ${s.name}</div>`).join('');
+            suggestionsBox.style.display = 'block';
+        } else {
+            suggestionsBox.style.display = 'none';
+        }
+    });
+
+    suggestionsBox.addEventListener('click', (e) => {
+        const text = e.target.innerText.split(' ').slice(1).join(' '); // Remove icon
+        if (text) {
+            toggleAISymptom(text);
+            symptomSearchInput.value = '';
+            suggestionsBox.style.display = 'none';
+        }
+    });
+
+    // Slider
+    if (severitySlider) {
+        severitySlider.addEventListener('input', () => {
+            aiState.severity = severitySlider.value;
+            severityVal.innerText = `${aiState.severity}/10`;
+            let color = '#22c55e';
+            if (aiState.severity > 3) color = '#f59e0b';
+            if (aiState.severity > 7) color = '#ef4444';
+            severityVal.style.color = color;
+        });
+    }
+
+    // Reset Flow
+    document.getElementById('new-check-btn').addEventListener('click', () => {
+        resultOverlay.style.display = 'none';
+        aiState.selectedSymptoms.clear();
+        renderChips();
+        updateGridSelection();
+        symptomSearchInput.value = '';
+    });
+
+    // API Call
+    if (checkBtn) {
+        checkBtn.addEventListener('click', async () => {
+            if (aiState.selectedSymptoms.size === 0) {
+                alert('Please select or search for at least one symptom.');
+                return;
+            }
+
+            aiState.isAnalyzing = true;
+            checkBtn.innerHTML = '<span class="spinner"></span> Analyzing Symptoms...';
+            checkBtn.disabled = true;
+
+            const duration = document.getElementById('symptom-duration').value;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/check-symptoms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        symptoms: Array.from(aiState.selectedSymptoms),
+                        severity: aiState.severity,
+                        duration: duration
+                    })
+                });
+
+                const data = await response.json();
+                resultOverlay.style.display = 'flex';
+                
+                if (data.analysis) {
+                    resultContent.innerHTML = data.analysis
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\n/g, '<br>');
+                } else {
+                    resultContent.innerHTML = 'Sorry, I encountered an error during analysis. Please try again.';
+                }
+            } catch (err) {
+                console.error(err);
+                resultContent.innerHTML = 'Failed to connect to MediEase AI. Please ensure the server is running.';
+            } finally {
+                aiState.isAnalyzing = false;
+                checkBtn.innerHTML = 'Check My Symptoms';
+                checkBtn.disabled = false;
+            }
+        });
+    }
+
     // --- 3. Settings Toggles ---
+
+
     const toggles = document.querySelectorAll('.toggle');
     toggles.forEach(toggle => {
         toggle.addEventListener('click', () => {
