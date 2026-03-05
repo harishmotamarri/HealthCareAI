@@ -32,8 +32,8 @@
                 <a href="#demo">Demo</a>
             </div>
             <div class="flex gap-4">
-                <a href="#" class="btn btn-outline" style="border:none;">Sign In</a>
-                <a href="#" class="btn btn-gradient">Get Early Access</a>
+                <a href="#" class="btn btn-outline" style="border:none;">Sign Up</a>
+                <a href="#" class="btn btn-gradient">Login</a>
             </div>
         </div>
     </nav>
@@ -51,22 +51,6 @@
                     <a href="#demo" class="btn btn-gradient" style="padding: 14px 28px; font-size: 1.05rem;">Try
                         MediMind Free →</a>
                     <a href="#" class="btn btn-outline" style="padding: 14px 28px; font-size: 1.05rem;">▶ Watch Demo</a>
-                </div>
-
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <h4>98%</h4>
-                        <p>Accuracy</p>
-                    </div>
-                    <div class="stat-item">
-                        <h4>6</h4>
-                        <p>AI Features</p>
-                    </div>
-                    <div class="stat-item">
-                        <h4>
-                            <3s< /h4>
-                                <p>Response</p>
-                    </div>
                 </div>
             </div>
 
@@ -176,7 +160,6 @@
                     <li>✓ Symptom-to-condition intelligence</li>
                     <li>✓ 24/7 AI medical assistant</li>
                 </ul>
-                <a href="#how-it-works" class="text-gradient font-semibold text-decoration-none">See How It Works →</a>
             </div>
 
             <div class="card" style="padding: 0; overflow: hidden; display: flex;">
@@ -251,7 +234,7 @@
                 <h2>Six Powerful AI Capabilities<br>Built for Patients</h2>
             </div>
 
-            <div class="grid grid-cols-3 gap-6">
+            <div class="grid grid-cols-2 gap-8">
                 <div class="card relative overflow-hidden">
                     <span
                         style="position:absolute; top:12px; right:12px; font-size: 0.7rem; background: rgba(0,229,163,0.1); color: var(--primary-green); padding: 4px 8px; border-radius: 4px;">Most
@@ -318,60 +301,6 @@
             </div>
         </div>
     </section>
-
-    <section id="demo"
-        style="background: rgba(255,255,255,0.02); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
-        <div class="container text-center">
-            <div class="badge"
-                style="margin-bottom: 16px; color: var(--accent-red); background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.2);">
-                ● LIVE DEMO</div>
-            <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 16px;">See MediMind AI<br>In Action — Right
-                Now</h2>
-            <p class="text-muted" style="max-width: 600px; margin: 0 auto 40px;">No signup required. Upload a sample
-                prescription or lab report and watch AI explain it in plain language within seconds.</p>
-
-            <div class="card" style="max-width: 800px; margin: 0 auto; text-align: left;">
-                <div class="demo-tabs">
-                    <button class="tab-btn active" onclick="switchTab('presc')">📄 Prescription</button>
-                    <button class="tab-btn" onclick="switchTab('lab')">🧪 Lab Report</button>
-                    <button class="tab-btn" onclick="switchTab('symp')">🩺 Symptoms</button>
-                    <button class="tab-btn" onclick="switchTab('ask')">💬 Ask AI</button>
-                </div>
-
-                <div
-                    style="background: #0f172a; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 24px;">
-                    <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 8px;">Sample Input:</p>
-                    <p id="demo-input-text" style="font-family: monospace; font-size: 0.9rem; color: #cbd5e1;">
-                        Amoxicillin 500mg TID x 7d, Pantoprazole 40mg QD AC</p>
-                </div>
-
-                <button class="btn btn-gradient" style="width: 100%; padding: 14px; font-size: 1.05rem;"
-                    onclick="simulateAnalysis()">Try with Sample Data →</button>
-
-                <div id="demo-result"
-                    style="display: none; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border-color);">
-                    <div class="flex items-center gap-2" style="margin-bottom: 16px;">
-                        <span style="color: var(--accent-green);">✓</span>
-                        <span class="font-semibold text-gradient">Analysis Complete</span>
-                    </div>
-                    <div id="demo-result-text"
-                        style="font-size: 0.9rem; line-height: 1.6; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px;">
-                    </div>
-                </div>
-            </div>
-
-            <div style="margin-top: 40px;">
-                <p class="text-muted" style="margin-bottom: 16px; font-size: 0.9rem;">Or get instant access →</p>
-                <div class="flex justify-center gap-4">
-                    <input type="email" placeholder="Enter your email"
-                        style="background: var(--bg-card); border: 1px solid var(--border-color); color: white; padding: 12px 20px; border-radius: 8px; width: 300px; outline: none;">
-                    <button class="btn btn-outline" style="background: white; color: black; font-weight: bold;">Join
-                        Waitlist</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <section id="technology">
         <div class="container">
             <div class="section-header">
@@ -382,21 +311,26 @@
             <div class="grid grid-cols-2 gap-8">
                 <div class="flex flex-col gap-4">
                     <div class="card" style="padding: 24px;">
-                        <h4 class="font-semibold" style="margin-bottom: 8px; color: var(--primary-green);">Large Language
+                        <h4 class="font-semibold" style="margin-bottom: 8px; color: var(--primary-green);">Large
+                            Language
                             Models</h4>
-                        <p class="text-muted" style="font-size: 0.85rem;">Fine-tuned medical LLMs trained on PubMed,
+                        <p class="text-muted" style="font-size: 0.85rem;">Fine-tuned medical LLMs trained on
+                            PubMed,
                             clinical guidelines, and pharmacological databases for maximum accuracy.</p>
                     </div>
                     <div class="card" style="padding: 24px;">
-                        <h4 class="font-semibold" style="margin-bottom: 8px; color: var(--accent-green);">HIPAA-Grade
+                        <h4 class="font-semibold" style="margin-bottom: 8px; color: var(--accent-green);">
+                            HIPAA-Grade
                             Security</h4>
                         <p class="text-muted" style="font-size: 0.85rem;">End-to-end encryption, zero-knowledge
                             architecture, and complete data anonymization — your health data stays private.</p>
                     </div>
                     <div class="card" style="padding: 24px;">
-                        <h4 class="font-semibold" style="margin-bottom: 8px; color: var(--primary-purple);">Real-time
+                        <h4 class="font-semibold" style="margin-bottom: 8px; color: var(--primary-purple);">
+                            Real-time
                             Processing</h4>
-                        <p class="text-muted" style="font-size: 0.85rem;">Sub-3-second analysis powered by optimized
+                        <p class="text-muted" style="font-size: 0.85rem;">Sub-3-second analysis powered by
+                            optimized
                             inference pipelines and edge computing architecture.</p>
                     </div>
                 </div>
@@ -409,18 +343,22 @@
                     <div class="grid grid-cols-2 gap-6" style="margin-bottom: 32px;">
                         <div>
                             <div class="text-gradient" style="font-size: 2.5rem; font-weight: 800;">94%</div>
-                            <p class="text-muted" style="font-size: 0.85rem;">Patient comprehension improvement</p>
+                            <p class="text-muted" style="font-size: 0.85rem;">Patient comprehension improvement
+                            </p>
                         </div>
                         <div>
                             <div class="text-gradient" style="font-size: 2.5rem; font-weight: 800;">98.7%</div>
-                            <p class="text-muted" style="font-size: 0.85rem;">Prescription interpretation accuracy</p>
+                            <p class="text-muted" style="font-size: 0.85rem;">Prescription interpretation
+                                accuracy</p>
                         </div>
                     </div>
 
                     <div
                         style="background: rgba(255,255,255,0.05); padding: 24px; border-radius: 12px; border-left: 4px solid var(--primary-green);">
-                        <p style="font-style: italic; font-size: 0.9rem; margin-bottom: 12px;">"I finally understood why
-                            I was taking 6 different medications. MediMind explained each one in 30 seconds. My doctor
+                        <p style="font-style: italic; font-size: 0.9rem; margin-bottom: 12px;">"I finally
+                            understood why
+                            I was taking 6 different medications. MediMind explained each one in 30 seconds. My
+                            doctor
                             was amazed I came back with the right questions."</p>
                         <p class="font-semibold" style="font-size: 0.85rem;">— Riya S. <span
                                 class="text-muted font-normal">| Diabetes Patient, Mumbai</span></p>
@@ -429,93 +367,6 @@
             </div>
         </div>
     </section>
-
-    <section style="background: rgba(255,255,255,0.02); border-top: 1px solid var(--border-color);">
-        <div class="container">
-            <div class="section-header">
-                <div class="badge" style="margin-bottom: 16px;">ROADMAP</div>
-                <h2>The Future of<br>Patient Intelligence</h2>
-            </div>
-
-            <div style="max-width: 600px; margin: 0 auto; padding: 20px 0;">
-                <div class="roadmap-line">
-                    <div class="roadmap-item">
-                        <div class="roadmap-dot completed"></div>
-                        <div class="badge"
-                            style="margin-bottom: 8px; color: var(--accent-green); border-color: var(--accent-green);">✓
-                            Complete</div>
-                        <h3 class="font-semibold" style="margin-bottom: 8px;">Phase 1: Core AI Features</h3>
-                        <p class="text-muted" style="font-size: 0.9rem;">Prescription Interpreter, Lab Report Analyzer,
-                            Symptom Checker, AI Chatbot.</p>
-                    </div>
-                    <div class="roadmap-item">
-                        <div class="roadmap-dot" style="background: var(--primary-green);"></div>
-                        <div class="badge"
-                            style="margin-bottom: 8px; color: var(--primary-green); border-color: var(--primary-green);">●
-                            In Progress</div>
-                        <h3 class="font-semibold" style="margin-bottom: 8px;">Phase 2: Smart Integrations</h3>
-                        <p class="text-muted" style="font-size: 0.9rem;">Wearable device integration (Apple Watch,
-                            Fitbit), EHR system connectivity.</p>
-                    </div>
-                    <div class="roadmap-item" style="margin-bottom: 0;">
-                        <div class="roadmap-dot" style="background: var(--text-muted);"></div>
-                        <div class="badge" style="margin-bottom: 8px;">Q3 2025</div>
-                        <h3 class="font-semibold" style="margin-bottom: 8px;">Phase 3: Predictive Health</h3>
-                        <p class="text-muted" style="font-size: 0.9rem;">Proactive health risk prediction, Chronic
-                            disease management AI.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section>
-        <div class="container text-center">
-            <div class="badge" style="margin-bottom: 16px;">THE TEAM</div>
-            <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 60px;">Built by People Who<br>Care About
-                Healthcare</h2>
-
-            <div class="grid grid-cols-4 gap-6">
-                <div class="card text-center" style="padding: 24px;">
-                    <div
-                        style="width: 64px; height: 64px; border-radius: 50%; background: rgba(0,229,163,0.2); color: var(--primary-green); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; margin: 0 auto 16px;">
-                        AM</div>
-                    <h4 class="font-semibold">Aryan Mehta</h4>
-                    <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 12px;">Founder & CEO</p>
-                    <p style="font-size: 0.75rem; color: #64748b;">Ex-Google Health Engineer. AI/ML specialist with 5
-                        years in medical NLP.</p>
-                </div>
-                <div class="card text-center" style="padding: 24px;">
-                    <div
-                        style="width: 64px; height: 64px; border-radius: 50%; background: rgba(139,92,246,0.2); color: var(--primary-purple); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; margin: 0 auto 16px;">
-                        SK</div>
-                    <h4 class="font-semibold">Dr. Sneha Krishnan</h4>
-                    <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 12px;">Chief Medical Advisor</p>
-                    <p style="font-size: 0.75rem; color: #64748b;">MBBS, MD Internal Medicine. 8 years clinical
-                        experience at AIIMS.</p>
-                </div>
-                <div class="card text-center" style="padding: 24px;">
-                    <div
-                        style="width: 64px; height: 64px; border-radius: 50%; background: rgba(16,185,129,0.2); color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; margin: 0 auto 16px;">
-                        PS</div>
-                    <h4 class="font-semibold">Priya Sharma</h4>
-                    <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 12px;">Lead AI Engineer</p>
-                    <p style="font-size: 0.75rem; color: #64748b;">ML researcher. Previously at DeepMind. Specialized in
-                        biomedical language models.</p>
-                </div>
-                <div class="card text-center" style="padding: 24px;">
-                    <div
-                        style="width: 64px; height: 64px; border-radius: 50%; background: rgba(239,68,68,0.2); color: var(--accent-red); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; margin: 0 auto 16px;">
-                        RV</div>
-                    <h4 class="font-semibold">Rahul Verma</h4>
-                    <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 12px;">Product & Design</p>
-                    <p style="font-size: 0.75rem; color: #64748b;">Former Razorpay designer. Obsessed with making
-                        complex things simple.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <footer style="background: #05080f; border-top: 1px solid var(--border-color); padding: 80px 0 40px;">
         <div class="container">
             <div class="grid grid-cols-4 gap-8" style="margin-bottom: 60px;">
@@ -528,7 +379,8 @@
                         MediMind <span class="text-gradient">AI</span>
                     </div>
                     <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 24px;">AI-powered patient
-                        intelligence. Transforming complex medical information into clear, actionable health insights.
+                        intelligence. Transforming complex medical information into clear, actionable health
+                        insights.
                     </p>
                 </div>
 
