@@ -829,6 +829,15 @@ body {
     font-size: 1.1rem;
 }
 
+/* logout link emphasis */
+.profile-dropdown-item.logout {
+    color: #ef4444;
+}
+.profile-dropdown-item.logout:hover {
+    background: rgba(239,68,68,0.1);
+    color: #ef4444;
+}
+
 /* --- HAMBURGER ICON --- */
 .hamburger-menu {
     display: flex !important;

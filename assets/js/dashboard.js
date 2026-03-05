@@ -178,4 +178,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- 5. Logout handler ---
+    const logoutBtn = document.querySelector('.profile-dropdown-item.logout');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            // redirect to login or perform logout actions
+            window.location.href = 'login.html';
+        });
+    }
+
 });
