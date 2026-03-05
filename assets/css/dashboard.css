@@ -113,8 +113,14 @@ textarea.form-control {
 }
 
 .sidebar.collapsed .nav-item span,
-.sidebar.collapsed .emergency-btn {
+.sidebar.collapsed .emergency-btn,
+.sidebar.collapsed .sidebar-user-profile .user-details {
     display: none;
+}
+
+.sidebar.collapsed .sidebar-user-profile {
+    justify-content: center;
+    padding: 16px 0 !important;
 }
 
 .logo-container {

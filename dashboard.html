@@ -122,7 +122,13 @@
                 <div style="margin-top: 20px;"></div>
             </nav>
 
-            <div class="emergency-btn">Emergency — Call 911</div>
+            <div class="sidebar-user-profile link-trigger" data-target="profile" style="display: flex; align-items: center; gap: 12px; padding: 16px 24px; margin-top: auto; border-top: 1px solid var(--border-color); cursor: pointer; transition: all 0.3s;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.05)'" onmouseout="this.style.backgroundColor='transparent'">
+                <div class="profile-icon" style="flex-shrink: 0; font-size: 1rem;">H</div>
+                <div class="user-details" style="overflow: hidden; display: flex; flex-direction: column;">
+                    <span style="font-weight: 600; font-size: 0.95rem; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Harish Motamarri</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">View Profile</span>
+                </div>
+            </div>
         </aside>
 
         <main class="main-content">
