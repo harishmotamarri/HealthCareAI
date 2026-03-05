@@ -73,6 +73,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewSections = document.querySelectorAll('.view-section');
     const topbarTitle = document.getElementById('topbar-title');
     const linkTriggers = document.querySelectorAll('.link-trigger'); // Quick action cards & back links
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+
+    // Create overlay element
+    const overlay = document.createElement('div');
+    overlay.className = 'mobile-overlay';
+    document.body.appendChild(overlay);
+
+    function toggleSidebar() {
+        sidebarToggle.classList.toggle('is-active');
+        if (window.innerWidth <= 768) {
+            // Mobile behavior (overlay)
+            sidebar.classList.toggle('sidebar-open');
+            overlay.classList.toggle('active');
+        } else {
+            // Desktop behavior (push)
+            sidebar.classList.toggle('collapsed');
+        }
+    }
+
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', toggleSidebar);
+    }
+
+    overlay.addEventListener('click', toggleSidebar);
 
     function switchView(targetId) {
         // Hide all views
@@ -93,6 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
             topbarTitle.innerText = matchingNav.innerText.trim();
         } else if (targetId === 'profile') {
             topbarTitle.innerText = 'Profile';
+        }
+
+        // Close mobile sidebar on view switch
+        if (window.innerWidth <= 768 && sidebar.classList.contains('sidebar-open')) {
+            toggleSidebar();
         }
     }
 

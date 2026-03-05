@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Health Copilot</title>
+    <title>MediEase Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/dashboard.css">
 </head>
@@ -15,755 +15,849 @@
     <div class="bg-orb orb-2"></div>
     <div class="bg-orb orb-3"></div>
 
-    <aside class="sidebar">
-        <div class="logo-container">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <header class="topbar">
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <button class="hamburger-menu" id="sidebar-toggle">
+                <span class="ham-line"></span>
+                <span class="ham-line"></span>
+                <span class="ham-line"></span>
+            </button>
+            <div
+                style="display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 1.1rem; color: var(--primary);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+                MediEase
+            </div>
+        </div>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2">
                 <path
-                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                </path>
             </svg>
-            AI Health Copilot
-        </div>
-
-        <nav class="nav-menu">
-            <a class="nav-item active" data-target="dashboard">
-                <svg class="nav-icon" viewBox="0 0 24 24">
-                    <rect x="3" y="3" width="7" height="9"></rect>
-                    <rect x="14" y="3" width="7" height="5"></rect>
-                    <rect x="14" y="12" width="7" height="9"></rect>
-                    <rect x="3" y="16" width="7" height="5"></rect>
-                </svg>
-                Dashboard
-            </a>
-            <a class="nav-item" data-target="reports">
-                <svg class="nav-icon" viewBox="0 0 24 24">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                </svg>
-                Medical Reports
-            </a>
-            <a class="nav-item" data-target="symptoms">
-                <svg class="nav-icon" viewBox="0 0 24 24">
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                </svg>
-                Symptom Checker
-            </a>
-            <a class="nav-item" data-target="hospitals">
-                <svg class="nav-icon" viewBox="0 0 24 24">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                    <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-                Hospital Finder
-            </a>
-            <a class="nav-item" data-target="firstaid">
-                <svg class="nav-icon" viewBox="0 0 24 24">
-                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
-                </svg>
-                First Aid Guide
-            </a>
-            <div style="margin-top: 20px;"></div>
-            <a class="nav-item" data-target="history">
-                <svg class="nav-icon" viewBox="0 0 24 24">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                </svg>
-                Health History
-            </a>
-            <a class="nav-item" data-target="profile">
-                <svg class="nav-icon" viewBox="0 0 24 24">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                Profile
-            </a>
-            <a class="nav-item" data-target="settings">
-                <svg class="nav-icon" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path
-                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-                    </path>
-                </svg>
-                Settings & Support
-            </a>
-        </nav>
-
-        <div class="emergency-btn">Emergency — Call 911</div>
-    </aside>
-
-    <main class="main-content">
-        <header class="topbar">
-            <div class="page-title" id="topbar-title">Dashboard</div>
-            <div style="display: flex; gap: 20px; align-items: center;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2">
-                    <path
-                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
-                    </path>
-                </svg>
+            <div class="profile-menu-container">
                 <div class="profile-icon">H</div>
-            </div>
-        </header>
-
-        <div id="dashboard" class="view-section active">
-            <div class="welcome-section">
-                <div>
-                    <div class="ai-badge">✨ AI Health Copilot</div>
-                    <h1 style="font-size: 2.2rem; margin-bottom: 8px;">Good Evening, Harish! 👋</h1>
-                    <p style="color: var(--text-muted);">Here's your health summary for today</p>
-                </div>
-                <div class="top-stats">
-                    <div class="stat-box">
-                        <div class="stat-num">1</div>
-                        <div class="stat-label">Reports</div>
-                    </div>
-                    <div class="stat-box" style="border-top-color: #a855f7;">
-                        <div class="stat-num" style="color:#a855f7;">1</div>
-                        <div class="stat-label">Sym. Checks</div>
-                    </div>
-                    <div class="stat-box" style="border-top-color: #3b82f6;">
-                        <div class="stat-num" style="color:#3b82f6;">0</div>
-                        <div class="stat-label">Appointments</div>
-                    </div>
+                <div class="profile-dropdown">
+                    <a href="#" class="profile-dropdown-item link-trigger" data-target="profile">
+                        <span>👤</span> Profile
+                    </a>
+                    <a href="#" class="profile-dropdown-item link-trigger" data-target="settings">
+                        <span>⚙️</span> Settings
+                    </a>
+                    <div style="height: 1px; background: var(--border-color); margin: 4px 0;"></div>
+                    <a href="#" class="profile-dropdown-item">
+                        <span>❓</span> Support
+                    </a>
                 </div>
             </div>
+        </div>
+    </header>
 
-            <h2 class="section-title">Quick Actions</h2>
-            <div class="quick-actions">
-                <div class="action-card link-trigger" data-target="reports">
-                    <div class="action-icon">📄</div>
-                    <h3>Upload Report</h3>
-                    <p>Analyze documents</p>
-                </div>
-                <div class="action-card link-trigger" data-target="symptoms">
-                    <div class="action-icon" style="color:#a855f7; background:rgba(168,85,247,0.1);">🩺</div>
-                    <h3>Check Symptoms</h3>
-                    <p>Get health assessment</p>
-                </div>
-                <div class="action-card link-trigger" data-target="hospitals">
-                    <div class="action-icon" style="color:#3b82f6; background:rgba(59,130,246,0.1);">🏥</div>
-                    <h3>Find Hospitals</h3>
-                    <p>Locate specialists</p>
-                </div>
-                <div class="action-card link-trigger" data-target="firstaid">
-                    <div class="action-icon" style="color:#ef4444; background:rgba(239,68,68,0.1);">❤️</div>
-                    <h3>First Aid Kit</h3>
-                    <p>Emergency guidance</p>
-                </div>
+    <div class="app-layout-container">
+        <aside class="sidebar">
+            <div class="logo-container" style="display: none;">
             </div>
 
-            <div class="bottom-grid">
-                <div>
-                    <h2 class="section-title">Recent Activity <a href="#" class="view-all">View all &rarr;</a></h2>
-                    <div class="activity-item">
-                        <div style="display: flex; align-items: center; gap:16px;">
-                            <div class="action-icon" style="margin:0; width:36px; height:36px; font-size:14px;">📄</div>
+            <nav class="nav-menu">
+                <a class="nav-item active" data-target="dashboard">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="7" height="9"></rect>
+                        <rect x="14" y="3" width="7" height="5"></rect>
+                        <rect x="14" y="12" width="7" height="9"></rect>
+                        <rect x="3" y="16" width="7" height="5"></rect>
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+                <a class="nav-item" data-target="analyzer">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>Report Analyzer</span>
+                </a>
+                <a class="nav-item" data-target="reports">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                    <span>Medical Reports</span>
+                </a>
+                <a class="nav-item" data-target="symptoms">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                    </svg>
+                    <span>Symptom Checker</span>
+                </a>
+                <a class="nav-item" data-target="hospitals">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    <span>Hospital Finder</span>
+                </a>
+                <a class="nav-item" data-target="firstaid">
+                    <svg class="nav-icon" viewBox="0 0 24 24">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                        <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                    </svg>
+                    <span>First Aid Guide</span>
+                </a>
+                <div style="margin-top: 20px;"></div>
+            </nav>
+
+            <div class="emergency-btn">Emergency — Call 911</div>
+        </aside>
+
+        <main class="main-content">
+            <div id="dashboard" class="view-section active">
+                <div class="welcome-section">
+                    <div>
+                        <div class="ai-badge">✨ MediEase AI</div>
+                        <h1 style="font-size: 2.2rem; margin-bottom: 8px;">Good Evening, Harish! 👋</h1>
+                        <p style="color: var(--text-muted);">Here's your health summary for today</p>
+                    </div>
+                    <div class="top-stats">
+                        <div class="stat-box">
+                            <div class="stat-num">1</div>
+                            <div class="stat-label">Reports</div>
+                        </div>
+                        <div class="stat-box" style="border-top-color: #a855f7;">
+                            <div class="stat-num" style="color:#a855f7;">1</div>
+                            <div class="stat-label">Sym. Checks</div>
+                        </div>
+                        <div class="stat-box" style="border-top-color: #3b82f6;">
+                            <div class="stat-num" style="color:#3b82f6;">0</div>
+                            <div class="stat-label">Appointments</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="section-title">Quick Actions</h2>
+                <div class="quick-actions">
+                    <div class="action-card link-trigger" data-target="analyzer">
+                        <div class="action-icon">📄</div>
+                        <h3>Upload Report</h3>
+                        <p>Analyze documents</p>
+                    </div>
+                    <div class="action-card link-trigger" data-target="symptoms">
+                        <div class="action-icon" style="color:#a855f7; background:rgba(168,85,247,0.1);">🩺</div>
+                        <h3>Check Symptoms</h3>
+                        <p>Get health assessment</p>
+                    </div>
+                    <div class="action-card link-trigger" data-target="hospitals">
+                        <div class="action-icon" style="color:#3b82f6; background:rgba(59,130,246,0.1);">🏥</div>
+                        <h3>Find Hospitals</h3>
+                        <p>Locate specialists</p>
+                    </div>
+                    <div class="action-card link-trigger" data-target="firstaid">
+                        <div class="action-icon" style="color:#ef4444; background:rgba(239,68,68,0.1);">❤️</div>
+                        <h3>First Aid Kit</h3>
+                        <p>Emergency guidance</p>
+                    </div>
+                </div>
+
+                <div class="bottom-grid">
+                    <div>
+                        <h2 class="section-title">Recent Activity <a href="#" class="view-all">View all &rarr;</a></h2>
+                        <div class="activity-item">
+                            <div style="display: flex; align-items: center; gap:16px;">
+                                <div class="action-icon" style="margin:0; width:36px; height:36px; font-size:14px;">📄
+                                </div>
+                                <div>
+                                    <h4>Blood Test Analyzed</h4>
+                                    <p>Results look normal overall</p>
+                                </div>
+                            </div>
+                            <div class="time-label">2 hours ago</div>
+                        </div>
+                        <div class="activity-item">
+                            <div style="display: flex; align-items: center; gap:16px;">
+                                <div class="action-icon"
+                                    style="margin:0; width:36px; height:36px; font-size:14px; color:#a855f7; background:rgba(168,85,247,0.1);">
+                                    🩺</div>
+                                <div>
+                                    <h4>Symptom Check Done</h4>
+                                    <p>Mild cold - rest recommended</p>
+                                </div>
+                            </div>
+                            <div class="time-label">Yesterday</div>
+                        </div>
+                        <div class="activity-item">
+                            <div style="display: flex; align-items: center; gap:16px;">
+                                <div class="action-icon"
+                                    style="margin:0; width:36px; height:36px; font-size:14px; color:#3b82f6; background:rgba(59,130,246,0.1);">
+                                    🏥</div>
+                                <div>
+                                    <h4>Hospital Saved</h4>
+                                    <p>City General Hospital</p>
+                                </div>
+                            </div>
+                            <div class="time-label">2 days ago</div>
+                        </div>
+                        <div class="activity-item">
+                            <div style="display: flex; align-items: center; gap:16px;">
+                                <div class="action-icon" style="margin:0; width:36px; height:36px; font-size:14px;">📄
+                                </div>
+                                <div>
+                                    <h4>Annual Blood Test - January 2024</h4>
+                                    <p>Blood test</p>
+                                </div>
+                            </div>
+                            <div class="time-label">04/03/2026</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="section-title">Daily Health Tip</h2>
+                        <div class="card"
+                            style="height: calc(100% - 40px); display: flex; flex-direction: column; justify-content: space-between;">
                             <div>
-                                <h4>Blood Test Analyzed</h4>
-                                <p>Results look normal overall</p>
+                                <div style="font-size: 24px; margin-bottom: 16px;">💧</div>
+                                <h3 style="margin-bottom: 8px;">Stay Hydrated</h3>
+                                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">Drink at least
+                                    8
+                                    glasses of water daily for optimal health.</p>
+                            </div>
+                            <div style="display: flex; gap: 6px; margin-top: 20px;">
+                                <div style="width:24px; height:4px; background:var(--primary); border-radius:2px;">
+                                </div>
+                                <div
+                                    style="width:24px; height:4px; background:rgba(255,255,255,0.2); border-radius:2px;">
+                                </div>
+                                <div
+                                    style="width:24px; height:4px; background:rgba(255,255,255,0.2); border-radius:2px;">
+                                </div>
                             </div>
                         </div>
-                        <div class="time-label">2 hours ago</div>
                     </div>
-                    <div class="activity-item">
+                </div>
+
+                <h2 class="section-title" style="margin-top: 40px;">⚡ Your Health At a Glance</h2>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+                    <div class="card" style="text-align: center; padding: 20px;">
+                        <div style="font-size:24px;">📄</div>
+                        <div style="font-size:1.5rem; font-weight:bold; color:var(--primary); margin:8px 0 4px;">1</div>
+                        <div style="font-size:0.8rem; color:var(--text-muted);">Reports Analyzed</div>
+                    </div>
+                    <div class="card" style="text-align: center; padding: 20px;">
+                        <div style="font-size:24px;">🩺</div>
+                        <div style="font-size:1.5rem; font-weight:bold; color:#a855f7; margin:8px 0 4px;">1</div>
+                        <div style="font-size:0.8rem; color:var(--text-muted);">Symptom Checks</div>
+                    </div>
+                    <div class="card" style="text-align: center; padding: 20px;">
+                        <div style="font-size:24px;">🏥</div>
+                        <div style="font-size:1.5rem; font-weight:bold; color:#3b82f6; margin:8px 0 4px;">0</div>
+                        <div style="font-size:0.8rem; color:var(--text-muted);">Saved Hospitals</div>
+                    </div>
+                    <div class="card" style="text-align: center; padding: 20px;">
+                        <div style="font-size:24px; color:var(--primary);">📈</div>
+                        <div style="font-size:1.5rem; font-weight:bold; color:var(--primary); margin:8px 0 4px;">--
+                        </div>
+                        <div style="font-size:0.8rem; color:var(--text-muted);">Health Score</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="analyzer" class="view-section">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+                    <div>
+                        <h1>Report Analyzer</h1>
+                        <p style="color:var(--text-muted); margin-top:4px;">Upload medical reports for instant AI
+                            analysis
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card"
+                    style="text-align: center; padding: 60px 20px; border: 2px dashed var(--border-color); cursor: pointer; transition: all 0.3s; margin-bottom: 32px;"
+                    onmouseover="this.style.borderColor='var(--primary)'; this.style.backgroundColor='rgba(0, 229, 163, 0.05)';"
+                    onmouseout="this.style.borderColor='var(--border-color)'; this.style.backgroundColor='transparent';">
+                    <div style="font-size: 3rem; margin-bottom: 16px;">📄</div>
+                    <h3 style="margin-bottom: 8px;">Drag & Drop your report here</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 24px;">Supports PDF, JPG, PNG (Max 10MB)</p>
+                    <button class="btn btn-primary" style="padding: 12px 24px;">Browse Files</button>
+                </div>
+
+                <h3 style="margin-bottom: 16px;">Recent Analysis</h3>
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div class="activity-item link-trigger" data-target="reports" style="cursor:pointer; margin:0;">
                         <div style="display: flex; align-items: center; gap:16px;">
                             <div class="action-icon"
-                                style="margin:0; width:36px; height:36px; font-size:14px; color:#a855f7; background:rgba(168,85,247,0.1);">
-                                🩺</div>
+                                style="margin:0; width:36px; height:36px; font-size:14px; background: rgba(34, 197, 94, 0.1); color: #22c55e;">
+                                ✓</div>
                             <div>
-                                <h4>Symptom Check Done</h4>
-                                <p>Mild cold - rest recommended</p>
+                                <h4>Blood Test - Alpha Labs</h4>
+                                <p style="margin-top:2px; font-size:0.85rem;">Analyzed today • No critical issues found
+                                </p>
                             </div>
                         </div>
-                        <div class="time-label">Yesterday</div>
+                        <span style="color: var(--primary); font-size: 0.9rem;">View Report &rarr;</span>
                     </div>
-                    <div class="activity-item">
+                    <div class="activity-item link-trigger" data-target="reports" style="cursor:pointer; margin:0;">
                         <div style="display: flex; align-items: center; gap:16px;">
                             <div class="action-icon"
-                                style="margin:0; width:36px; height:36px; font-size:14px; color:#3b82f6; background:rgba(59,130,246,0.1);">
-                                🏥</div>
+                                style="margin:0; width:36px; height:36px; font-size:14px; background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                                ⚠</div>
                             <div>
-                                <h4>Hospital Saved</h4>
-                                <p>City General Hospital</p>
+                                <h4>MRI Scan - Lower Back</h4>
+                                <p style="margin-top:2px; font-size:0.85rem;">Analyzed 3 days ago • 1 minor issue
+                                    detected
+                                </p>
                             </div>
                         </div>
-                        <div class="time-label">2 days ago</div>
-                    </div>
-                    <div class="activity-item">
-                        <div style="display: flex; align-items: center; gap:16px;">
-                            <div class="action-icon" style="margin:0; width:36px; height:36px; font-size:14px;">📄</div>
-                            <div>
-                                <h4>Annual Blood Test - January 2024</h4>
-                                <p>Blood test</p>
-                            </div>
-                        </div>
-                        <div class="time-label">04/03/2026</div>
+                        <span style="color: var(--primary); font-size: 0.9rem;">View Report &rarr;</span>
                     </div>
                 </div>
+            </div>
 
-                <div>
-                    <h2 class="section-title">Daily Health Tip</h2>
-                    <div class="card"
-                        style="height: calc(100% - 40px); display: flex; flex-direction: column; justify-content: space-between;">
+            <div id="reports" class="view-section">
+                <span class="back-link link-trigger" data-target="analyzer">&larr; Back to Analyzer</span>
+
+                <div class="card"
+                    style="margin-top: 20px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2);">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                        <div class="action-icon" style="margin:0; background:rgba(34, 197, 94, 0.1); color:#22c55e;">✓
+                        </div>
+                        <h3 style="font-size: 1.1rem; color: #22c55e;">Summary: Normal</h3>
+                    </div>
+                    <p style="color: var(--text-light); font-size: 0.95rem; line-height: 1.5;">Overall, your blood work
+                        shows healthy results with one area to monitor. Your hemoglobin and glucose levels are
+                        excellent.
+                        LDL cholesterol is slightly elevated but manageable with lifestyle changes.</p>
+                </div>
+
+                <div class="card" style="margin-top: 24px;">
+                    <h3
+                        style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                        Test Results & Findings
+                        <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">3 items
+                            analyzed</span>
+                    </h3>
+
+                    <div class="result-row">
                         <div>
-                            <div style="font-size: 24px; margin-bottom: 16px;">💧</div>
-                            <h3 style="margin-bottom: 8px;">Stay Hydrated</h3>
-                            <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">Drink at least 8
-                                glasses of water daily for optimal health.</p>
+                            <h4 style="display:flex; align-items:center; gap:8px;">✓ Hemoglobin <span
+                                    class="badge badge-normal">Normal</span></h4>
+                            <div style="display: flex; gap: 40px; margin-top: 12px;">
+                                <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Your
+                                        Result</span><span style="font-size: 1.2rem; font-weight: 600;">14.5 <small
+                                            style="font-weight:normal; font-size:0.8rem;">g/dL</small></span></div>
+                                <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Normal
+                                        Range</span><span style="font-size: 1rem; font-weight: 500;">12-16 g/dL</span>
+                                </div>
+                            </div>
                         </div>
-                        <div style="display: flex; gap: 6px; margin-top: 20px;">
-                            <div style="width:24px; height:4px; background:var(--primary); border-radius:2px;"></div>
-                            <div style="width:24px; height:4px; background:rgba(255,255,255,0.2); border-radius:2px;">
+                    </div>
+
+                    <div class="result-row">
+                        <div>
+                            <h4 style="display:flex; align-items:center; gap:8px; color:#f59e0b;">⚠ LDL Cholesterol
+                                <span class="badge badge-warning">Borderline</span>
+                            </h4>
+                            <div style="display: flex; gap: 40px; margin-top: 12px;">
+                                <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Your
+                                        Result</span><span
+                                        style="font-size: 1.2rem; font-weight: 600; color:#f59e0b;">145
+                                        <small
+                                            style="font-weight:normal; font-size:0.8rem; color:var(--text-light);">mg/dL</small></span>
+                                </div>
+                                <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Normal
+                                        Range</span><span style="font-size: 1rem; font-weight: 500;">
+                                        <100 mg/dL</span>
+                                </div>
                             </div>
-                            <div style="width:24px; height:4px; background:rgba(255,255,255,0.2); border-radius:2px;">
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 12px;">Your LDL
+                                cholesterol
+                                is slightly elevated. Consider dietary changes and regular exercise.</p>
+                        </div>
+                    </div>
+
+                    <div class="result-row" style="border-bottom: none;">
+                        <div>
+                            <h4 style="display:flex; align-items:center; gap:8px;">✓ Glucose (Fasting) <span
+                                    class="badge badge-normal">Normal</span></h4>
+                            <div style="display: flex; gap: 40px; margin-top: 12px;">
+                                <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Your
+                                        Result</span><span style="font-size: 1.2rem; font-weight: 600;">92 <small
+                                            style="font-weight:normal; font-size:0.8rem;">mg/dL</small></span></div>
+                                <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Normal
+                                        Range</span><span style="font-size: 1rem; font-weight: 500;">70-100 mg/dL</span>
+                                </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card"
+                    style="margin-top: 24px; background: rgba(0, 229, 163, 0.05); border: 1px solid rgba(0, 229, 163, 0.3);">
+                    <h3
+                        style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; color: var(--primary);">
+                        ✓
+                        Recommendations</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Suggested actions
+                        based on
+                        your results</p>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div style="display: flex; gap: 12px; align-items: flex-start;">
+                            <span
+                                style="background: var(--primary); color: #000; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; flex-shrink: 0;">1</span>
+                            <span style="font-size: 0.95rem;">Maintain a heart-healthy diet with reduced saturated
+                                fats</span>
+                        </div>
+                        <div style="display: flex; gap: 12px; align-items: flex-start;">
+                            <span
+                                style="background: var(--primary); color: #000; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; flex-shrink: 0;">2</span>
+                            <span style="font-size: 0.95rem;">Aim for 30 minutes of moderate exercise daily</span>
+                        </div>
+                        <div style="display: flex; gap: 12px; align-items: flex-start;">
+                            <span
+                                style="background: var(--primary); color: #000; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; flex-shrink: 0;">3</span>
+                            <span style="font-size: 0.95rem;">Schedule a follow-up test in 6 months to monitor
+                                cholesterol</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <h2 class="section-title" style="margin-top: 40px;">⚡ Your Health At a Glance</h2>
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
-                <div class="card" style="text-align: center; padding: 20px;">
-                    <div style="font-size:24px;">📄</div>
-                    <div style="font-size:1.5rem; font-weight:bold; color:var(--primary); margin:8px 0 4px;">1</div>
-                    <div style="font-size:0.8rem; color:var(--text-muted);">Reports Analyzed</div>
-                </div>
-                <div class="card" style="text-align: center; padding: 20px;">
-                    <div style="font-size:24px;">🩺</div>
-                    <div style="font-size:1.5rem; font-weight:bold; color:#a855f7; margin:8px 0 4px;">1</div>
-                    <div style="font-size:0.8rem; color:var(--text-muted);">Symptom Checks</div>
-                </div>
-                <div class="card" style="text-align: center; padding: 20px;">
-                    <div style="font-size:24px;">🏥</div>
-                    <div style="font-size:1.5rem; font-weight:bold; color:#3b82f6; margin:8px 0 4px;">0</div>
-                    <div style="font-size:0.8rem; color:var(--text-muted);">Saved Hospitals</div>
-                </div>
-                <div class="card" style="text-align: center; padding: 20px;">
-                    <div style="font-size:24px; color:var(--primary);">📈</div>
-                    <div style="font-size:1.5rem; font-weight:bold; color:var(--primary); margin:8px 0 4px;">--</div>
-                    <div style="font-size:0.8rem; color:var(--text-muted);">Health Score</div>
-                </div>
-            </div>
-        </div>
-
-        <div id="reports" class="view-section">
-            <span class="back-link link-trigger" data-target="dashboard">&larr; Back to Dashboard</span>
-
-            <div class="card"
-                style="margin-top: 20px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2);">
-                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
-                    <div class="action-icon" style="margin:0; background:rgba(34, 197, 94, 0.1); color:#22c55e;">✓</div>
-                    <h3 style="font-size: 1.1rem; color: #22c55e;">Summary: Normal</h3>
-                </div>
-                <p style="color: var(--text-light); font-size: 0.95rem; line-height: 1.5;">Overall, your blood work
-                    shows healthy results with one area to monitor. Your hemoglobin and glucose levels are excellent.
-                    LDL cholesterol is slightly elevated but manageable with lifestyle changes.</p>
-            </div>
-
-            <div class="card" style="margin-top: 24px;">
-                <h3 style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                    Test Results & Findings
-                    <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">3 items
-                        analyzed</span>
-                </h3>
-
-                <div class="result-row">
+            <div id="symptoms" class="view-section">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
                     <div>
-                        <h4 style="display:flex; align-items:center; gap:8px;">✓ Hemoglobin <span
-                                class="badge badge-normal">Normal</span></h4>
-                        <div style="display: flex; gap: 40px; margin-top: 12px;">
-                            <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Your
-                                    Result</span><span style="font-size: 1.2rem; font-weight: 600;">14.5 <small
-                                        style="font-weight:normal; font-size:0.8rem;">g/dL</small></span></div>
-                            <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Normal
-                                    Range</span><span style="font-size: 1rem; font-weight: 500;">12-16 g/dL</span></div>
-                        </div>
+                        <h1>Symptom Checker</h1>
+                        <p style="color:var(--text-muted); margin-top:4px;">Get AI-powered health guidance</p>
                     </div>
+                    <button class="btn btn-outline">History</button>
                 </div>
 
-                <div class="result-row">
-                    <div>
-                        <h4 style="display:flex; align-items:center; gap:8px; color:#f59e0b;">⚠ LDL Cholesterol <span
-                                class="badge badge-warning">Borderline</span></h4>
-                        <div style="display: flex; gap: 40px; margin-top: 12px;">
-                            <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Your
-                                    Result</span><span style="font-size: 1.2rem; font-weight: 600; color:#f59e0b;">145
-                                    <small
-                                        style="font-weight:normal; font-size:0.8rem; color:var(--text-light);">mg/dL</small></span>
-                            </div>
-                            <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Normal
-                                    Range</span><span style="font-size: 1rem; font-weight: 500;">
-                                    <100 mg/dL</span>
-                            </div>
-                        </div>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 12px;">Your LDL cholesterol
-                            is slightly elevated. Consider dietary changes and regular exercise.</p>
-                    </div>
-                </div>
-
-                <div class="result-row" style="border-bottom: none;">
-                    <div>
-                        <h4 style="display:flex; align-items:center; gap:8px;">✓ Glucose (Fasting) <span
-                                class="badge badge-normal">Normal</span></h4>
-                        <div style="display: flex; gap: 40px; margin-top: 12px;">
-                            <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Your
-                                    Result</span><span style="font-size: 1.2rem; font-weight: 600;">92 <small
-                                        style="font-weight:normal; font-size:0.8rem;">mg/dL</small></span></div>
-                            <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Normal
-                                    Range</span><span style="font-size: 1rem; font-weight: 500;">70-100 mg/dL</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card"
-                style="margin-top: 24px; background: rgba(0, 229, 163, 0.05); border: 1px solid rgba(0, 229, 163, 0.3);">
-                <h3 style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; color: var(--primary);">✓
-                    Recommendations</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Suggested actions based on
-                    your results</p>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <div style="display: flex; gap: 12px; align-items: flex-start;">
-                        <span
-                            style="background: var(--primary); color: #000; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; flex-shrink: 0;">1</span>
-                        <span style="font-size: 0.95rem;">Maintain a heart-healthy diet with reduced saturated
-                            fats</span>
-                    </div>
-                    <div style="display: flex; gap: 12px; align-items: flex-start;">
-                        <span
-                            style="background: var(--primary); color: #000; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; flex-shrink: 0;">2</span>
-                        <span style="font-size: 0.95rem;">Aim for 30 minutes of moderate exercise daily</span>
-                    </div>
-                    <div style="display: flex; gap: 12px; align-items: flex-start;">
-                        <span
-                            style="background: var(--primary); color: #000; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; flex-shrink: 0;">3</span>
-                        <span style="font-size: 0.95rem;">Schedule a follow-up test in 6 months to monitor
-                            cholesterol</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="symptoms" class="view-section">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
-                <div>
-                    <h1>Symptom Checker</h1>
-                    <p style="color:var(--text-muted); margin-top:4px;">Get AI-powered health guidance</p>
-                </div>
-                <button class="btn btn-outline">History</button>
-            </div>
-
-            <div class="card">
-                <div class="input-group">
-                    <label>Describe how you're feeling</label>
-                    <textarea class="form-control"
-                        placeholder="e.g., I've been having a persistent headache for the past 2 days, along with mild fever and fatigue..."></textarea>
-                </div>
-
-                <div class="input-group">
-                    <label>Select common symptoms</label>
-                    <div class="pill-container">
-                        <div class="pill">Headache</div>
-                        <div class="pill">Fever</div>
-                        <div class="pill">Cough</div>
-                        <div class="pill">Fatigue</div>
-                        <div class="pill">Nausea</div>
-                        <div class="pill">Dizziness</div>
-                        <div class="pill">Chest Pain</div>
-                        <div class="pill selected">Shortness of Breath</div>
-                        <div class="pill">Sore Throat</div>
-                        <div class="pill">Body Aches</div>
-                        <div class="pill">Runny Nose</div>
-                        <div class="pill">Stomach Pain</div>
-                        <div class="pill">Back Pain</div>
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px;">
+                <div class="card">
                     <div class="input-group">
-                        <label>How long have you had these symptoms?</label>
-                        <select class="form-control">
-                            <option>1-3 days</option>
-                            <option>Less than a day</option>
-                            <option>About a week</option>
+                        <label>Describe how you're feeling</label>
+                        <textarea class="form-control"
+                            placeholder="e.g., I've been having a persistent headache for the past 2 days, along with mild fever and fatigue..."></textarea>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Select common symptoms</label>
+                        <div class="pill-container">
+                            <div class="pill">Headache</div>
+                            <div class="pill">Fever</div>
+                            <div class="pill">Cough</div>
+                            <div class="pill">Fatigue</div>
+                            <div class="pill">Nausea</div>
+                            <div class="pill">Dizziness</div>
+                            <div class="pill">Chest Pain</div>
+                            <div class="pill selected">Shortness of Breath</div>
+                            <div class="pill">Sore Throat</div>
+                            <div class="pill">Body Aches</div>
+                            <div class="pill">Runny Nose</div>
+                            <div class="pill">Stomach Pain</div>
+                            <div class="pill">Back Pain</div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px;">
+                        <div class="input-group">
+                            <label>How long have you had these symptoms?</label>
+                            <select class="form-control">
+                                <option>1-3 days</option>
+                                <option>Less than a day</option>
+                                <option>About a week</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Severity level <span style="float:right; color:#f59e0b;">5/10 -
+                                    Moderate</span></label>
+                            <input type="range" min="1" max="10" value="5" class="range-slider">
+                            <div
+                                style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
+                                <span>Mild</span><span>Severe</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary"
+                        style="width: 100%; justify-content: center; padding: 14px; font-size: 1rem; margin-top: 16px;">+
+                        Check My Symptoms</button>
+                </div>
+
+                <div class="disclaimer-box">
+                    <h4 style="color: #f59e0b; margin-bottom: 4px;">⚠ Medical Disclaimer</h4>
+                    <p>This AI-powered tool provides general health information and is not a substitute for professional
+                        medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider.</p>
+                </div>
+            </div>
+
+            <div id="hospitals" class="view-section">
+                <h1 style="margin-bottom: 8px;">Find Healthcare</h1>
+                <p style="color: var(--text-muted); margin-bottom: 24px;">Locate hospitals and specialists near you</p>
+
+                <div style="display: flex; gap: 16px; margin-bottom: 24px;">
+                    <input type="text" class="form-control" placeholder="Search hospitals, clinics..." style="flex: 2;">
+                    <select class="form-control" style="flex: 1;">
+                        <option>All Specialties</option>
+                        <option>Cardiology</option>
+                    </select>
+                    <select class="form-control" style="flex: 1;">
+                        <option>Any Distance</option>
+                        <option>Within 5 miles</option>
+                    </select>
+                    <select class="form-control" style="flex: 1;">
+                        <option>Any Rating</option>
+                        <option>4+ Stars</option>
+                    </select>
+                    <button class="btn btn-outline" style="flex: 1;">More Filters</button>
+                </div>
+
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">5 hospitals found</p>
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                    <div class="card hospital-card" onclick="openModal()">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span
+                                    style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
+                                <h3 style="font-size: 1.1rem;">City General Hospital</h3>
+                            </div>
+                            <span style="color: var(--text-muted); cursor:pointer;">♡</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.7 <span
+                                style="color: var(--text-muted);">(328 reviews)</span></p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">123 Medical Center
+                            Dr,
+                            New York, NY 10001</p>
+                        <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
+                            <span style="color: var(--primary);">0.8 mi</span>
+                            <span style="color: #f59e0b;">~15 min wait</span>
+                            <span style="color: #3b82f6;">24/7</span>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
+                            <span class="small-tag">Emergency Medicine</span><span
+                                class="small-tag">Cardiology</span><span class="small-tag">Neurology</span><span
+                                class="small-tag">Orthopedics</span><span class="small-tag">+1 more</span>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
+                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        </div>
+                    </div>
+
+                    <div class="card hospital-card">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span
+                                    style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
+                                <h3 style="font-size: 1.1rem;">St. Mary Medical Center</h3>
+                            </div>
+                            <span style="color: var(--text-muted); cursor:pointer;">♡</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.5 <span
+                                style="color: var(--text-muted);">(256 reviews)</span></p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">456 Healthcare Ave,
+                            New
+                            York, NY 10002</p>
+                        <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
+                            <span style="color: var(--primary);">1.2 mi</span>
+                            <span style="color: #f59e0b;">~25 min wait</span>
+                            <span style="color: #3b82f6;">24/7</span>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
+                            <span class="small-tag">General Practice</span><span
+                                class="small-tag">Pediatrics</span><span class="small-tag">Internal Medicine</span><span
+                                class="small-tag">Dermatology</span>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
+                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-overlay" id="hospitalModal">
+                <div class="modal-content">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                        <div>
+                            <h2 style="font-size: 1.5rem; margin-bottom: 8px;">City General Hospital</h2>
+                            <p style="color: var(--text-muted);">123 Medical Center Dr, New York, NY 10001</p>
+                        </div>
+                        <button class="btn btn-outline" style="border:none; font-size: 1.2rem;"
+                            onclick="closeModal()">✕</button>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
+                        <div class="card" style="text-align: center; padding: 16px;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #f59e0b;">4.7 ★</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">328 reviews</div>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 16px;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #ef4444;">~15 min</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Est. wait time</div>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 16px;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">0.8 mi</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Distance</div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <p style="margin-bottom: 12px; font-weight: 500;">Specialties</p>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            <span class="small-tag"
+                                style="background: rgba(0, 229, 163, 0.1); color: var(--primary);">Open
+                                24/7</span>
+                            <span class="small-tag"
+                                style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Emergency</span>
+                            <span class="small-tag" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">Free
+                                Parking</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 16px; margin-top: 32px;">
+                        <button class="btn btn-primary" style="flex: 1; justify-content: center; padding: 12px;">📞 Call
+                            Now</button>
+                        <button class="btn btn-outline" style="flex: 1; justify-content: center; padding: 12px;">Get
+                            Directions</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="firstaid" class="view-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div>
+                        <h1>First Aid Guide</h1>
+                        <p style="color: var(--text-muted); margin-top: 4px;">Get step-by-step emergency guidance</p>
+                    </div>
+                    <button class="btn btn-outline" style="color:#ef4444; border-color:rgba(239,68,68,0.5);">📞 Call
+                        911</button>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 16px;">What happened?</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">Describe the injury for
+                        personalized guidance</p>
+
+                    <div
+                        style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 40px; text-align: center; margin-bottom: 32px; cursor: pointer;">
+                        <span style="font-size: 2rem; color: #ef4444;">📷</span>
+                        <p style="margin-top: 12px; font-weight: 500;">Take a photo or upload</p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">This helps provide more accurate
+                            guidance
+                        </p>
+                    </div>
+
+                    <label
+                        style="display: block; margin-bottom: 16px; color: var(--text-muted); font-size: 0.95rem;">Select
+                        injury type</label>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px;">
+                        <div class="card" style="text-align: center; padding: 20px; cursor: pointer;">🩸<br><span
+                                style="font-size:0.9rem; display:block; margin-top:8px;">Cut / Wound</span></div>
+                        <div class="card" style="text-align: center; padding: 20px; cursor: pointer;">🔥<br><span
+                                style="font-size:0.9rem; display:block; margin-top:8px;">Burn</span></div>
+                        <div class="card" style="text-align: center; padding: 20px; cursor: pointer;">🦴<br><span
+                                style="font-size:0.9rem; display:block; margin-top:8px;">Sprain</span></div>
+                        <div class="card" style="text-align: center; padding: 20px; cursor: pointer;">⚠<br><span
+                                style="font-size:0.9rem; display:block; margin-top:8px;">Possible Fracture</span></div>
+                        <div class="card"
+                            style="text-align: center; padding: 20px; cursor: pointer; border-color: #ef4444; background: rgba(239, 68, 68, 0.05);">
+                            😮<br><span
+                                style="font-size:0.9rem; display:block; margin-top:8px; color:#ef4444;">Choking</span>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 20px; cursor: pointer;">👃<br><span
+                                style="font-size:0.9rem; display:block; margin-top:8px;">Nosebleed</span></div>
+                        <div class="card" style="text-align: center; padding: 20px; cursor: pointer;">🐝<br><span
+                                style="font-size:0.9rem; display:block; margin-top:8px;">Insect Sting</span></div>
+                        <div class="card" style="text-align: center; padding: 20px; cursor: pointer;">❗<br><span
+                                style="font-size:0.9rem; display:block; margin-top:8px;">Allergic Reaction</span></div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Describe the injury in detail</label>
+                        <textarea class="form-control"
+                            placeholder="e.g., I accidentally cut my finger while cooking. The cut is about 1 inch long and is bleeding moderately..."></textarea>
+                    </div>
+
+                    <div
+                        style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+                        <h4 style="color: #ef4444; margin-bottom: 8px;">⚠ Important</h4>
+                        <p style="font-size: 0.9rem; line-height: 1.5;">For serious injuries, severe bleeding,
+                            difficulty
+                            breathing, or any life-threatening emergency, <strong>call 911 immediately.</strong> This
+                            guide
+                            is for minor injuries only.</p>
+                    </div>
+
+                    <button class="btn"
+                        style="width: 100%; justify-content: center; padding: 16px; font-size: 1.1rem; background: #ef4444; color: #fff; border-radius: 8px;">Get
+                        First Aid Guidance</button>
+                </div>
+            </div>
+
+            <div id="profile" class="view-section">
+                <div class="card"
+                    style="background: linear-gradient(135deg, rgba(0,229,163,0.15) 0%, rgba(19,24,35,1) 100%); border-top: 4px solid var(--primary); margin-bottom: 24px;">
+                    <div style="display: flex; align-items: center; gap: 24px;">
+                        <div
+                            style="width: 80px; height: 80px; background: var(--primary); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold;">
+                            H</div>
+                        <div>
+                            <h1 style="margin-bottom: 8px; font-size: 1.8rem;">Harish Motamarri</h1>
+                            <p style="color: var(--text-muted);">✉ motamarriharish@gmail.com</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="top-stats" style="margin-bottom: 24px;">
+                    <div class="stat-box" style="flex: 1; padding: 24px;">
+                        <div style="font-size: 2rem; font-weight: bold; color:var(--primary);">1</div>
+                        <div style="font-size: 0.9rem; color: var(--text-muted);">Reports</div>
+                    </div>
+                    <div class="stat-box" style="flex: 1; padding: 24px; border-top-color: #a855f7;">
+                        <div style="font-size: 2rem; font-weight: bold; color:#a855f7;">1</div>
+                        <div style="font-size: 0.9rem; color: var(--text-muted);">Symptom Checks</div>
+                    </div>
+                    <div class="stat-box" style="flex: 1; padding: 24px; border-top-color: #3b82f6;">
+                        <div style="font-size: 2rem; font-weight: bold; color:#3b82f6;">0</div>
+                        <div style="font-size: 0.9rem; color: var(--text-muted);">Saved Hospitals</div>
+                    </div>
+                </div>
+
+                <div
+                    style="display: flex; gap: 32px; border-bottom: 1px solid var(--border-color); margin-bottom: 24px; padding-bottom: 12px;">
+                    <span
+                        style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 12px; font-weight: 500; cursor:pointer;">📄
+                        Reports</span>
+                    <span style="color: var(--text-muted); cursor:pointer;">🩺 Symptom History</span>
+                    <span style="color: var(--text-muted); cursor:pointer;">🏥 Saved Hospitals</span>
+                </div>
+
+                <div class="card"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; cursor:pointer;">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div class="action-icon" style="margin:0;">📄</div>
+                        <div>
+                            <h4 style="margin-bottom: 4px; font-size: 1rem;">Annual Blood Test - January 2024</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">04/03/2026</p>
+                        </div>
+                    </div>
+                    <span style="color: var(--text-muted); font-size: 1.5rem;">›</span>
+                </div>
+
+                <h3 style="margin-bottom: 16px; font-size: 1.1rem;">Quick Actions</h3>
+                <div style="display: flex; gap: 20px;">
+                    <div class="card link-trigger" data-target="settings"
+                        style="flex: 1; cursor: pointer; display: flex; align-items: center; gap: 12px;"><span
+                            style="font-size: 1.2rem;">⚙️</span> Settings</div>
+                    <div class="card" style="flex: 1; cursor: pointer; display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 1.2rem;">🚪</span> Sign Out
+                    </div>
+                </div>
+            </div>
+
+            <div id="settings" class="view-section">
+                <h1 style="margin-bottom: 8px;">Settings</h1>
+                <p style="color: var(--text-muted); margin-bottom: 32px;">Manage your preferences and account</p>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-size: 1.1rem;">📞
+                        Emergency Contact</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Who to contact in an
+                        emergency</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="input-group" style="margin:0;"><label>Contact Name</label><input type="text"
+                                class="form-control" placeholder="e.g., John Doe"></div>
+                        <div class="input-group" style="margin:0;"><label>Phone Number</label><input type="text"
+                                class="form-control" placeholder="+1 (555) 000-0000"></div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-size: 1.1rem;">🔔
+                        Notifications</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">How you receive
+                        updates
+                    </p>
+                    <div class="setting-row">
+                        <div>
+                            <h4 style="margin-bottom: 4px; font-weight: 500;">Email Notifications</h4>
+                            <p style="font-size:0.85rem; color:var(--text-muted);">Receive updates via email</p>
+                        </div>
+                        <div class="toggle on"></div>
+                    </div>
+                    <div class="setting-row">
+                        <div>
+                            <h4 style="margin-bottom: 4px; font-weight: 500;">Push Notifications</h4>
+                            <p style="font-size:0.85rem; color:var(--text-muted);">Receive push notifications</p>
+                        </div>
+                        <div class="toggle"></div>
+                    </div>
+                    <div class="setting-row" style="border:none;">
+                        <div>
+                            <h4 style="margin-bottom: 4px; font-weight: 500;">Health Reminders</h4>
+                            <p style="font-size:0.85rem; color:var(--text-muted);">Get periodic health tips</p>
+                        </div>
+                        <div class="toggle on"></div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-size: 1.1rem;">⚙️
+                        Preferences</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Customize your
+                        experience
+                    </p>
+                    <div class="setting-row">
+                        <div>
+                            <h4 style="margin-bottom: 4px; font-weight: 500;">Language</h4>
+                            <p style="font-size:0.85rem; color:var(--text-muted);">English</p>
+                        </div>
+                        <select class="form-control" style="width:200px;">
+                            <option>English</option>
+                            <option>Español</option>
+                            <option>Français</option>
                         </select>
                     </div>
-                    <div class="input-group">
-                        <label>Severity level <span style="float:right; color:#f59e0b;">5/10 - Moderate</span></label>
-                        <input type="range" min="1" max="10" value="5" class="range-slider">
-                        <div
-                            style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">
-                            <span>Mild</span><span>Severe</span>
+                    <div class="setting-row" style="border:none;">
+                        <div>
+                            <h4 style="margin-bottom: 4px; font-weight: 500;">Dark Mode</h4>
+                            <p style="font-size:0.85rem; color:var(--text-muted);">Use dark theme</p>
                         </div>
+                        <div class="toggle on"></div>
                     </div>
                 </div>
 
-                <button class="btn btn-primary"
-                    style="width: 100%; justify-content: center; padding: 14px; font-size: 1rem; margin-top: 16px;">+
-                    Check My Symptoms</button>
-            </div>
-
-            <div class="disclaimer-box">
-                <h4 style="color: #f59e0b; margin-bottom: 4px;">⚠ Medical Disclaimer</h4>
-                <p>This AI-powered tool provides general health information and is not a substitute for professional
-                    medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider.</p>
-            </div>
-        </div>
-
-        <div id="hospitals" class="view-section">
-            <h1 style="margin-bottom: 8px;">Find Healthcare</h1>
-            <p style="color: var(--text-muted); margin-bottom: 24px;">Locate hospitals and specialists near you</p>
-
-            <div style="display: flex; gap: 16px; margin-bottom: 24px;">
-                <input type="text" class="form-control" placeholder="Search hospitals, clinics..." style="flex: 2;">
-                <select class="form-control" style="flex: 1;">
-                    <option>All Specialties</option>
-                    <option>Cardiology</option>
-                </select>
-                <select class="form-control" style="flex: 1;">
-                    <option>Any Distance</option>
-                    <option>Within 5 miles</option>
-                </select>
-                <select class="form-control" style="flex: 1;">
-                    <option>Any Rating</option>
-                    <option>4+ Stars</option>
-                </select>
-                <button class="btn btn-outline" style="flex: 1;">More Filters</button>
-            </div>
-
-            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">5 hospitals found</p>
-
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-                <div class="card hospital-card" onclick="openModal()">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span
-                                style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
-                            <h3 style="font-size: 1.1rem;">City General Hospital</h3>
+                <div class="card" style="margin-bottom: 24px;">
+                    <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-size: 1.1rem;">
+                        🛡️
+                        Privacy & Data</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Manage your data</p>
+                    <div class="setting-row" style="cursor: pointer;">
+                        <div style="display:flex; align-items:center; gap:8px;"><span
+                                style="color:var(--text-muted);">📄</span>
+                            <h4 style="font-weight: 500;">Export My Data</h4>
                         </div>
-                        <span style="color: var(--text-muted); cursor:pointer;">♡</span>
+                        <span style="color:var(--primary); font-size:1.2rem;">›</span>
                     </div>
-                    <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.7 <span
-                            style="color: var(--text-muted);">(328 reviews)</span></p>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">123 Medical Center Dr,
-                        New York, NY 10001</p>
-                    <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
-                        <span style="color: var(--primary);">0.8 mi</span>
-                        <span style="color: #f59e0b;">~15 min wait</span>
-                        <span style="color: #3b82f6;">24/7</span>
-                    </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
-                        <span class="small-tag">Emergency Medicine</span><span class="small-tag">Cardiology</span><span
-                            class="small-tag">Neurology</span><span class="small-tag">Orthopedics</span><span
-                            class="small-tag">+1 more</span>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
-                        <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
-                    </div>
-                </div>
-
-                <div class="card hospital-card">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span
-                                style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
-                            <h3 style="font-size: 1.1rem;">St. Mary Medical Center</h3>
+                    <div class="setting-row" style="border:none; cursor: pointer;">
+                        <div style="display:flex; align-items:center; gap:8px;"><span style="color:#ef4444;">🗑️</span>
+                            <h4 style="font-weight: 500; color:#ef4444;">Delete All Data</h4>
                         </div>
-                        <span style="color: var(--text-muted); cursor:pointer;">♡</span>
+                        <span style="color:#ef4444; font-size:1.2rem;">›</span>
                     </div>
-                    <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.5 <span
-                            style="color: var(--text-muted);">(256 reviews)</span></p>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">456 Healthcare Ave, New
-                        York, NY 10002</p>
-                    <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
-                        <span style="color: var(--primary);">1.2 mi</span>
-                        <span style="color: #f59e0b;">~25 min wait</span>
-                        <span style="color: #3b82f6;">24/7</span>
-                    </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
-                        <span class="small-tag">General Practice</span><span class="small-tag">Pediatrics</span><span
-                            class="small-tag">Internal Medicine</span><span class="small-tag">Dermatology</span>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
-                        <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
-                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: center; margin-top: 32px;">
+                    <button class="btn btn-primary" style="padding: 14px 40px; font-size: 1rem;">💾 Save
+                        Settings</button>
                 </div>
             </div>
-        </div>
+        </main>
 
-        <div class="modal-overlay" id="hospitalModal">
-            <div class="modal-content">
-                <div
-                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
-                    <div>
-                        <h2 style="font-size: 1.5rem; margin-bottom: 8px;">City General Hospital</h2>
-                        <p style="color: var(--text-muted);">123 Medical Center Dr, New York, NY 10001</p>
-                    </div>
-                    <button class="btn btn-outline" style="border:none; font-size: 1.2rem;"
-                        onclick="closeModal()">✕</button>
-                </div>
-
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
-                    <div class="card" style="text-align: center; padding: 16px;">
-                        <div style="font-size: 1.5rem; font-weight: bold; color: #f59e0b;">4.7 ★</div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);">328 reviews</div>
-                    </div>
-                    <div class="card" style="text-align: center; padding: 16px;">
-                        <div style="font-size: 1.5rem; font-weight: bold; color: #ef4444;">~15 min</div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);">Est. wait time</div>
-                    </div>
-                    <div class="card" style="text-align: center; padding: 16px;">
-                        <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">0.8 mi</div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);">Distance</div>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <p style="margin-bottom: 12px; font-weight: 500;">Specialties</p>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                        <span class="small-tag" style="background: rgba(0, 229, 163, 0.1); color: var(--primary);">Open
-                            24/7</span>
-                        <span class="small-tag"
-                            style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Emergency</span>
-                        <span class="small-tag" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">Free
-                            Parking</span>
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 16px; margin-top: 32px;">
-                    <button class="btn btn-primary" style="flex: 1; justify-content: center; padding: 12px;">📞 Call
-                        Now</button>
-                    <button class="btn btn-outline" style="flex: 1; justify-content: center; padding: 12px;">Get
-                        Directions</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="firstaid" class="view-section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <div>
-                    <h1>First Aid Guide</h1>
-                    <p style="color: var(--text-muted); margin-top: 4px;">Get step-by-step emergency guidance</p>
-                </div>
-                <button class="btn btn-outline" style="color:#ef4444; border-color:rgba(239,68,68,0.5);">📞 Call
-                    911</button>
-            </div>
-
-            <div class="card">
-                <h3 style="margin-bottom: 16px;">What happened?</h3>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">Describe the injury for
-                    personalized guidance</p>
-
-                <div
-                    style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 40px; text-align: center; margin-bottom: 32px; cursor: pointer;">
-                    <span style="font-size: 2rem; color: #ef4444;">📷</span>
-                    <p style="margin-top: 12px; font-weight: 500;">Take a photo or upload</p>
-                    <p style="font-size: 0.85rem; color: var(--text-muted);">This helps provide more accurate guidance
-                    </p>
-                </div>
-
-                <label style="display: block; margin-bottom: 16px; color: var(--text-muted); font-size: 0.95rem;">Select
-                    injury type</label>
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px;">
-                    <div class="card" style="text-align: center; padding: 20px; cursor: pointer;">🩸<br><span
-                            style="font-size:0.9rem; display:block; margin-top:8px;">Cut / Wound</span></div>
-                    <div class="card" style="text-align: center; padding: 20px; cursor: pointer;">🔥<br><span
-                            style="font-size:0.9rem; display:block; margin-top:8px;">Burn</span></div>
-                    <div class="card" style="text-align: center; padding: 20px; cursor: pointer;">🦴<br><span
-                            style="font-size:0.9rem; display:block; margin-top:8px;">Sprain</span></div>
-                    <div class="card" style="text-align: center; padding: 20px; cursor: pointer;">⚠<br><span
-                            style="font-size:0.9rem; display:block; margin-top:8px;">Possible Fracture</span></div>
-                    <div class="card"
-                        style="text-align: center; padding: 20px; cursor: pointer; border-color: #ef4444; background: rgba(239, 68, 68, 0.05);">
-                        😮<br><span
-                            style="font-size:0.9rem; display:block; margin-top:8px; color:#ef4444;">Choking</span></div>
-                    <div class="card" style="text-align: center; padding: 20px; cursor: pointer;">👃<br><span
-                            style="font-size:0.9rem; display:block; margin-top:8px;">Nosebleed</span></div>
-                    <div class="card" style="text-align: center; padding: 20px; cursor: pointer;">🐝<br><span
-                            style="font-size:0.9rem; display:block; margin-top:8px;">Insect Sting</span></div>
-                    <div class="card" style="text-align: center; padding: 20px; cursor: pointer;">❗<br><span
-                            style="font-size:0.9rem; display:block; margin-top:8px;">Allergic Reaction</span></div>
-                </div>
-
-                <div class="input-group">
-                    <label>Describe the injury in detail</label>
-                    <textarea class="form-control"
-                        placeholder="e.g., I accidentally cut my finger while cooking. The cut is about 1 inch long and is bleeding moderately..."></textarea>
-                </div>
-
-                <div
-                    style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
-                    <h4 style="color: #ef4444; margin-bottom: 8px;">⚠ Important</h4>
-                    <p style="font-size: 0.9rem; line-height: 1.5;">For serious injuries, severe bleeding, difficulty
-                        breathing, or any life-threatening emergency, <strong>call 911 immediately.</strong> This guide
-                        is for minor injuries only.</p>
-                </div>
-
-                <button class="btn"
-                    style="width: 100%; justify-content: center; padding: 16px; font-size: 1.1rem; background: #ef4444; color: #fff; border-radius: 8px;">Get
-                    First Aid Guidance</button>
-            </div>
-        </div>
-
-        <div id="profile" class="view-section">
-            <div class="card"
-                style="background: linear-gradient(135deg, rgba(0,229,163,0.15) 0%, rgba(19,24,35,1) 100%); border-top: 4px solid var(--primary); margin-bottom: 24px;">
-                <div style="display: flex; align-items: center; gap: 24px;">
-                    <div
-                        style="width: 80px; height: 80px; background: var(--primary); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold;">
-                        H</div>
-                    <div>
-                        <h1 style="margin-bottom: 8px; font-size: 1.8rem;">Harish Motamarri</h1>
-                        <p style="color: var(--text-muted);">✉ motamarriharish@gmail.com</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="top-stats" style="margin-bottom: 24px;">
-                <div class="stat-box" style="flex: 1; padding: 24px;">
-                    <div style="font-size: 2rem; font-weight: bold; color:var(--primary);">1</div>
-                    <div style="font-size: 0.9rem; color: var(--text-muted);">Reports</div>
-                </div>
-                <div class="stat-box" style="flex: 1; padding: 24px; border-top-color: #a855f7;">
-                    <div style="font-size: 2rem; font-weight: bold; color:#a855f7;">1</div>
-                    <div style="font-size: 0.9rem; color: var(--text-muted);">Symptom Checks</div>
-                </div>
-                <div class="stat-box" style="flex: 1; padding: 24px; border-top-color: #3b82f6;">
-                    <div style="font-size: 2rem; font-weight: bold; color:#3b82f6;">0</div>
-                    <div style="font-size: 0.9rem; color: var(--text-muted);">Saved Hospitals</div>
-                </div>
-            </div>
-
-            <div
-                style="display: flex; gap: 32px; border-bottom: 1px solid var(--border-color); margin-bottom: 24px; padding-bottom: 12px;">
-                <span
-                    style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 12px; font-weight: 500; cursor:pointer;">📄
-                    Reports</span>
-                <span style="color: var(--text-muted); cursor:pointer;">🩺 Symptom History</span>
-                <span style="color: var(--text-muted); cursor:pointer;">🏥 Saved Hospitals</span>
-            </div>
-
-            <div class="card"
-                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; cursor:pointer;">
-                <div style="display: flex; align-items: center; gap: 16px;">
-                    <div class="action-icon" style="margin:0;">📄</div>
-                    <div>
-                        <h4 style="margin-bottom: 4px; font-size: 1rem;">Annual Blood Test - January 2024</h4>
-                        <p style="font-size: 0.85rem; color: var(--text-muted);">04/03/2026</p>
-                    </div>
-                </div>
-                <span style="color: var(--text-muted); font-size: 1.5rem;">›</span>
-            </div>
-
-            <h3 style="margin-bottom: 16px; font-size: 1.1rem;">Quick Actions</h3>
-            <div style="display: flex; gap: 20px;">
-                <div class="card link-trigger" data-target="settings"
-                    style="flex: 1; cursor: pointer; display: flex; align-items: center; gap: 12px;"><span
-                        style="font-size: 1.2rem;">⚙️</span> Settings</div>
-                <div class="card" style="flex: 1; cursor: pointer; display: flex; align-items: center; gap: 12px;"><span
-                        style="font-size: 1.2rem;">🚪</span> Sign Out</div>
-            </div>
-        </div>
-
-        <div id="settings" class="view-section">
-            <h1 style="margin-bottom: 8px;">Settings</h1>
-            <p style="color: var(--text-muted); margin-bottom: 32px;">Manage your preferences and account</p>
-
-            <div class="card" style="margin-bottom: 24px;">
-                <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-size: 1.1rem;">📞
-                    Emergency Contact</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Who to contact in an
-                    emergency</p>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div class="input-group" style="margin:0;"><label>Contact Name</label><input type="text"
-                            class="form-control" placeholder="e.g., John Doe"></div>
-                    <div class="input-group" style="margin:0;"><label>Phone Number</label><input type="text"
-                            class="form-control" placeholder="+1 (555) 000-0000"></div>
-                </div>
-            </div>
-
-            <div class="card" style="margin-bottom: 24px;">
-                <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-size: 1.1rem;">🔔
-                    Notifications</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">How you receive updates
-                </p>
-                <div class="setting-row">
-                    <div>
-                        <h4 style="margin-bottom: 4px; font-weight: 500;">Email Notifications</h4>
-                        <p style="font-size:0.85rem; color:var(--text-muted);">Receive updates via email</p>
-                    </div>
-                    <div class="toggle on"></div>
-                </div>
-                <div class="setting-row">
-                    <div>
-                        <h4 style="margin-bottom: 4px; font-weight: 500;">Push Notifications</h4>
-                        <p style="font-size:0.85rem; color:var(--text-muted);">Receive push notifications</p>
-                    </div>
-                    <div class="toggle"></div>
-                </div>
-                <div class="setting-row" style="border:none;">
-                    <div>
-                        <h4 style="margin-bottom: 4px; font-weight: 500;">Health Reminders</h4>
-                        <p style="font-size:0.85rem; color:var(--text-muted);">Get periodic health tips</p>
-                    </div>
-                    <div class="toggle on"></div>
-                </div>
-            </div>
-
-            <div class="card" style="margin-bottom: 24px;">
-                <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-size: 1.1rem;">⚙️
-                    Preferences</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Customize your experience
-                </p>
-                <div class="setting-row">
-                    <div>
-                        <h4 style="margin-bottom: 4px; font-weight: 500;">Language</h4>
-                        <p style="font-size:0.85rem; color:var(--text-muted);">English</p>
-                    </div>
-                    <select class="form-control" style="width:200px;">
-                        <option>English</option>
-                        <option>Español</option>
-                        <option>Français</option>
-                    </select>
-                </div>
-                <div class="setting-row" style="border:none;">
-                    <div>
-                        <h4 style="margin-bottom: 4px; font-weight: 500;">Dark Mode</h4>
-                        <p style="font-size:0.85rem; color:var(--text-muted);">Use dark theme</p>
-                    </div>
-                    <div class="toggle on"></div>
-                </div>
-            </div>
-
-            <div class="card" style="margin-bottom: 24px;">
-                <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-size: 1.1rem;">🛡️
-                    Privacy & Data</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Manage your data</p>
-                <div class="setting-row" style="cursor: pointer;">
-                    <div style="display:flex; align-items:center; gap:8px;"><span
-                            style="color:var(--text-muted);">📄</span>
-                        <h4 style="font-weight: 500;">Export My Data</h4>
-                    </div>
-                    <span style="color:var(--primary); font-size:1.2rem;">›</span>
-                </div>
-                <div class="setting-row" style="border:none; cursor: pointer;">
-                    <div style="display:flex; align-items:center; gap:8px;"><span style="color:#ef4444;">🗑️</span>
-                        <h4 style="font-weight: 500; color:#ef4444;">Delete All Data</h4>
-                    </div>
-                    <span style="color:#ef4444; font-size:1.2rem;">›</span>
-                </div>
-            </div>
-
-            <div style="display: flex; justify-content: center; margin-top: 32px;">
-                <button class="btn btn-primary" style="padding: 14px 40px; font-size: 1rem;">💾 Save Settings</button>
-            </div>
-        </div>
-    </main>
-
-    <script src="assets/js/dashboard.js"></script>
+        <script src="assets/js/dashboard.js"></script>
 </body>
 
 </html>
