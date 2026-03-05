@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediMind AI - Your Personal AI Doctor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/landing.css">
+</head>
+
+<body>
+    <!-- Premium Background Orbs -->
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <nav id="navbar">
+        <div class="container flex items-center justify-between">
+            <div class="flex items-center gap-2 font-bold" style="font-size: 1.2rem;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-green)"
+                    stroke-width="2">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+                MediMind <span class="text-gradient">AI</span>
+            </div>
+            <div class="nav-links flex gap-6" style="display: none;"> <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#technology">Technology</a>
+                <a href="#impact">Impact</a>
+                <a href="#demo">Demo</a>
+            </div>
+            <div class="flex gap-4">
+                <a href="#" class="btn btn-outline" style="border:none;">Sign In</a>
+                <a href="#" class="btn btn-gradient">Get Early Access</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container grid grid-cols-2 gap-12 items-center">
+            <div>
+                <div class="badge text-muted">✦ AI-POWERED HEALTHCARE INTELLIGENCE</div>
+                <h1>Your Personal <br><span class="text-gradient">AI Doctor</span><br>Is Here.</h1>
+                <p class="text-muted" style="font-size: 1.15rem; margin-bottom: 32px; max-width: 480px;">
+                    MediMind transforms complex prescriptions, lab reports, and symptoms into clear, actionable health
+                    insights. Understand your health like never before.
+                </p>
+                <div class="flex gap-4 items-center">
+                    <a href="#demo" class="btn btn-gradient" style="padding: 14px 28px; font-size: 1.05rem;">Try
+                        MediMind Free →</a>
+                    <a href="#" class="btn btn-outline" style="padding: 14px 28px; font-size: 1.05rem;">▶ Watch Demo</a>
+                </div>
+
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <h4>98%</h4>
+                        <p>Accuracy</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4>6</h4>
+                        <p>AI Features</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4>
+                            <3s< /h4>
+                                <p>Response</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-visual justify-center flex">
+                <div class="mock-window">
+                    <div class="mock-header">
+                        <div class="mock-dot red"></div>
+                        <div class="mock-dot yellow"></div>
+                        <div class="mock-dot green"></div>
+                    </div>
+                    <div style="padding: 24px; background: #0b1120;">
+                        <div
+                            style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 0.85rem;">
+                            📄 PRESCRIPTION UPLOADED
+                        </div>
+                        <div
+                            style="border-left: 2px solid var(--primary-green); padding-left: 16px; margin-bottom: 16px;">
+                            <p class="font-bold text-gradient" style="font-size: 0.8rem; margin-bottom: 4px;">AI
+                                ANALYZING...</p>
+                            <p style="font-size: 0.95rem;"><strong>Metformin 500mg</strong> — Used to control blood
+                                sugar levels in Type 2 diabetes. Take with meals to reduce stomach upset. Common side
+                                effects include nausea and stomach discomfort.</p>
+                        </div>
+                        <div
+                            style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px;">
+                            <p style="color: var(--accent-green); font-size: 0.85rem; font-weight: 600;">✓ Medication
+                                Schedule Set</p>
+                            <p class="text-muted" style="font-size: 0.8rem;">Next dose: 8:00 AM with Breakfast</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="problem" style="background: rgba(255,255,255,0.02); border-top: 1px solid var(--border-color);">
+        <div class="container">
+            <div class="section-header">
+                <div class="badge" style="margin-bottom: 16px; color: var(--text-muted);">THE PROBLEM</div>
+                <h2>Medical Information<br>Shouldn't Be A Mystery</h2>
+                <p>Millions of patients leave hospitals confused, overwhelmed, and afraid — holding papers they can't
+                    understand.</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6" style="margin-bottom: 60px;">
+                <div class="card problem-card">
+                    <div class="icon">📄</div>
+                    <h3 class="font-semibold" style="margin-bottom: 8px;">Complex Prescriptions</h3>
+                    <p class="text-muted" style="font-size: 0.9rem;">76% of patients cannot fully understand their
+                        prescription instructions, leading to incorrect dosage and dangerous medication errors.</p>
+                </div>
+                <div class="card problem-card">
+                    <div class="icon">🧪</div>
+                    <h3 class="font-semibold" style="margin-bottom: 8px;">Confusing Lab Reports</h3>
+                    <p class="text-muted" style="font-size: 0.9rem;">Lab values filled with acronyms and ranges that
+                        mean nothing to the average patient, causing unnecessary anxiety or missed warnings.</p>
+                </div>
+                <div class="card problem-card">
+                    <div class="icon">❓</div>
+                    <h3 class="font-semibold" style="margin-bottom: 8px;">Symptom Uncertainty</h3>
+                    <p class="text-muted" style="font-size: 0.9rem;">Not knowing whether symptoms are emergencies or
+                        minor issues leads to delayed care or unnecessary ER visits costing billions annually.</p>
+                </div>
+                <div class="card problem-card">
+                    <div class="icon">💊</div>
+                    <h3 class="font-semibold" style="margin-bottom: 8px;">Medication Non-Compliance</h3>
+                    <p class="text-muted" style="font-size: 0.9rem;">50% of patients don't take medications as
+                        prescribed due to confusion about schedules, interactions, and side effects.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-4 gap-4 text-center border-t pt-8"
+                style="border-top: 1px solid var(--border-color); padding-top: 40px;">
+                <div>
+                    <h3 class="font-bold text-gradient" style="font-size: 2rem;">3 in 4</h3>
+                    <p class="text-muted" style="font-size: 0.85rem;">patients confused</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gradient" style="font-size: 2rem;">50%</h3>
+                    <p class="text-muted" style="font-size: 0.85rem;">miss doses</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gradient" style="font-size: 2rem;">$528B</h3>
+                    <p class="text-muted" style="font-size: 0.85rem;">wasted yearly</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gradient" style="font-size: 2rem;">1 in 5</h3>
+                    <p class="text-muted" style="font-size: 0.85rem;">misdiagnosed</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container grid grid-cols-2 gap-12 items-center">
+            <div>
+                <div class="badge text-muted" style="margin-bottom: 16px;">THE SOLUTION</div>
+                <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 16px;">AI That Speaks<br>Your Language
+                </h2>
+                <p class="text-muted" style="margin-bottom: 24px;">MediMind AI bridges the gap between complex medical
+                    data and patient understanding. Upload any document, describe any symptom, ask any question — and
+                    receive clear, human-friendly explanations in seconds.</p>
+                <ul class="text-muted"
+                    style="list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px;">
+                    <li>✓ Plain-language prescription explanations</li>
+                    <li>✓ Lab result interpretation with severity alerts</li>
+                    <li>✓ Symptom-to-condition intelligence</li>
+                    <li>✓ 24/7 AI medical assistant</li>
+                </ul>
+                <a href="#how-it-works" class="text-gradient font-semibold text-decoration-none">See How It Works →</a>
+            </div>
+
+            <div class="card" style="padding: 0; overflow: hidden; display: flex;">
+                <div
+                    style="flex: 1; padding: 24px; background: rgba(255,255,255,0.02); border-right: 1px solid var(--border-color);">
+                    <p class="text-muted font-semibold text-center" style="font-size: 0.8rem; margin-bottom: 16px;">
+                        Before MediMind</p>
+                    <div style="font-family: monospace; font-size: 0.75rem; color: #64748b; line-height: 2;">
+                        Atorvastatin Ca 20mg Tab<br>
+                        HMG-CoA Reductase Inhibitor<br>
+                        Hyperlipidemia prophylaxis<br>
+                        Titrate PRN based on LDL-C<br>
+                        Monitor ALT/AST q6mo<br>
+                        CI: Active hepatic disease
+                    </div>
+                </div>
+                <div style="flex: 1; padding: 24px; background: rgba(0, 229, 163, 0.05);">
+                    <p class="text-gradient font-semibold text-center" style="font-size: 0.8rem; margin-bottom: 16px;">
+                        After MediMind</p>
+                    <div style="font-size: 0.85rem; line-height: 1.6;">
+                        <strong>Cholesterol Medication (Atorvastatin 20mg)</strong><br><br>
+                        • Take 1 pill daily, with or without food.<br>
+                        • <strong>Purpose:</strong> Lowers bad cholesterol to reduce heart disease risk.<br>
+                        • <strong>Warning:</strong> Contact doctor if you experience unexplained muscle pain or
+                        weakness.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="how-it-works" style="background: rgba(255,255,255,0.02); border-top: 1px solid var(--border-color);">
+        <div class="container">
+            <div class="section-header">
+                <div class="badge" style="margin-bottom: 16px;">HOW IT WORKS</div>
+                <h2>From Confusion to Clarity<br>in 3 Simple Steps</h2>
+            </div>
+
+            <div class="grid grid-cols-3 gap-8">
+                <div class="card text-center relative">
+                    <div
+                        style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-dark); border: 2px solid var(--primary-green); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 0 auto 16px;">
+                        01</div>
+                    <h3 class="font-semibold" style="margin-bottom: 12px;">Upload or Describe</h3>
+                    <p class="text-muted" style="font-size: 0.9rem;">Upload your prescription, lab report, or medical
+                        document — or simply type your symptoms in plain language.</p>
+                </div>
+                <div class="card text-center">
+                    <div
+                        style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-dark); border: 2px solid var(--primary-purple); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 0 auto 16px;">
+                        02</div>
+                    <h3 class="font-semibold" style="margin-bottom: 12px;">AI Analyzes Instantly</h3>
+                    <p class="text-muted" style="font-size: 0.9rem;">Our medical AI — trained on millions of clinical
+                        records — instantly analyzes your data, identifies key insights, and detects anomalies.</p>
+                </div>
+                <div class="card text-center">
+                    <div
+                        style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-dark); border: 2px solid var(--accent-green); color: var(--text-main); display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 0 auto 16px;">
+                        03</div>
+                    <h3 class="font-semibold" style="margin-bottom: 12px;">Receive Clear Insights</h3>
+                    <p class="text-muted" style="font-size: 0.9rem;">Get a comprehensive, plain-English breakdown with
+                        actionable recommendations, severity indicators, and follow-up suggestions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features">
+        <div class="container">
+            <div class="section-header">
+                <div class="badge" style="margin-bottom: 16px;">FEATURES</div>
+                <h2>Six Powerful AI Capabilities<br>Built for Patients</h2>
+            </div>
+
+            <div class="grid grid-cols-3 gap-6">
+                <div class="card relative overflow-hidden">
+                    <span
+                        style="position:absolute; top:12px; right:12px; font-size: 0.7rem; background: rgba(0,229,163,0.1); color: var(--primary-green); padding: 4px 8px; border-radius: 4px;">Most
+                        Used Feature</span>
+                    <div style="font-size: 24px; margin-bottom: 16px;">📄</div>
+                    <h3 class="font-semibold" style="margin-bottom: 8px;">Prescription Decoder</h3>
+                    <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 16px;">Upload any handwritten or
+                        digital prescription. AI identifies each medicine, explains its purpose, correct dosage, timing,
+                        potential side effects, and dangerous interactions.</p>
+                    <a href="#" class="text-gradient"
+                        style="font-size: 0.85rem; font-weight: 600; text-decoration: none;">Try Now →</a>
+                </div>
+                <div class="card relative overflow-hidden">
+                    <span
+                        style="position:absolute; top:12px; right:12px; font-size: 0.7rem; background: rgba(139,92,246,0.1); color: var(--primary-purple); padding: 4px 8px; border-radius: 4px;">Highest
+                        Accuracy</span>
+                    <div style="font-size: 24px; margin-bottom: 16px;">🧪</div>
+                    <h3 class="font-semibold" style="margin-bottom: 8px;">Lab Report Intelligence</h3>
+                    <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 16px;">Paste or upload lab results.
+                        AI highlights abnormal values in red/yellow, explains what each biomarker means, and assesses
+                        urgency level from 1-5.</p>
+                    <a href="#" class="text-gradient"
+                        style="font-size: 0.85rem; font-weight: 600; text-decoration: none;">Try Now →</a>
+                </div>
+                <div class="card relative overflow-hidden">
+                    <span
+                        style="position:absolute; top:12px; right:12px; font-size: 0.7rem; background: rgba(16,185,129,0.1); color: var(--accent-green); padding: 4px 8px; border-radius: 4px;">Real-time
+                        Analysis</span>
+                    <div style="font-size: 24px; margin-bottom: 16px;">🩺</div>
+                    <h3 class="font-semibold" style="margin-bottom: 8px;">Symptom Checker Pro</h3>
+                    <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 16px;">Enter symptoms in natural
+                        language. AI maps to possible conditions, ranks by likelihood, assigns urgency level, and
+                        recommends whether to seek immediate care.</p>
+                    <a href="#" class="text-gradient"
+                        style="font-size: 0.85rem; font-weight: 600; text-decoration: none;">Try Now →</a>
+                </div>
+                <div class="card">
+                    <div style="font-size: 24px; margin-bottom: 16px;">💬</div>
+                    <h3 class="font-semibold" style="margin-bottom: 8px;">24/7 AI Health Chatbot</h3>
+                    <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 16px;">Ask anything. Get medical
+                        clarity. A conversational AI trained on medical literature. Ask about symptoms, drug
+                        interactions, or anything health-related.</p>
+                    <a href="#" class="text-gradient"
+                        style="font-size: 0.85rem; font-weight: 600; text-decoration: none;">Try Now →</a>
+                </div>
+                <div class="card">
+                    <div style="font-size: 24px; margin-bottom: 16px;">🗓️</div>
+                    <h3 class="font-semibold" style="margin-bottom: 8px;">Smart Medication Planner</h3>
+                    <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 16px;">Never miss a dose. Input your
+                        prescriptions and AI generates a personalized medication schedule with reminders, meal timing
+                        instructions, and interaction warnings.</p>
+                    <a href="#" class="text-gradient"
+                        style="font-size: 0.85rem; font-weight: 600; text-decoration: none;">Try Now →</a>
+                </div>
+                <div class="card">
+                    <div style="font-size: 24px; margin-bottom: 16px;">📝</div>
+                    <h3 class="font-semibold" style="margin-bottom: 8px;">Medical Report Simplifier</h3>
+                    <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 16px;">Translate medical jargon to
+                        plain English. Upload any doctor's note or discharge summary. AI rewrites it in simple language
+                        a patient can understand.</p>
+                    <a href="#" class="text-gradient"
+                        style="font-size: 0.85rem; font-weight: 600; text-decoration: none;">Try Now →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="demo"
+        style="background: rgba(255,255,255,0.02); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+        <div class="container text-center">
+            <div class="badge"
+                style="margin-bottom: 16px; color: var(--accent-red); background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.2);">
+                ● LIVE DEMO</div>
+            <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 16px;">See MediMind AI<br>In Action — Right
+                Now</h2>
+            <p class="text-muted" style="max-width: 600px; margin: 0 auto 40px;">No signup required. Upload a sample
+                prescription or lab report and watch AI explain it in plain language within seconds.</p>
+
+            <div class="card" style="max-width: 800px; margin: 0 auto; text-align: left;">
+                <div class="demo-tabs">
+                    <button class="tab-btn active" onclick="switchTab('presc')">📄 Prescription</button>
+                    <button class="tab-btn" onclick="switchTab('lab')">🧪 Lab Report</button>
+                    <button class="tab-btn" onclick="switchTab('symp')">🩺 Symptoms</button>
+                    <button class="tab-btn" onclick="switchTab('ask')">💬 Ask AI</button>
+                </div>
+
+                <div
+                    style="background: #0f172a; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 24px;">
+                    <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 8px;">Sample Input:</p>
+                    <p id="demo-input-text" style="font-family: monospace; font-size: 0.9rem; color: #cbd5e1;">
+                        Amoxicillin 500mg TID x 7d, Pantoprazole 40mg QD AC</p>
+                </div>
+
+                <button class="btn btn-gradient" style="width: 100%; padding: 14px; font-size: 1.05rem;"
+                    onclick="simulateAnalysis()">Try with Sample Data →</button>
+
+                <div id="demo-result"
+                    style="display: none; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border-color);">
+                    <div class="flex items-center gap-2" style="margin-bottom: 16px;">
+                        <span style="color: var(--accent-green);">✓</span>
+                        <span class="font-semibold text-gradient">Analysis Complete</span>
+                    </div>
+                    <div id="demo-result-text"
+                        style="font-size: 0.9rem; line-height: 1.6; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px;">
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px;">
+                <p class="text-muted" style="margin-bottom: 16px; font-size: 0.9rem;">Or get instant access →</p>
+                <div class="flex justify-center gap-4">
+                    <input type="email" placeholder="Enter your email"
+                        style="background: var(--bg-card); border: 1px solid var(--border-color); color: white; padding: 12px 20px; border-radius: 8px; width: 300px; outline: none;">
+                    <button class="btn btn-outline" style="background: white; color: black; font-weight: bold;">Join
+                        Waitlist</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="technology">
+        <div class="container">
+            <div class="section-header">
+                <div class="badge" style="margin-bottom: 16px;">TECHNOLOGY</div>
+                <h2>Medical AI Built on<br>World-Class Infrastructure</h2>
+            </div>
+
+            <div class="grid grid-cols-2 gap-8">
+                <div class="flex flex-col gap-4">
+                    <div class="card" style="padding: 24px;">
+                        <h4 class="font-semibold" style="margin-bottom: 8px; color: var(--primary-green);">Large Language
+                            Models</h4>
+                        <p class="text-muted" style="font-size: 0.85rem;">Fine-tuned medical LLMs trained on PubMed,
+                            clinical guidelines, and pharmacological databases for maximum accuracy.</p>
+                    </div>
+                    <div class="card" style="padding: 24px;">
+                        <h4 class="font-semibold" style="margin-bottom: 8px; color: var(--accent-green);">HIPAA-Grade
+                            Security</h4>
+                        <p class="text-muted" style="font-size: 0.85rem;">End-to-end encryption, zero-knowledge
+                            architecture, and complete data anonymization — your health data stays private.</p>
+                    </div>
+                    <div class="card" style="padding: 24px;">
+                        <h4 class="font-semibold" style="margin-bottom: 8px; color: var(--primary-purple);">Real-time
+                            Processing</h4>
+                        <p class="text-muted" style="font-size: 0.85rem;">Sub-3-second analysis powered by optimized
+                            inference pipelines and edge computing architecture.</p>
+                    </div>
+                </div>
+                <div class="card flex flex-col justify-center"
+                    style="background: linear-gradient(135deg, rgba(0, 229, 163, 0.05), rgba(139, 92, 246, 0.05));">
+                    <div class="badge" style="margin-bottom: 24px; align-self: flex-start;">IMPACT</div>
+                    <h3 style="font-size: 2rem; font-weight: 800; margin-bottom: 32px;">Real Results for<br>Real
+                        Patients</h3>
+
+                    <div class="grid grid-cols-2 gap-6" style="margin-bottom: 32px;">
+                        <div>
+                            <div class="text-gradient" style="font-size: 2.5rem; font-weight: 800;">94%</div>
+                            <p class="text-muted" style="font-size: 0.85rem;">Patient comprehension improvement</p>
+                        </div>
+                        <div>
+                            <div class="text-gradient" style="font-size: 2.5rem; font-weight: 800;">98.7%</div>
+                            <p class="text-muted" style="font-size: 0.85rem;">Prescription interpretation accuracy</p>
+                        </div>
+                    </div>
+
+                    <div
+                        style="background: rgba(255,255,255,0.05); padding: 24px; border-radius: 12px; border-left: 4px solid var(--primary-green);">
+                        <p style="font-style: italic; font-size: 0.9rem; margin-bottom: 12px;">"I finally understood why
+                            I was taking 6 different medications. MediMind explained each one in 30 seconds. My doctor
+                            was amazed I came back with the right questions."</p>
+                        <p class="font-semibold" style="font-size: 0.85rem;">— Riya S. <span
+                                class="text-muted font-normal">| Diabetes Patient, Mumbai</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section style="background: rgba(255,255,255,0.02); border-top: 1px solid var(--border-color);">
+        <div class="container">
+            <div class="section-header">
+                <div class="badge" style="margin-bottom: 16px;">ROADMAP</div>
+                <h2>The Future of<br>Patient Intelligence</h2>
+            </div>
+
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px 0;">
+                <div class="roadmap-line">
+                    <div class="roadmap-item">
+                        <div class="roadmap-dot completed"></div>
+                        <div class="badge"
+                            style="margin-bottom: 8px; color: var(--accent-green); border-color: var(--accent-green);">✓
+                            Complete</div>
+                        <h3 class="font-semibold" style="margin-bottom: 8px;">Phase 1: Core AI Features</h3>
+                        <p class="text-muted" style="font-size: 0.9rem;">Prescription Interpreter, Lab Report Analyzer,
+                            Symptom Checker, AI Chatbot.</p>
+                    </div>
+                    <div class="roadmap-item">
+                        <div class="roadmap-dot" style="background: var(--primary-green);"></div>
+                        <div class="badge"
+                            style="margin-bottom: 8px; color: var(--primary-green); border-color: var(--primary-green);">●
+                            In Progress</div>
+                        <h3 class="font-semibold" style="margin-bottom: 8px;">Phase 2: Smart Integrations</h3>
+                        <p class="text-muted" style="font-size: 0.9rem;">Wearable device integration (Apple Watch,
+                            Fitbit), EHR system connectivity.</p>
+                    </div>
+                    <div class="roadmap-item" style="margin-bottom: 0;">
+                        <div class="roadmap-dot" style="background: var(--text-muted);"></div>
+                        <div class="badge" style="margin-bottom: 8px;">Q3 2025</div>
+                        <h3 class="font-semibold" style="margin-bottom: 8px;">Phase 3: Predictive Health</h3>
+                        <p class="text-muted" style="font-size: 0.9rem;">Proactive health risk prediction, Chronic
+                            disease management AI.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container text-center">
+            <div class="badge" style="margin-bottom: 16px;">THE TEAM</div>
+            <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 60px;">Built by People Who<br>Care About
+                Healthcare</h2>
+
+            <div class="grid grid-cols-4 gap-6">
+                <div class="card text-center" style="padding: 24px;">
+                    <div
+                        style="width: 64px; height: 64px; border-radius: 50%; background: rgba(0,229,163,0.2); color: var(--primary-green); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; margin: 0 auto 16px;">
+                        AM</div>
+                    <h4 class="font-semibold">Aryan Mehta</h4>
+                    <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 12px;">Founder & CEO</p>
+                    <p style="font-size: 0.75rem; color: #64748b;">Ex-Google Health Engineer. AI/ML specialist with 5
+                        years in medical NLP.</p>
+                </div>
+                <div class="card text-center" style="padding: 24px;">
+                    <div
+                        style="width: 64px; height: 64px; border-radius: 50%; background: rgba(139,92,246,0.2); color: var(--primary-purple); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; margin: 0 auto 16px;">
+                        SK</div>
+                    <h4 class="font-semibold">Dr. Sneha Krishnan</h4>
+                    <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 12px;">Chief Medical Advisor</p>
+                    <p style="font-size: 0.75rem; color: #64748b;">MBBS, MD Internal Medicine. 8 years clinical
+                        experience at AIIMS.</p>
+                </div>
+                <div class="card text-center" style="padding: 24px;">
+                    <div
+                        style="width: 64px; height: 64px; border-radius: 50%; background: rgba(16,185,129,0.2); color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; margin: 0 auto 16px;">
+                        PS</div>
+                    <h4 class="font-semibold">Priya Sharma</h4>
+                    <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 12px;">Lead AI Engineer</p>
+                    <p style="font-size: 0.75rem; color: #64748b;">ML researcher. Previously at DeepMind. Specialized in
+                        biomedical language models.</p>
+                </div>
+                <div class="card text-center" style="padding: 24px;">
+                    <div
+                        style="width: 64px; height: 64px; border-radius: 50%; background: rgba(239,68,68,0.2); color: var(--accent-red); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; margin: 0 auto 16px;">
+                        RV</div>
+                    <h4 class="font-semibold">Rahul Verma</h4>
+                    <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 12px;">Product & Design</p>
+                    <p style="font-size: 0.75rem; color: #64748b;">Former Razorpay designer. Obsessed with making
+                        complex things simple.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer style="background: #05080f; border-top: 1px solid var(--border-color); padding: 80px 0 40px;">
+        <div class="container">
+            <div class="grid grid-cols-4 gap-8" style="margin-bottom: 60px;">
+                <div style="grid-column: span 1;">
+                    <div class="flex items-center gap-2 font-bold" style="font-size: 1.2rem; margin-bottom: 16px;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-green)"
+                            stroke-width="2">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        </svg>
+                        MediMind <span class="text-gradient">AI</span>
+                    </div>
+                    <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 24px;">AI-powered patient
+                        intelligence. Transforming complex medical information into clear, actionable health insights.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold" style="margin-bottom: 16px; font-size: 0.95rem;">Product</h4>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem;"
+                        class="text-muted">
+                        <li><a href="#" style="color: inherit; text-decoration: none;">Features</a></li>
+                        <li><a href="#" style="color: inherit; text-decoration: none;">How It Works</a></li>
+                        <li><a href="#" style="color: inherit; text-decoration: none;">Pricing</a></li>
+                        <li><a href="#" style="color: inherit; text-decoration: none;">Roadmap</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold" style="margin-bottom: 16px; font-size: 0.95rem;">Company</h4>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem;"
+                        class="text-muted">
+                        <li><a href="#" style="color: inherit; text-decoration: none;">About</a></li>
+                        <li><a href="#" style="color: inherit; text-decoration: none;">Blog</a></li>
+                        <li><a href="#" style="color: inherit; text-decoration: none;">Careers</a></li>
+                        <li><a href="#" style="color: inherit; text-decoration: none;">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold" style="margin-bottom: 16px; font-size: 0.95rem;">Legal</h4>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem;"
+                        class="text-muted">
+                        <li><a href="#" style="color: inherit; text-decoration: none;">Privacy Policy</a></li>
+                        <li><a href="#" style="color: inherit; text-decoration: none;">Terms of Service</a></li>
+                        <li><a href="#" style="color: inherit; text-decoration: none;">HIPAA Compliance</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center text-muted"
+                style="font-size: 0.8rem; border-top: 1px solid var(--border-color); padding-top: 24px;">
+                <p>© 2026 MediMind AI. All rights reserved.</p>
+                <p>Built with ❤️ for patients everywhere.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/landing.js"></script>
+</body>
+
+</html>
