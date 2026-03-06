@@ -367,6 +367,60 @@ If the image does NOT show an injury or is unrelated, respond with:
     }
 });
 
+// --- Extract medicines from prescription image ---
+app.post('/api/prescriptions/extract', requireAuth, upload.single('prescription'), async (req, res) => {
+    console.log('--- Prescription Extract ---');
+    try {
+        if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
+
+        const mimeType = req.file.mimetype;
+        const fileBuffer = fs.readFileSync(req.file.path);
+        const base64Data = fileBuffer.toString('base64');
+
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+        const prompt = `You are MediEase, a prescription analyzer. Extract all medicines from this prescription image.
+
+STRICT RULES:
+- Extract ONLY medicines that are clearly visible in the prescription.
+- Do NOT invent or guess medicines.
+- If the image is not a prescription or is unreadable, return an empty array.
+
+Respond in this EXACT JSON format (no markdown, no code fences, ONLY raw JSON):
+[
+  {
+    "name": "Medicine Name",
+    "dosage": "e.g. 500mg, 1 tablet",
+    "frequency": "Once daily|Twice daily|Three times daily|Every 8 hours|As needed",
+    "timing": "Before food|After food|With food|Bedtime",
+    "duration": "e.g. 5 days, 1 week, 2 weeks"
+  }
+]
+
+If no medicines found, return: []`;
+
+        const result = await model.generateContent([
+            { text: prompt },
+            { inlineData: { mimeType, data: base64Data } }
+        ]);
+
+        let text = result.response.text().trim();
+        text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
+
+        const medicines = JSON.parse(text);
+
+        // Clean up uploaded file
+        fs.unlink(req.file.path, () => {});
+
+        console.log('Prescription extracted:', medicines.length, 'medicines');
+        res.json({ medicines: Array.isArray(medicines) ? medicines : [] });
+    } catch (error) {
+        console.error('Prescription extract error:', error.message);
+        if (req.file?.path) fs.unlink(req.file.path, () => {});
+        res.status(500).json({ error: 'Failed to extract medicines.', details: error.message });
+    }
+});
+
 app.post('/api/check-symptoms', async (req, res) => {
     console.log('--- Start Health Chat ---');
     console.log('Timestamp:', new Date().toISOString());

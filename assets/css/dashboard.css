@@ -1140,12 +1140,45 @@ textarea.form-control {
 
 .form-control-minimal {
     width: 100%;
-    background: transparent;
-    border: none;
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
     color: var(--text-light);
     font-size: 1rem;
-    padding: 4px 0;
-    border-bottom: 1px solid var(--border-color);
+    padding: 10px 12px;
+    border-radius: 10px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control-minimal:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 229, 163, 0.15);
+}
+
+.form-control-minimal option {
+    background: var(--bg-sidebar);
+    color: var(--text-light);
+    padding: 8px;
+}
+
+[data-theme="light"] .form-control-minimal {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+[data-theme="light"] .form-control-minimal:focus {
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+}
+
+[data-theme="light"] .form-control-minimal option {
+    background: #ffffff;
+    color: #0f172a;
 }
 
 .modern-slider {
@@ -3033,4 +3066,254 @@ body {
 [data-theme="light"] .fa-upload-ring {
     background: rgba(5,150,105,0.05);
     border-color: rgba(5,150,105,0.12);
+}
+
+/* ===================== MEDICATION PLANNER ===================== */
+.med-upload-zone {
+    border: 2px dashed var(--border-color);
+    border-radius: 16px;
+    padding: 40px 24px;
+    cursor: pointer;
+    transition: border-color 0.3s, background 0.3s;
+}
+
+.med-upload-zone:hover,
+.med-upload-zone.drag-over {
+    border-color: var(--primary);
+    background: rgba(0, 229, 163, 0.04);
+}
+
+.med-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.med-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.med-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.med-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.med-card-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.med-card-dosage {
+    font-size: 0.85rem;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+.med-card-details {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.med-card-tag {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(0, 229, 163, 0.1);
+    color: var(--primary);
+}
+
+.med-card-tag.timing {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.med-card-tag.duration {
+    background: rgba(168, 85, 247, 0.1);
+    color: #a855f7;
+}
+
+.med-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.med-card-actions button {
+    flex: 1;
+    padding: 8px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-muted);
+    transition: 0.2s;
+}
+
+.med-card-actions button:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.med-card-actions .med-delete-btn:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+.med-card-reminder {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 10px;
+    margin-top: 12px;
+    font-size: 0.8rem;
+    color: #f59e0b;
+}
+
+.med-extracted-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    background: var(--bg-card);
+}
+
+.med-extracted-item:last-child {
+    margin-bottom: 0;
+}
+
+.med-extracted-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.med-extracted-name {
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.med-extracted-detail {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.med-timeline {
+    position: relative;
+    padding-left: 28px;
+}
+
+.med-timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border-color);
+}
+
+.med-timeline-item {
+    position: relative;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.med-timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 22px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 2px solid var(--bg-main);
+}
+
+.med-timeline-item.taken::before {
+    background: #22c55e;
+}
+
+.med-timeline-item.missed::before {
+    background: #ef4444;
+}
+
+.med-timeline-time {
+    font-size: 0.8rem;
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.med-timeline-name {
+    font-weight: 500;
+    color: var(--text-light);
+    margin-bottom: 2px;
+}
+
+.med-timeline-dose {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.med-taken-btn {
+    margin-top: 8px;
+    padding: 6px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--primary);
+    background: transparent;
+    color: var(--primary);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.med-taken-btn:hover {
+    background: var(--primary);
+    color: #000;
+}
+
+.med-taken-btn.taken {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: #fff;
+    cursor: default;
+}
+
+[data-theme="light"] .med-card {
+    background: rgba(255,255,255,0.7);
+}
+
+[data-theme="light"] .med-upload-zone:hover,
+[data-theme="light"] .med-upload-zone.drag-over {
+    background: rgba(5,150,105,0.04);
+}
+
+[data-theme="light"] .med-timeline-item {
+    background: rgba(255,255,255,0.7);
 }
