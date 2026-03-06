@@ -106,11 +106,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Login Flow ---
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
+        // Pre-fill email if "Remember Me" was used
+        const savedEmail = localStorage.getItem('remembered_email');
+        const rememberMeCheckbox = document.getElementById('remember-me');
+        if (savedEmail) {
+            document.getElementById('email').value = savedEmail;
+            if (rememberMeCheckbox) rememberMeCheckbox.checked = true;
+        }
+
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
             const submitBtn = loginForm.querySelector('button[type="submit"]');
 
             submitBtn.disabled = true;
@@ -125,6 +134,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (error) throw error;
 
+                // Handle Remember Me
+                if (rememberMe) {
+                    localStorage.setItem('remembered_email', email);
+                } else {
+                    localStorage.removeItem('remembered_email');
+                }
+
                 // Redirect to dashboard on success
                 window.location.href = 'dashboard.html';
 
@@ -132,6 +148,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 showMessage('auth-message', error.message, true);
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Login';
+            }
+        });
+    }
+
+    // --- Forgot Password Flow ---
+    const forgotPasswordLink = document.getElementById('forgot-password-link');
+    if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            
+            if (!email) {
+                showMessage('auth-message', 'Please enter your email address first to reset your password.', true);
+                // Highlight the email field
+                document.getElementById('email').focus();
+                return;
+            }
+
+            try {
+                const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
+                    redirectTo: `${window.location.origin}/login.html?reset=true`,
+                });
+
+                if (error) throw error;
+
+                // Success Popup (no browser alert)
+                const modal = document.getElementById('custom-modal');
+                const emailDisplay = document.getElementById('modal-email-display');
+                if (modal && emailDisplay) {
+                    emailDisplay.innerText = email;
+                    modal.style.display = 'flex';
+                } else {
+                    showMessage('auth-message', 'Password reset link sent! Please check your inbox.', false);
+                }
+            } catch (error) {
+                showMessage('auth-message', `Error: ${error.message}`, true);
             }
         });
     }
