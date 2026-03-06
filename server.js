@@ -1,5 +1,5 @@
 const express = require('express');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const Groq = require('groq-sdk');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
@@ -17,11 +17,28 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+// --- Auth middleware: extract user_id from Supabase JWT ---
+async function requireAuth(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Not authenticated.' });
+    }
+    const token = authHeader.split(' ')[1];
+    try {
+        const { data: { user }, error } = await supabase.auth.getUser(token);
+        if (error || !user) return res.status(401).json({ error: 'Invalid session.' });
+        req.userId = user.id;
+        next();
+    } catch (err) {
+        return res.status(401).json({ error: 'Authentication failed.' });
+    }
+}
 
 // --- Validate Supabase schema on startup ---
 (async () => {
-    const requiredCols = ['id', 'file_name', 'stored_name', 'report_type', 'analysis', 'file_size', 'mime_type', 'created_at'];
+    const requiredCols = ['id', 'user_id', 'file_name', 'stored_name', 'report_type', 'analysis', 'file_size', 'mime_type', 'created_at'];
     const missing = [];
     for (const col of requiredCols) {
         const { error } = await supabase.from('medical_reports').select(col).limit(0);
@@ -31,6 +48,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         console.error('\n⚠️  Supabase "medical_reports" table is missing columns:', missing.join(', '));
         console.error('   Run this SQL in your Supabase Dashboard → SQL Editor:\n');
         console.error(`   ALTER TABLE medical_reports
+     ADD COLUMN IF NOT EXISTS user_id UUID,
      ADD COLUMN IF NOT EXISTS file_name TEXT,
      ADD COLUMN IF NOT EXISTS stored_name TEXT,
      ADD COLUMN IF NOT EXISTS analysis TEXT,
@@ -64,7 +82,7 @@ const upload = multer({
 });
 
 // --- Upload & Analyze Report ---
-app.post('/api/reports/upload', upload.single('report'), async (req, res) => {
+app.post('/api/reports/upload', requireAuth, upload.single('report'), async (req, res) => {
     console.log('--- Report Upload ---');
     try {
         if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
@@ -73,9 +91,7 @@ app.post('/api/reports/upload', upload.single('report'), async (req, res) => {
         const mimeType = req.file.mimetype;
         const originalName = req.file.originalname;
 
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-        // Read file as base64 for Gemini
+        // Read file as base64 for Groq vision
         const fileBuffer = fs.readFileSync(filePath);
         const base64Data = fileBuffer.toString('base64');
 
@@ -104,12 +120,19 @@ A 2-3 sentence plain-English summary of the report's key findings.
 ### Recommendations
 - 2-3 actionable recommendations based on the findings`;
 
-        const result = await model.generateContent([
-            { text: prompt },
-            { inlineData: { mimeType, data: base64Data } }
-        ]);
+        const result = await groq.chat.completions.create({
+            messages: [{
+                role: "user",
+                content: [
+                    { type: "text", text: prompt },
+                    { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Data}` } }
+                ]
+            }],
+            model: "meta-llama/llama-4-scout-17b-16e-instruct",
+            temperature: 0.3,
+        });
 
-        const analysis = result.response.text();
+        const analysis = result.choices[0].message.content;
 
         // Extract report type from analysis
         const typeMatch = analysis.match(/###\s*Report Type\s*\n+(.+)/i);
@@ -119,6 +142,7 @@ A 2-3 sentence plain-English summary of the report's key findings.
         const { data: report, error: dbError } = await supabase
             .from('medical_reports')
             .insert({
+                user_id: req.userId,
                 file_name: originalName,
                 stored_name: req.file.filename,
                 report_type: reportType,
@@ -151,11 +175,12 @@ A 2-3 sentence plain-English summary of the report's key findings.
 });
 
 // --- List All Reports ---
-app.get('/api/reports', async (req, res) => {
+app.get('/api/reports', requireAuth, async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('medical_reports')
             .select('*')
+            .eq('user_id', req.userId)
             .order('created_at', { ascending: false });
 
         if (error) throw new Error(error.message);
@@ -179,15 +204,16 @@ app.get('/api/reports', async (req, res) => {
 });
 
 // --- Delete a Report ---
-app.delete('/api/reports/:id', async (req, res) => {
+app.delete('/api/reports/:id', requireAuth, async (req, res) => {
     try {
         const id = req.params.id;
 
-        // Get the report first to find the stored file name
+        // Get the report first to find the stored file name (only if owned by user)
         const { data: report, error: fetchErr } = await supabase
             .from('medical_reports')
             .select('stored_name')
             .eq('id', id)
+            .eq('user_id', req.userId)
             .single();
 
         if (fetchErr || !report) return res.status(404).json({ error: 'Report not found.' });
@@ -200,7 +226,8 @@ app.delete('/api/reports/:id', async (req, res) => {
         const { error: delErr } = await supabase
             .from('medical_reports')
             .delete()
-            .eq('id', id);
+            .eq('id', id)
+            .eq('user_id', req.userId);
 
         if (delErr) throw new Error(delErr.message);
 
@@ -212,16 +239,17 @@ app.delete('/api/reports/:id', async (req, res) => {
 });
 
 // --- Ask AI about stored reports ---
-app.post('/api/reports/ask', async (req, res) => {
+app.post('/api/reports/ask', requireAuth, async (req, res) => {
     console.log('--- Report Query ---');
     try {
         const { question } = req.body;
         if (!question) return res.status(400).json({ error: 'Please provide a question.' });
 
-        // Fetch all reports from Supabase
+        // Fetch user's reports from Supabase
         const { data: reports, error: dbErr } = await supabase
             .from('medical_reports')
             .select('file_name, report_type, analysis, created_at')
+            .eq('user_id', req.userId)
             .order('created_at', { ascending: false });
 
         if (dbErr) throw new Error(dbErr.message);
@@ -229,8 +257,6 @@ app.post('/api/reports/ask', async (req, res) => {
         if (!reports || reports.length === 0) {
             return res.json({ answer: "You haven't uploaded any reports yet. Upload a medical report first, then I can answer questions about your data." });
         }
-
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         // Build context from all stored report analyses
         const reportsContext = reports.map((r, i) =>
@@ -252,13 +278,163 @@ STRICT RULES:
 
 Patient's question: "${question}"`;
 
-        const result = await model.generateContent(prompt);
-        const answer = result.response.text();
+        const result = await groq.chat.completions.create({
+            messages: [{ role: "user", content: prompt }],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.3,
+        });
+        const answer = result.choices[0].message.content;
 
         res.json({ answer });
     } catch (error) {
         console.error('Report query error:', error.message);
         res.status(500).json({ error: 'Failed to answer question.', details: error.message });
+    }
+});
+
+// --- First Aid Image Analysis ---
+app.post('/api/firstaid/analyze', upload.single('injury'), async (req, res) => {
+    console.log('--- First Aid Analysis ---');
+    try {
+        if (!req.file) return res.status(400).json({ error: 'No image uploaded.' });
+
+        const mimeType = req.file.mimetype;
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(mimeType)) {
+            return res.status(400).json({ error: 'Only JPG, PNG, or WEBP images are allowed.' });
+        }
+
+        const fileBuffer = fs.readFileSync(req.file.path);
+        const base64Data = fileBuffer.toString('base64');
+
+        const prompt = `You are MediEase, an AI first aid assistant. Analyze this injury photo carefully.
+
+STRICT RULES:
+- Be accurate. If the image is unclear or not an injury, say so.
+- Use simple language anyone can understand.
+- Do NOT diagnose conditions beyond first aid scope.
+- Be concise but thorough.
+
+Respond in this EXACT JSON format (no markdown, no code fences, ONLY raw JSON):
+{
+  "injury_type": "Short name of the injury (e.g., Minor Cut, Second-Degree Burn, Bruise, Abrasion, Sprain)",
+  "description": "1-2 sentence description of what you see in the image",
+  "severity": "mild|moderate|severe",
+  "severity_score": <number from 1 to 10>,
+  "warning_color": "green|yellow|red",
+  "first_aid_steps": [
+    "Step 1...",
+    "Step 2...",
+    "Step 3...",
+    "Step 4..."
+  ],
+  "see_doctor_when": [
+    "Condition 1 when they should see a doctor...",
+    "Condition 2..."
+  ],
+  "warning_signs": [
+    "Warning sign 1...",
+    "Warning sign 2..."
+  ],
+  "do_not": [
+    "Thing to avoid 1...",
+    "Thing to avoid 2..."
+  ]
+}
+
+SEVERITY GUIDE:
+- "green" (mild): Minor injuries like small cuts, light bruises, mild scrapes. Severity 1-3.
+- "yellow" (moderate): Deeper cuts, moderate burns, significant bruising, mild sprains. Severity 4-6.
+- "red" (severe): Deep wounds, severe burns, possible fractures, heavy bleeding. Severity 7-10.
+
+If the image does NOT show an injury or is unrelated, respond with:
+{"injury_type": "Not an injury", "description": "This image does not appear to show an injury.", "severity": "mild", "severity_score": 0, "warning_color": "green", "first_aid_steps": [], "see_doctor_when": [], "warning_signs": [], "do_not": []}`;
+
+        const result = await groq.chat.completions.create({
+            messages: [{
+                role: "user",
+                content: [
+                    { type: "text", text: prompt },
+                    { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Data}` } }
+                ]
+            }],
+            model: "meta-llama/llama-4-scout-17b-16e-instruct",
+            temperature: 0.2,
+        });
+
+        let text = result.choices[0].message.content.trim();
+        // Strip code fences if model wraps it
+        text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
+
+        const analysis = JSON.parse(text);
+        
+        // Clean up the uploaded file after analysis
+        fs.unlink(req.file.path, () => {});
+
+        console.log('First aid analysis complete:', analysis.injury_type);
+        res.json({ analysis });
+    } catch (error) {
+        console.error('First aid analysis error:', error.message);
+        if (req.file?.path) fs.unlink(req.file.path, () => {});
+        res.status(500).json({ error: 'Failed to analyze image.', details: error.message });
+    }
+});
+
+// --- Extract medicines from prescription image ---
+app.post('/api/prescriptions/extract', requireAuth, upload.single('prescription'), async (req, res) => {
+    console.log('--- Prescription Extract ---');
+    try {
+        if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
+
+        const mimeType = req.file.mimetype;
+        const fileBuffer = fs.readFileSync(req.file.path);
+        const base64Data = fileBuffer.toString('base64');
+
+        const prompt = `You are MediEase, a prescription analyzer. Extract all medicines from this prescription image.
+
+STRICT RULES:
+- Extract ONLY medicines that are clearly visible in the prescription.
+- Do NOT invent or guess medicines.
+- If the image is not a prescription or is unreadable, return an empty array.
+
+Respond in this EXACT JSON format (no markdown, no code fences, ONLY raw JSON):
+[
+  {
+    "name": "Medicine Name",
+    "dosage": "e.g. 500mg, 1 tablet",
+    "frequency": "Once daily|Twice daily|Three times daily|Every 8 hours|As needed",
+    "timing": "Before food|After food|With food|Bedtime",
+    "duration": "e.g. 5 days, 1 week, 2 weeks"
+  }
+]
+
+If no medicines found, return: []`;
+
+        const result = await groq.chat.completions.create({
+            messages: [{
+                role: "user",
+                content: [
+                    { type: "text", text: prompt },
+                    { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Data}` } }
+                ]
+            }],
+            model: "meta-llama/llama-4-scout-17b-16e-instruct",
+            temperature: 0.2,
+        });
+
+        let text = result.choices[0].message.content.trim();
+        text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
+
+        const medicines = JSON.parse(text);
+
+        // Clean up uploaded file
+        fs.unlink(req.file.path, () => {});
+
+        console.log('Prescription extracted:', medicines.length, 'medicines');
+        res.json({ medicines: Array.isArray(medicines) ? medicines : [] });
+    } catch (error) {
+        console.error('Prescription extract error:', error.message);
+        if (req.file?.path) fs.unlink(req.file.path, () => {});
+        res.status(500).json({ error: 'Failed to extract medicines.', details: error.message });
     }
 });
 
@@ -270,15 +446,13 @@ app.post('/api/check-symptoms', async (req, res) => {
     try {
         const { message, symptoms, duration, severity } = req.body;
 
-        if (!process.env.GEMINI_API_KEY) {
-            throw new Error('GEMINI_API_KEY is missing from environment variables');
+        if (!process.env.GROQ_API_KEY) {
+            throw new Error('GROQ_API_KEY is missing from environment variables');
         }
 
         if (!message && (!symptoms || symptoms.length === 0)) {
             return res.status(400).json({ error: 'Please provide a message or select symptoms.' });
         }
-
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const hasSymptoms = symptoms && symptoms.length > 0;
         const hasMessage = message && message.trim().length > 0;
@@ -335,10 +509,13 @@ app.post('/api/check-symptoms', async (req, res) => {
             `;
         }
 
-        console.log('Calling Gemini API...');
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
+        console.log('Calling Groq API...');
+        const result = await groq.chat.completions.create({
+            messages: [{ role: "user", content: prompt }],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.3,
+        });
+        const text = result.choices[0].message.content;
         console.log('AI response generated successfully. Length:', text.length);
 
         res.json({ analysis: text });
@@ -355,6 +532,61 @@ app.post('/api/check-symptoms', async (req, res) => {
         });
     } finally {
         console.log('--- End Health Chat ---');
+    }
+});
+
+// --- Medications CRUD (Supabase) ---
+app.get('/api/medications', requireAuth, async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('medications')
+            .select('*')
+            .eq('user_id', req.userId)
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        res.json({ medications: data || [] });
+    } catch (err) {
+        console.error('Get medications error:', err.message);
+        res.status(500).json({ error: 'Failed to load medications.' });
+    }
+});
+
+app.post('/api/medications', requireAuth, async (req, res) => {
+    try {
+        const { name, dosage, frequency, timing, duration } = req.body;
+        if (!name) return res.status(400).json({ error: 'Medicine name is required.' });
+        const { data, error } = await supabase
+            .from('medications')
+            .insert({
+                user_id: req.userId,
+                name,
+                dosage: dosage || '1 tablet',
+                frequency: frequency || 'Once daily',
+                timing: timing || 'After food',
+                duration: duration || ''
+            })
+            .select()
+            .single();
+        if (error) throw error;
+        res.json({ medication: data });
+    } catch (err) {
+        console.error('Add medication error:', err.message);
+        res.status(500).json({ error: 'Failed to add medication.' });
+    }
+});
+
+app.delete('/api/medications/:id', requireAuth, async (req, res) => {
+    try {
+        const { error } = await supabase
+            .from('medications')
+            .delete()
+            .eq('id', req.params.id)
+            .eq('user_id', req.userId);
+        if (error) throw error;
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Delete medication error:', err.message);
+        res.status(500).json({ error: 'Failed to delete medication.' });
     }
 });
 

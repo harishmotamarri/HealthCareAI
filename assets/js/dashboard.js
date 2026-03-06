@@ -67,7 +67,8 @@ const appRouter = {
             { id: 'reports', title: 'Medical Reports', icon: '📁', keywords: ['upload', 'pdf', 'scan', 'history', 'past', 'records'] },
             { id: 'symptoms', title: 'Symptom Checker', icon: '🩺', keywords: ['check', 'health', 'sick'] },
             { id: 'hospitals', title: 'Hospital Finder', icon: '🏥', keywords: ['clinic', 'doctor', 'find'] },
-            { id: 'firstaid', title: 'First Aid Guide', icon: '🚑', keywords: ['emergency', 'help', 'guide'] }
+            { id: 'firstaid', title: 'First Aid Guide', icon: '🚑', keywords: ['emergency', 'help', 'guide'] },
+            { id: 'medications', title: 'Medication Planner', icon: '💊', keywords: ['medicine', 'prescription', 'pill', 'drug', 'reminder', 'medication'] }
         ];
 
         if (globalSearch && suggestionsBox) {
@@ -89,10 +90,10 @@ const appRouter = {
                 suggestionsBox.style.display = 'flex';
             };
 
-            // Show defaults on focus if empty
+            // Show defaults on focus only if there's a query
             globalSearch.addEventListener('focus', (e) => {
-                if (e.target.value.trim().length === 0) {
-                    showDefaultSuggestions();
+                if (e.target.value.trim().length > 0) {
+                    globalSearch.dispatchEvent(new Event('input'));
                 }
             });
 
@@ -154,6 +155,7 @@ const appRouter = {
                     else if (query.includes('symptom') || query.includes('check')) target = 'symptoms';
                     else if (query.includes('hospital') || query.includes('find') || query.includes('clinic')) target = 'hospitals';
                     else if (query.includes('first') || query.includes('aid') || query.includes('emerg')) target = 'firstaid';
+                    else if (query.includes('med') || query.includes('pill') || query.includes('prescript') || query.includes('remind')) target = 'medications';
 
                     if (target) {
                         this.navigate(target);
@@ -525,6 +527,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 2b. Medical Reports Feature ---
+    // Helper to get auth headers for API calls
+    async function getAuthHeaders() {
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        if (!session) return {};
+        return { 'Authorization': 'Bearer ' + session.access_token };
+    }
+
     const reportFileInput = document.getElementById('report-file-input');
     const reportBrowseBtn = document.getElementById('report-browse-btn');
     const reportDropZone = document.getElementById('report-drop-zone');
@@ -607,7 +616,12 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('report', file);
 
         try {
-            const res = await fetch('/api/reports/upload', { method: 'POST', body: formData });
+            const authHeaders = await getAuthHeaders();
+            const res = await fetch('/api/reports/upload', {
+                method: 'POST',
+                headers: authHeaders,
+                body: formData
+            });
             const data = await res.json();
 
             clearInterval(progressInterval);
@@ -632,7 +646,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load and render reports list
     async function loadReportsList() {
         try {
-            const res = await fetch('/api/reports');
+            const authHeaders = await getAuthHeaders();
+            const res = await fetch('/api/reports', { headers: authHeaders });
             const data = await res.json();
 
             // Profile references
@@ -707,8 +722,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // View a single report detail
-    window.viewReport = function (id) {
-        fetch('/api/reports').then(r => r.json()).then(data => {
+    window.viewReport = async function (id) {
+        const authHeaders = await getAuthHeaders();
+        fetch('/api/reports', { headers: authHeaders }).then(r => r.json()).then(data => {
             const report = data.reports.find(r => r.id === id);
             if (report) showReportDetail(report);
         });
@@ -739,7 +755,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.deleteReport = async function (id) {
         if (!confirm('Delete this report?')) return;
         try {
-            await fetch('/api/reports/' + id, { method: 'DELETE' });
+            const authHeaders = await getAuthHeaders();
+            await fetch('/api/reports/' + id, { method: 'DELETE', headers: authHeaders });
             loadReportsList();
         } catch (err) {
             alert('Failed to delete report.');
@@ -756,9 +773,10 @@ document.addEventListener('DOMContentLoaded', () => {
         reportAskAnswer.innerHTML = '<div style="display:flex; align-items:center; gap:10px;"><span class="report-spinner"></span> Thinking...</div>';
 
         try {
+            const authHeaders = await getAuthHeaders();
             const res = await fetch('/api/reports/ask', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', ...authHeaders },
                 body: JSON.stringify({ question })
             });
             const data = await res.json();
@@ -795,6 +813,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Expose functions globally so inline onclick handlers in HTML can use them
     window.openModal = function (cardElement) {
         if (!modal) return;
+
+        // Store current card's phone for "Call Now" button
+        if (cardElement && cardElement.dataset.phone) {
+            modal.dataset.currentPhone = cardElement.dataset.phone;
+        }
 
         // If a card element was passed, extract its data to populate the modal
         if (cardElement) {
@@ -858,22 +881,54 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modal) modal.classList.remove('active');
     }
 
-    // Attach click listeners to all Details buttons
+    // Attach click listeners to all Details buttons, phone buttons, and add directions
     const allHospitalCards = document.querySelectorAll('.hospital-card');
     allHospitalCards.forEach(card => {
         const detailsBtn = card.querySelector('button.btn-primary');
+        const phoneBtn = card.querySelector('button.btn-outline');
+
         if (detailsBtn) {
             detailsBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // prevent triggering the card's onclick if it has one
+                e.stopPropagation();
                 openModal(card);
             });
         }
 
-        // Ensure the card itself is also clickable if we want
-        card.addEventListener('click', () => {
+        // 📞 button on card → call the hospital
+        if (phoneBtn) {
+            phoneBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const phone = card.dataset.phone;
+                if (phone) window.location.href = 'tel:' + phone;
+            });
+        }
+
+        // Clicking the card body opens modal (but not from buttons)
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('button')) return;
             openModal(card);
         });
     });
+
+    // Modal "Call Now" and "Get Directions" buttons
+    const modalCallBtn = document.getElementById('modal-call-btn');
+    const modalDirBtn = document.getElementById('modal-directions-btn');
+
+    if (modalCallBtn) {
+        modalCallBtn.addEventListener('click', () => {
+            const phone = modal.dataset.currentPhone;
+            if (phone) window.location.href = 'tel:' + phone;
+        });
+    }
+
+    if (modalDirBtn) {
+        modalDirBtn.addEventListener('click', () => {
+            const address = document.getElementById('modal-hospital-address').innerText;
+            if (address) {
+                window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(address), '_blank');
+            }
+        });
+    }
 
     // Close modal if clicking outside the content box
     if (modal) {
@@ -957,6 +1012,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Using allHospitalCards declared earlier
     const hospitalsCount = document.getElementById('hospitals-count');
 
+    function getCardDistance(card) {
+        const match = card.innerText.match(/([\d\.]+)\s*(mi|km)/);
+        return match ? parseFloat(match[1]) : 9999;
+    }
+
     function filterHospitals() {
         if (!allHospitalCards) return;
 
@@ -983,15 +1043,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // 3. Distance Filter
-            if (isVisible && distanceFilter !== 'Any Distance') {
-                const distanceMatch = card.innerText.match(/([\d\.]+)\s*(mi|km)/);
-                if (distanceMatch) {
-                    let dist = parseFloat(distanceMatch[1]);
-                    // No conversion needed, unit is km
-
-                    if (distanceFilter === 'Within 5 km' && dist > 5) isVisible = false;
-                    if (distanceFilter === 'Within 10 km' && dist > 10) isVisible = false;
-                }
+            if (isVisible && distanceFilter === 'Within 5 km') {
+                if (getCardDistance(card) > 5) isVisible = false;
+            } else if (isVisible && distanceFilter === 'Within 10 km') {
+                if (getCardDistance(card) > 10) isVisible = false;
             }
 
             // 4. Rating Filter
@@ -1011,6 +1066,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.style.display = 'none';
             }
         });
+
+        // Sort by distance (ascending) when selected
+        if (distanceFilter === 'Sort by Distance') {
+            const grid = document.getElementById('hospital-cards-grid');
+            const cards = Array.from(allHospitalCards);
+            cards.sort((a, b) => getCardDistance(a) - getCardDistance(b));
+            cards.forEach(card => grid.appendChild(card));
+        }
 
         // Update hospitals found count text
         if (hospitalsCount) {
@@ -1100,5 +1163,566 @@ document.addEventListener('DOMContentLoaded', () => {
         // Auto rotate tips
         tipInterval = setInterval(autoRotateTip, 2000);
     }
+
+    // ============================================================
+    //  SECTION 7 — FIRST AID IMAGE ANALYZER
+    // ============================================================
+    (function initFirstAid() {
+        const uploadZone = document.getElementById('fa-upload-zone');
+        const fileInput = document.getElementById('fa-file-input');
+        const cameraBtn = document.getElementById('fa-camera-btn');
+        const browseBtn = document.getElementById('fa-browse-btn');
+        const previewWrap = document.getElementById('fa-preview');
+        const previewImg = document.getElementById('fa-preview-img');
+        const removeImgBtn = document.getElementById('fa-remove-img');
+        const analyzeBtn = document.getElementById('fa-analyze-btn');
+        const loadingEl = document.getElementById('fa-loading');
+        const resultsEl = document.getElementById('fa-results');
+        const uploadCard = document.getElementById('fa-upload-card');
+        const resetBtn = document.getElementById('fa-reset-btn');
+
+        if (!uploadZone) return; // guard
+
+        let selectedFile = null;
+
+        // --- Drag & drop ---
+        uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+        uploadZone.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) handleFileSelected(file);
+        });
+
+        // --- Browse ---
+        browseBtn.addEventListener('click', () => fileInput.click());
+        uploadZone.addEventListener('click', (e) => {
+            if (e.target === uploadZone || e.target.closest('.fa-upload-icon') || e.target.closest('h3') || e.target.closest('p')) {
+                fileInput.click();
+            }
+        });
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files[0]) handleFileSelected(fileInput.files[0]);
+        });
+
+        // --- Camera ---
+        cameraBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+
+            // Try to open real camera via getUserMedia
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+                    });
+
+                    // Build camera overlay UI
+                    const overlay = document.createElement('div');
+                    overlay.id = 'fa-camera-overlay';
+                    overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+
+                    const video = document.createElement('video');
+                    video.setAttribute('autoplay', '');
+                    video.setAttribute('playsinline', '');
+                    video.srcObject = stream;
+                    video.style.cssText = 'width:100%;max-height:calc(100vh - 100px);object-fit:contain;background:#000;';
+
+                    const controls = document.createElement('div');
+                    controls.style.cssText = 'display:flex;gap:24px;padding:16px;align-items:center;';
+
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.textContent = 'Cancel';
+                    cancelBtn.style.cssText = 'padding:12px 28px;border-radius:12px;border:1px solid rgba(255,255,255,0.3);background:transparent;color:#fff;font-size:1rem;cursor:pointer;';
+
+                    const snapBtn = document.createElement('button');
+                    snapBtn.innerHTML = '📸 Capture';
+                    snapBtn.style.cssText = 'padding:14px 36px;border-radius:14px;border:none;background:var(--primary,#00e5a3);color:#fff;font-size:1.05rem;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(0,229,163,0.3);';
+
+                    controls.appendChild(cancelBtn);
+                    controls.appendChild(snapBtn);
+                    overlay.appendChild(video);
+                    overlay.appendChild(controls);
+                    document.body.appendChild(overlay);
+
+                    const cleanup = () => {
+                        stream.getTracks().forEach(t => t.stop());
+                        overlay.remove();
+                    };
+
+                    cancelBtn.addEventListener('click', cleanup);
+
+                    snapBtn.addEventListener('click', () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        canvas.getContext('2d').drawImage(video, 0, 0);
+                        cleanup();
+                        canvas.toBlob((blob) => {
+                            if (blob) {
+                                const file = new File([blob], 'camera-photo.jpg', { type: 'image/jpeg' });
+                                handleFileSelected(file);
+                            }
+                        }, 'image/jpeg', 0.92);
+                    });
+
+                    return;
+                } catch (_) {
+                    // Camera denied or unavailable — fall through to file input
+                }
+            }
+
+            // Fallback: file input with capture hint (mobile)
+            const camInput = document.createElement('input');
+            camInput.type = 'file';
+            camInput.accept = 'image/*';
+            camInput.setAttribute('capture', 'environment');
+            camInput.onchange = () => { if (camInput.files[0]) handleFileSelected(camInput.files[0]); };
+            camInput.click();
+        });
+
+        function handleFileSelected(file) {
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File too large. Maximum size is 10MB.');
+                return;
+            }
+            selectedFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                uploadZone.style.display = 'none';
+                previewWrap.style.display = 'flex';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // --- Remove image ---
+        removeImgBtn.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            previewImg.src = '';
+            previewWrap.style.display = 'none';
+            uploadZone.style.display = 'flex';
+        });
+
+        // --- Analyze ---
+        analyzeBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+            previewWrap.style.display = 'none';
+            loadingEl.style.display = 'flex';
+            resultsEl.style.display = 'none';
+
+            try {
+                const formData = new FormData();
+                formData.append('injury', selectedFile);
+
+                const resp = await fetch('/api/firstaid/analyze', { method: 'POST', body: formData });
+                const data = await resp.json();
+
+                if (!resp.ok) throw new Error(data.error || 'Analysis failed');
+
+                renderResults(data.analysis);
+            } catch (err) {
+                alert('Error: ' + err.message);
+                previewWrap.style.display = 'flex';
+            } finally {
+                loadingEl.style.display = 'none';
+            }
+        });
+
+        // --- Reset ---
+        resetBtn.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            previewImg.src = '';
+            previewWrap.style.display = 'none';
+            uploadZone.style.display = 'flex';
+            uploadCard.style.display = '';
+            resultsEl.style.display = 'none';
+        });
+
+        // --- Render Results ---
+        function renderResults(a) {
+            // Severity banner
+            const banner = document.getElementById('fa-severity-banner');
+            const indicator = document.getElementById('fa-severity-indicator');
+            const colorMap = { green: '#22c55e', yellow: '#eab308', red: '#f97316' };
+            const bgMap = { green: 'rgba(34,197,94,0.08)', yellow: 'rgba(234,179,8,0.08)', red: 'rgba(249,115,22,0.08)' };
+            const borderMap = { green: 'rgba(34,197,94,0.25)', yellow: 'rgba(234,179,8,0.25)', red: 'rgba(249,115,22,0.25)' };
+            const labelMap = { green: 'MILD', yellow: 'MODERATE', red: 'SEVERE' };
+            const c = a.warning_color || 'green';
+
+            banner.style.background = bgMap[c];
+            banner.style.borderColor = borderMap[c];
+            indicator.style.background = colorMap[c];
+            indicator.style.boxShadow = `0 0 16px ${colorMap[c]}`;
+
+            // Severity tag
+            const tag = document.getElementById('fa-severity-tag');
+            tag.textContent = labelMap[c];
+            tag.style.background = colorMap[c];
+            tag.style.color = c === 'yellow' ? '#000' : '#fff';
+
+            document.getElementById('fa-injury-type').textContent = a.injury_type || '—';
+            document.getElementById('fa-injury-desc').textContent = a.description || '—';
+
+            // Score ring
+            const score = a.severity_score ?? 0;
+            document.getElementById('fa-score-num').textContent = score;
+            const ringFill = document.getElementById('fa-ring-fill');
+            ringFill.style.stroke = colorMap[c];
+            ringFill.setAttribute('stroke-dasharray', `${score * 10}, 100`);
+            document.querySelector('.fa-ring-bg').style.stroke = borderMap[c];
+
+            // Steps with stagger animation
+            const stepsList = document.getElementById('fa-steps-list');
+            stepsList.innerHTML = (a.first_aid_steps || []).map((s, i) =>
+                `<li style="animation-delay:${i * 0.08}s"><span class="fa-step-num">${i + 1}</span><span>${escHtml(s)}</span></li>`
+            ).join('');
+
+            // Warning signs
+            const warnList = document.getElementById('fa-warn-list');
+            warnList.innerHTML = (a.warning_signs || []).map((w, i) =>
+                `<li style="animation-delay:${i * 0.08}s"><span class="fa-dot" style="background:${colorMap[c]}"></span><span>${escHtml(w)}</span></li>`
+            ).join('');
+
+            // See doctor
+            const docList = document.getElementById('fa-doctor-list');
+            docList.innerHTML = (a.see_doctor_when || []).map((d, i) =>
+                `<li style="animation-delay:${i * 0.08}s"><span class="fa-dot" style="background:#3b82f6"></span><span>${escHtml(d)}</span></li>`
+            ).join('');
+
+            // Do NOT
+            const donotList = document.getElementById('fa-donot-list');
+            donotList.innerHTML = (a.do_not || []).map((d, i) =>
+                `<li style="animation-delay:${i * 0.08}s"><span class="fa-dot" style="background:#f97316"></span><span>${escHtml(d)}</span></li>`
+            ).join('');
+
+            // Color-code section cards by severity
+            document.querySelector('.fa-warn-card').style.borderTop = `3px solid ${colorMap[c]}`;
+            document.querySelector('.fa-doctor-card').style.borderTop = '3px solid #3b82f6';
+            document.querySelector('.fa-steps-card').style.borderTop = `3px solid ${colorMap[c]}`;
+
+            uploadCard.style.display = 'none';
+            resultsEl.style.display = 'block';
+            resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function escHtml(str) {
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+    })();
+
+    // ===================== MEDICATION PLANNER =====================
+    (function initMedicationPlanner() {
+        const medList = document.getElementById('med-list');
+        const medEmptyState = document.getElementById('med-empty-state');
+        const medActiveCount = document.getElementById('med-active-count');
+        const scheduleSection = document.getElementById('med-schedule-section');
+        const scheduleTimeline = document.getElementById('med-schedule-timeline');
+        const manualAddBtn = document.getElementById('med-manual-add-btn');
+
+        if (!medList) return;
+
+        let medications = [];
+        const notifiedSet = new Set(); // track already-notified times this session
+
+        // --- API helpers ---
+        async function fetchMedications() {
+            try {
+                const headers = await getAuthHeaders();
+                if (!headers.Authorization) { medications = []; renderMedications(); return; }
+                const resp = await fetch('/api/medications', { headers });
+                const data = await resp.json();
+                if (!resp.ok) throw new Error(data.error);
+                medications = data.medications || [];
+            } catch (err) {
+                console.error('Failed to load medications:', err);
+                medications = [];
+            }
+            renderMedications();
+        }
+
+        async function apiAddMedication(med) {
+            try {
+                const headers = await getAuthHeaders();
+                headers['Content-Type'] = 'application/json';
+                const resp = await fetch('/api/medications', {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(med)
+                });
+                const data = await resp.json();
+                if (!resp.ok) throw new Error(data.error);
+                return data.medication;
+            } catch (err) {
+                console.error('Failed to add medication:', err);
+                alert('Failed to save medication. Please try again.');
+                return null;
+            }
+        }
+
+        async function apiDeleteMedication(id) {
+            try {
+                const headers = await getAuthHeaders();
+                const resp = await fetch('/api/medications/' + id, { method: 'DELETE', headers });
+                if (!resp.ok) { const d = await resp.json(); throw new Error(d.error); }
+            } catch (err) {
+                console.error('Failed to delete medication:', err);
+                alert('Failed to remove medication. Please try again.');
+            }
+        }
+
+        function escMed(str) {
+            const d = document.createElement('div');
+            d.textContent = str || '';
+            return d.innerHTML;
+        }
+
+        function getTimesForFrequency(freq) {
+            switch (freq) {
+                case 'Once daily': return ['08:00 AM'];
+                case 'Twice daily': return ['08:00 AM', '08:00 PM'];
+                case 'Thrice daily': return ['08:00 AM', '02:00 PM', '08:00 PM'];
+                case 'Every 6 hours': return ['06:00 AM', '12:00 PM', '06:00 PM', '12:00 AM'];
+                case 'Every 8 hours': return ['08:00 AM', '04:00 PM', '12:00 AM'];
+                case 'As needed': return ['As needed'];
+                default: return ['08:00 AM'];
+            }
+        }
+
+        // --- Render medication cards ---
+        function renderMedications() {
+            medList.innerHTML = '';
+
+            if (medications.length === 0) {
+                medEmptyState.style.display = 'block';
+                medActiveCount.textContent = '0 active';
+                scheduleSection.style.display = 'none';
+                return;
+            }
+
+            medEmptyState.style.display = 'none';
+            medActiveCount.textContent = `${medications.length} active`;
+
+            medications.forEach((med) => {
+                const card = document.createElement('div');
+                card.className = 'med-card';
+                const nextReminder = getTimesForFrequency(med.frequency)[0];
+                card.innerHTML = `
+                    <div class="med-card-header">
+                        <div>
+                            <div class="med-card-name">${escMed(med.name)}</div>
+                            <div class="med-card-dosage">${escMed(med.dosage)}</div>
+                        </div>
+                        <span style="font-size:1.5rem;">💊</span>
+                    </div>
+                    <div class="med-card-details">
+                        <span class="med-card-tag">${escMed(med.frequency)}</span>
+                        <span class="med-card-tag timing">${escMed(med.timing)}</span>
+                        ${med.duration ? `<span class="med-card-tag duration">${escMed(med.duration)}</span>` : ''}
+                    </div>
+                    <div class="med-card-reminder">🔔 Next: ${escMed(nextReminder)}</div>
+                    <div class="med-card-actions">
+                        <button class="med-taken-action">✅ Taken</button>
+                        <button class="med-delete-btn" data-id="${med.id}">🗑️ Remove</button>
+                    </div>
+                `;
+                medList.appendChild(card);
+            });
+
+            medList.querySelectorAll('.med-delete-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.dataset.id;
+                    btn.disabled = true;
+                    btn.textContent = '⏳';
+                    await apiDeleteMedication(id);
+                    await fetchMedications();
+                });
+            });
+
+            medList.querySelectorAll('.med-taken-action').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    btn.textContent = '✅ Taken!';
+                    btn.style.color = '#22c55e';
+                    btn.style.borderColor = '#22c55e';
+                    btn.disabled = true;
+                });
+            });
+
+            renderSchedule(medications);
+        }
+
+        // --- Render today's schedule ---
+        function renderSchedule(meds) {
+            if (meds.length === 0) { scheduleSection.style.display = 'none'; return; }
+            scheduleSection.style.display = 'block';
+            scheduleTimeline.innerHTML = '';
+
+            const timeSlots = [];
+            meds.forEach(med => {
+                getTimesForFrequency(med.frequency).forEach(time => {
+                    timeSlots.push({ time, name: med.name, dosage: med.dosage, timing: med.timing });
+                });
+            });
+            timeSlots.sort((a, b) => a.time.localeCompare(b.time));
+
+            timeSlots.forEach(slot => {
+                const item = document.createElement('div');
+                item.className = 'med-timeline-item';
+                item.innerHTML = `
+                    <div class="med-timeline-time">${slot.time}</div>
+                    <div class="med-timeline-name">${escMed(slot.name)}</div>
+                    <div class="med-timeline-dose">${escMed(slot.dosage)} — ${escMed(slot.timing)}</div>
+                    <button class="med-taken-btn">Mark as Taken</button>
+                `;
+                item.querySelector('.med-taken-btn').addEventListener('click', function() {
+                    this.classList.add('taken');
+                    this.textContent = '✅ Taken';
+                    item.classList.add('taken');
+                });
+                scheduleTimeline.appendChild(item);
+            });
+        }
+
+        // --- Manual add ---
+        manualAddBtn.addEventListener('click', async () => {
+            const name = document.getElementById('med-manual-name').value.trim();
+            const dosage = document.getElementById('med-manual-dosage').value.trim();
+            const frequency = document.getElementById('med-manual-frequency').value;
+            const timing = document.getElementById('med-manual-timing').value;
+            if (!name) { alert('Please enter a medicine name.'); return; }
+            manualAddBtn.disabled = true;
+            manualAddBtn.textContent = 'Saving...';
+            const saved = await apiAddMedication({ name, dosage: dosage || '1 tablet', frequency, timing });
+            manualAddBtn.disabled = false;
+            manualAddBtn.textContent = 'Add';
+            if (saved) {
+                document.getElementById('med-manual-name').value = '';
+                document.getElementById('med-manual-dosage').value = '';
+                await fetchMedications();
+            }
+        });
+
+        // --- Medication Alert Popup ---
+        function showMedAlertPopup(medsList) {
+            // Remove existing popup if any
+            const old = document.getElementById('med-alert-popup');
+            if (old) old.remove();
+
+            const medsHtml = medsList.map(m =>
+                `<div class="med-alert-item">
+                    <span class="med-alert-pill">💊</span>
+                    <div>
+                        <strong>${escMed(m.name)}</strong>
+                        <span class="med-alert-detail">${escMed(m.dosage)} — ${escMed(m.timing)}</span>
+                    </div>
+                </div>`
+            ).join('');
+
+            const popup = document.createElement('div');
+            popup.id = 'med-alert-popup';
+            popup.className = 'med-alert-overlay';
+            popup.innerHTML = `
+                <div class="med-alert-box">
+                    <div class="med-alert-header">
+                        <div class="med-alert-icon-ring">
+                            <span class="med-alert-icon">💊</span>
+                        </div>
+                        <h2>Time for Your Medicine!</h2>
+                        <p>Don't forget to take the following:</p>
+                    </div>
+                    <div class="med-alert-list">${medsHtml}</div>
+                    <div class="med-alert-actions">
+                        <button class="btn btn-primary med-alert-taken-btn" style="flex:2; padding:12px;">✅ I've Taken It</button>
+                        <button class="btn btn-outline med-alert-snooze-btn" style="flex:1; padding:12px;">⏰ Snooze 5m</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(popup);
+
+            // Play alert sound
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = 880;
+                osc.type = 'sine';
+                gain.gain.value = 0.3;
+                osc.start();
+                setTimeout(() => { osc.stop(); ctx.close(); }, 300);
+                setTimeout(() => {
+                    const ctx2 = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc2 = ctx2.createOscillator();
+                    const gain2 = ctx2.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(ctx2.destination);
+                    osc2.frequency.value = 1100;
+                    osc2.type = 'sine';
+                    gain2.gain.value = 0.3;
+                    osc2.start();
+                    setTimeout(() => { osc2.stop(); ctx2.close(); }, 300);
+                }, 350);
+            } catch (e) { /* audio not supported */ }
+
+            popup.querySelector('.med-alert-taken-btn').addEventListener('click', () => {
+                popup.classList.add('med-alert-closing');
+                setTimeout(() => popup.remove(), 300);
+            });
+
+            popup.querySelector('.med-alert-snooze-btn').addEventListener('click', () => {
+                popup.classList.add('med-alert-closing');
+                setTimeout(() => popup.remove(), 300);
+                // Re-trigger after 5 min
+                setTimeout(() => showMedAlertPopup(medsList), 5 * 60 * 1000);
+            });
+        }
+
+        // --- Check reminders every 30s ---
+        function checkMedReminders() {
+            if (medications.length === 0) return;
+            const now = new Date();
+            const currentTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            const dateKey = now.toDateString();
+
+            const dueMeds = [];
+            medications.forEach(med => {
+                getTimesForFrequency(med.frequency).forEach(t => {
+                    const notifKey = `${dateKey}-${med.id}-${t}`;
+                    if (t === currentTime && !notifiedSet.has(notifKey)) {
+                        notifiedSet.add(notifKey);
+                        dueMeds.push(med);
+                    }
+                });
+            });
+
+            if (dueMeds.length > 0) {
+                // Browser notification
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    dueMeds.forEach(med => {
+                        new Notification('💊 MediEase Medication Reminder', {
+                            body: `Time to take ${med.name} — ${med.dosage} (${med.timing})`,
+                            icon: 'assets/img/favicon.png',
+                            requireInteraction: true
+                        });
+                    });
+                }
+                // In-app popup
+                showMedAlertPopup(dueMeds);
+            }
+        }
+
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+        setInterval(checkMedReminders, 30000);
+
+        // Initial load from Supabase
+        fetchMedications();
+    })();
 
 });
