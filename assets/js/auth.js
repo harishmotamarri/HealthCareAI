@@ -72,16 +72,33 @@ document.addEventListener('DOMContentLoaded', () => {
                         window.location.href = 'dashboard.html';
                     }, 1500);
                 } else {
-                    showMessage('auth-message', 'Account created! Please check your email for a confirmation link (or disable Email Confirmations in Supabase dashboard).', false);
-                    // Do not redirect, keep them on the signup page or let them go to login
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Sign Up';
+                    // Show confirmation card and hide signup card
+                    const signupCard = document.getElementById('signup-card');
+                    const confirmationCard = document.getElementById('confirmation-card');
+                    const emailDisplay = document.getElementById('sent-email-display');
+
+                    if (signupCard && confirmationCard) {
+                        signupCard.style.display = 'none';
+                        confirmationCard.style.display = 'block';
+                        if (emailDisplay) emailDisplay.textContent = email;
+                        
+                        // Scroll to top to ensure they see the confirmation
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else {
+                        showMessage('auth-message', 'Account created! Please check your email for a confirmation link.', false);
+                    }
                 }
 
             } catch (error) {
-                showMessage('auth-message', error.message, true);
+                // Handle common auth errors
+                let errorMsg = error.message;
+                if (error.message.includes('User already registered') || error.status === 400) {
+                    errorMsg = 'This email address is already registered. Please use a different email or log in.';
+                }
+                
+                showMessage('auth-message', errorMsg, true);
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Sign Up';
+                submitBtn.textContent = 'Create Account';
             }
         });
     }
