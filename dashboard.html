@@ -130,7 +130,7 @@
                     <svg class="nav-icon" viewBox="0 0 24 24">
                         <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
                     </svg>
-                    <span>Symptom Checker</span>
+                    <span>Symptom Analyser</span>
                 </a>
                 <a class="nav-item" data-target="hospitals">
                     <svg class="nav-icon" viewBox="0 0 24 24">
@@ -481,130 +481,130 @@
             <div id="symptoms" class="view-section">
                 <div class="ai-checker-container">
                     <div class="ai-checker-header">
-                        <h1>Symptom Checker</h1>
-                        <p>AI-powered health guidance</p>
+                        <h1>Health Assistant</h1>
+                        <p>Ask anything about your health or Select Symptoms below</p>
                     </div>
 
                     <div class="ai-assistant-card">
-                        <div class="assistant-intro">
-                            <div class="assistant-avatar">✨</div>
-                            <div class="assistant-message">
-                                <h3>"Hi! I can help assess your symptoms. Tell me what you're feeling today."</h3>
+                        <!-- Chat Messages Area -->
+                        <div id="chat-messages" class="chat-messages">
+                            <div class="chat-bubble assistant">
+                                <div class="bubble-avatar">✨</div>
+                                <div class="bubble-content">
+                                    <p>Hi! I'm your MediEase health assistant. You can ask me any health question, or select symptoms below for a checkup.</p>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="checker-interaction-zone">
-                            <!-- Large Search Bar -->
-                            <div class="smart-search-box">
-                                <span class="search-icon">🔍</span>
-                                <input type="text" id="symptom-search"
-                                    placeholder="Search symptoms (e.g. headache, fever, cough)" autocomplete="off">
-                                <div id="search-suggestions" class="search-results-dropdown"></div>
-                            </div>
-
-                            <!-- Selected Symptoms Chips -->
-                            <div id="active-symptoms-list" class="symptom-chips-container">
-                                <!-- Chips will be injected here via JS -->
-                            </div>
-
-                            <!-- Suggested Symptoms with Icons -->
-                            <div class="suggestions-section">
-                                <p class="label-text">Common Symptoms</p>
-                                <div class="symptom-grid">
-                                    <button class="symptom-card-btn" data-symptom="Headache">
-                                        <span class="s-icon">🤕</span>
-                                        <span class="s-label">Headache</span>
-                                    </button>
-                                    <button class="symptom-card-btn" data-symptom="Fever">
-                                        <span class="s-icon">🌡️</span>
-                                        <span class="s-label">Fever</span>
-                                    </button>
-                                    <button class="symptom-card-btn" data-symptom="Fatigue">
-                                        <span class="s-icon">🛌</span>
-                                        <span class="s-label">Fatigue</span>
-                                    </button>
-                                    <button class="symptom-card-btn" data-symptom="Body Aches">
-                                        <span class="s-icon">💪</span>
-                                        <span class="s-label">Body Aches</span>
-                                    </button>
-                                    <button class="symptom-card-btn" data-symptom="Cough">
-                                        <span class="s-icon">🌬️</span>
-                                        <span class="s-label">Cough</span>
-                                    </button>
-                                    <button class="symptom-card-btn" data-symptom="Sore Throat">
-                                        <span class="s-icon">🗣️</span>
-                                        <span class="s-label">Sore Throat</span>
-                                    </button>
-                                    <button class="symptom-card-btn" data-symptom="Runny Nose">
-                                        <span class="s-icon">🤧</span>
-                                        <span class="s-label">Runny Nose</span>
-                                    </button>
-                                    <button class="symptom-card-btn" data-symptom="Nausea">
-                                        <span class="s-icon">🤢</span>
-                                        <span class="s-label">Nausea</span>
-                                    </button>
-                                    <button class="symptom-card-btn" data-symptom="Stomach Ache">
-                                        <span class="s-icon">😖</span>
-                                        <span class="s-label">Stomach Ache</span>
-                                    </button>
-                                    <button class="symptom-card-btn" data-symptom="Diarrhea">
-                                        <span class="s-icon">🚽</span>
-                                        <span class="s-label">Diarrhea</span>
-                                    </button>
-                                    <button class="symptom-card-btn" data-symptom="Chest Pain">
-                                        <span class="s-icon">🫀</span>
-                                        <span class="s-label">Chest Pain</span>
-                                    </button>
-                                    <button class="symptom-card-btn" data-symptom="Dizziness">
-                                        <span class="s-icon">😵</span>
-                                        <span class="s-label">Dizziness</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Severity & Details (Refined for UI) -->
-                            <div class="additional-input-grid">
-                                <div class="input-card">
-                                    <label>Discomfort Level: <span id="severity-val">5/10</span></label>
-                                    <input type="range" id="severity-slider" min="1" max="10" value="5"
-                                        class="modern-slider">
-                                </div>
-                                <div class="input-card">
-                                    <label>How long? (Optional)</label>
-                                    <select id="symptom-duration" class="form-control-minimal">
-                                        <option value="1-3 days">1-3 days</option>
-                                        <option value="Less than 24h">Less than 24 hours</option>
-                                        <option value="About a week">About a week</option>
-                                        <option value="Longer">Longer</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="action-footer">
-                                <button id="check-symptoms-btn" class="btn btn-primary btn-hero">
-                                    Check My Symptoms
-                                </button>
-                            </div>
+                        <!-- Chat Input Bar -->
+                        <div class="chat-input-bar">
+                            <input type="text" id="chat-input"
+                                placeholder="Ask a health question... (e.g. &quot;Is it safe to take paracetamol daily?&quot;)"
+                                autocomplete="off">
+                            <button id="chat-send-btn" class="chat-send-btn" title="Send">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                </svg>
+                            </button>
                         </div>
 
-                        <!-- Result Section -->
-                        <div id="symptom-result" class="analysis-result-overlay" style="display: none;">
-                            <div class="result-card">
-                                <div class="result-header">
-                                    <div class="pulse-indicator"></div>
-                                    <div class="header-text">
-                                        <h4>AI Analysis Complete</h4>
-                                        <p>Based on your reported symptoms</p>
+                        <!-- Optional Symptom Selection (collapsible) -->
+                        <details class="symptom-details-panel">
+                            <summary class="symptom-toggle-btn">
+                                <span class="toggle-left">
+                                    <span class="toggle-icon">🩺</span>
+                                    <span class="toggle-text">
+                                        <strong>Select Symptoms</strong>
+                                        <span>Tap to pick symptoms for a detailed checkup</span>
+                                    </span>
+                                </span>
+                                <svg class="toggle-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </summary>
+                            <div class="checker-interaction-zone">
+                                <!-- Selected Symptoms Chips -->
+                                <div id="active-symptoms-list" class="symptom-chips-container"></div>
+
+                                <!-- Suggested Symptoms with Icons -->
+                                <div class="suggestions-section">
+                                    <p class="label-text">Common Symptoms</p>
+                                    <div class="symptom-grid">
+                                        <button class="symptom-card-btn" data-symptom="Headache">
+                                            <span class="s-icon">🤕</span>
+                                            <span class="s-label">Headache</span>
+                                        </button>
+                                        <button class="symptom-card-btn" data-symptom="Fever">
+                                            <span class="s-icon">🌡️</span>
+                                            <span class="s-label">Fever</span>
+                                        </button>
+                                        <button class="symptom-card-btn" data-symptom="Fatigue">
+                                            <span class="s-icon">🛌</span>
+                                            <span class="s-label">Fatigue</span>
+                                        </button>
+                                        <button class="symptom-card-btn" data-symptom="Body Aches">
+                                            <span class="s-icon">💪</span>
+                                            <span class="s-label">Body Aches</span>
+                                        </button>
+                                        <button class="symptom-card-btn" data-symptom="Cough">
+                                            <span class="s-icon">🌬️</span>
+                                            <span class="s-label">Cough</span>
+                                        </button>
+                                        <button class="symptom-card-btn" data-symptom="Sore Throat">
+                                            <span class="s-icon">🗣️</span>
+                                            <span class="s-label">Sore Throat</span>
+                                        </button>
+                                        <button class="symptom-card-btn" data-symptom="Runny Nose">
+                                            <span class="s-icon">🤧</span>
+                                            <span class="s-label">Runny Nose</span>
+                                        </button>
+                                        <button class="symptom-card-btn" data-symptom="Nausea">
+                                            <span class="s-icon">🤢</span>
+                                            <span class="s-label">Nausea</span>
+                                        </button>
+                                        <button class="symptom-card-btn" data-symptom="Stomach Ache">
+                                            <span class="s-icon">😖</span>
+                                            <span class="s-label">Stomach Ache</span>
+                                        </button>
+                                        <button class="symptom-card-btn" data-symptom="Diarrhea">
+                                            <span class="s-icon">🚽</span>
+                                            <span class="s-label">Diarrhea</span>
+                                        </button>
+                                        <button class="symptom-card-btn" data-symptom="Chest Pain">
+                                            <span class="s-icon">🫀</span>
+                                            <span class="s-label">Chest Pain</span>
+                                        </button>
+                                        <button class="symptom-card-btn" data-symptom="Dizziness">
+                                            <span class="s-icon">😵</span>
+                                            <span class="s-label">Dizziness</span>
+                                        </button>
                                     </div>
-                                    <button id="close-result" class="close-btn" title="Close">&times;</button>
                                 </div>
-                                <div id="symptom-analysis-content" class="result-text-body"></div>
-                                <div class="result-footer">
-                                    <span class="quick-disclaimer">For informational purposes only</span>
-                                    <button id="new-check-btn" class="btn btn-primary">Start New Check</button>
+
+                                <!-- Severity & Duration -->
+                                <div class="additional-input-grid">
+                                    <div class="input-card">
+                                        <label>Discomfort Level: <span id="severity-val">5/10</span></label>
+                                        <input type="range" id="severity-slider" min="1" max="10" value="5"
+                                            class="modern-slider">
+                                    </div>
+                                    <div class="input-card">
+                                        <label>How long? (Optional)</label>
+                                        <select id="symptom-duration" class="form-control-minimal">
+                                            <option value="1-3 days">1-3 days</option>
+                                            <option value="Less than 24h">Less than 24 hours</option>
+                                            <option value="About a week">About a week</option>
+                                            <option value="Longer">Longer</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="action-footer">
+                                    <button id="check-symptoms-btn" class="btn btn-primary btn-hero">
+                                        Analyze My Symptoms
+                                    </button>
                                 </div>
                             </div>
-                        </div>
+                        </details>
                     </div>
 
                     <div class="medical-disclaimer">

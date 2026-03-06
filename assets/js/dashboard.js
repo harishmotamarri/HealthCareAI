@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- 2. Symptom Checker - AI Assistant Redesign logic ---
+    // --- 2. Health Assistant Chatbot + Optional Symptom Checker ---
     const aiState = {
         selectedSymptoms: new Set(),
         severity: 5,
@@ -249,66 +249,129 @@ document.addEventListener('DOMContentLoaded', () => {
         isAnalyzing: false
     };
 
-    const symptomSearchInput = document.getElementById('symptom-search');
-    const suggestionsBox = document.getElementById('search-suggestions');
+    const chatInput = document.getElementById('chat-input');
+    const chatSendBtn = document.getElementById('chat-send-btn');
+    const chatMessages = document.getElementById('chat-messages');
     const activeChipsContainer = document.getElementById('active-symptoms-list');
     const checkBtn = document.getElementById('check-symptoms-btn');
-    const resultOverlay = document.getElementById('symptom-result');
-    const resultContent = document.getElementById('symptom-analysis-content');
     const severitySlider = document.getElementById('severity-slider');
     const severityVal = document.getElementById('severity-val');
 
-    const symptomsWithIcons = [
-        // General / Systemic
-        { name: "Headache", icon: "🤕" },
-        { name: "Fever", icon: "🌡️" },
-        { name: "Fatigue", icon: "🛌" },
-        { name: "Chills", icon: "🥶" },
-        { name: "Sweating", icon: "💦" },
-        { name: "Body Aches", icon: "💪" },
-        { name: "Weakness", icon: "🔋" },
+    function formatAIResponse(rawText) {
+        const lines = rawText.trim().split('\n').filter(l => l.trim() !== '');
+        const sectionIcons = {
+            "possible issue": "🔍", "what it means": "💡", "what this means": "💡",
+            "what you can do": "✅", "see a doctor if": "⚠️"
+        };
+        let html = '', inList = false;
+        lines.forEach(line => {
+            let trimmed = line.trim();
+            trimmed = trimmed.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            const headerMatch = trimmed.match(/^#{1,4}\s+(.+)/);
+            if (headerMatch) {
+                if (inList) { html += '</ul>'; inList = false; }
+                const title = headerMatch[1].trim();
+                const key = title.toLowerCase().replace(/[^a-z\s]/g, '').trim();
+                const icon = sectionIcons[key] || '📋';
+                html += `<h3>${icon} ${title}</h3>`;
+                return;
+            }
+            const bulletMatch = trimmed.match(/^[-•]\s+(.+)/);
+            if (bulletMatch) {
+                if (!inList) { html += '<ul>'; inList = true; }
+                html += `<li>${bulletMatch[1]}</li>`;
+                return;
+            }
+            if (trimmed) {
+                if (inList) { html += '</ul>'; inList = false; }
+                html += `<p>${trimmed}</p>`;
+            }
+        });
+        if (inList) html += '</ul>';
+        return html;
+    }
 
-        // Respiratory / ENT
-        { name: "Cough", icon: "🌬️" },
-        { name: "Sore Throat", icon: "🗣️" },
-        { name: "Shortness of Breath", icon: "🫁" },
-        { name: "Runny Nose", icon: "🤧" },
-        { name: "Congestion", icon: "👃" },
-        { name: "Loss of Smell", icon: "🚫👃" },
+    function addChatBubble(type, content, isHtml) {
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble ${type}`;
 
-        // Gastrointestinal
-        { name: "Nausea", icon: "🤢" },
-        { name: "Vomiting", icon: "🤮" },
-        { name: "Diarrhea", icon: "🚽" },
-        { name: "Stomach Ache", icon: "😖" },
-        { name: "Heartburn", icon: "🔥" },
-        { name: "Loss of Appetite", icon: "🍽️" },
+        if (type === 'assistant') {
+            bubble.innerHTML = `
+                <div class="bubble-avatar">✨</div>
+                <div class="bubble-content">${isHtml ? content : '<p>' + content + '</p>'}</div>
+            `;
+        } else {
+            bubble.innerHTML = `<div class="bubble-content"><p>${content}</p></div>`;
+        }
 
-        // Cardiovascular / Neurological
-        { name: "Chest Pain", icon: "🫀" },
-        { name: "Palpitations", icon: "💓" },
-        { name: "Dizziness", icon: "😵" },
-        { name: "Fainting", icon: "💫" },
-        { name: "Confusion", icon: "❓" },
-        { name: "Numbness", icon: "🧊" },
+        chatMessages.appendChild(bubble);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 
-        // Musculoskeletal / Skin
-        { name: "Joint Pain", icon: "🦴" },
-        { name: "Muscle Cramps", icon: "🦵" },
-        { name: "Back Pain", icon: "🧍" },
-        { name: "Rash", icon: "🔴" },
-        { name: "Itching", icon: "🤏" },
-        // Vision / Eye
-        { name: "Blurry Vision", icon: "👓" },
-        { name: "Red Eye", icon: "👁️" }
-    ];
+    function addTypingIndicator() {
+        const typing = document.createElement('div');
+        typing.className = 'chat-bubble assistant typing-indicator';
+        typing.id = 'typing-bubble';
+        typing.innerHTML = `
+            <div class="bubble-avatar">✨</div>
+            <div class="bubble-content"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        `;
+        chatMessages.appendChild(typing);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 
+    function removeTypingIndicator() {
+        const el = document.getElementById('typing-bubble');
+        if (el) el.remove();
+    }
+
+    async function sendToAPI(payload) {
+        const response = await fetch('/api/check-symptoms', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Server error');
+        return data.analysis;
+    }
+
+    // Chat send (free-text question)
+    async function handleChatSend() {
+        const text = chatInput.value.trim();
+        if (!text || aiState.isAnalyzing) return;
+
+        addChatBubble('user', text);
+        chatInput.value = '';
+        aiState.isAnalyzing = true;
+        chatSendBtn.disabled = true;
+        addTypingIndicator();
+
+        try {
+            const analysis = await sendToAPI({ message: text });
+            removeTypingIndicator();
+            addChatBubble('assistant', formatAIResponse(analysis), true);
+        } catch (err) {
+            removeTypingIndicator();
+            addChatBubble('assistant', '<p>Sorry, I couldn\'t process that. Please try again.</p>', true);
+        } finally {
+            aiState.isAnalyzing = false;
+            chatSendBtn.disabled = false;
+            chatInput.focus();
+        }
+    }
+
+    chatSendBtn.addEventListener('click', handleChatSend);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleChatSend();
+    });
+
+    // --- Symptom pill logic (optional section) ---
     function renderChips() {
         if (aiState.selectedSymptoms.size === 0) {
             activeChipsContainer.innerHTML = '';
             return;
         }
-
         activeChipsContainer.innerHTML = Array.from(aiState.selectedSymptoms).map(symptom => `
             <div class="chip">
                 <span>${symptom}</span>
@@ -336,43 +399,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.removeAISymptom = (s) => toggleAISymptom(s);
 
-    // Grid Buttons
     document.querySelectorAll('.symptom-card-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             toggleAISymptom(btn.getAttribute('data-symptom'));
         });
     });
 
-    // Search Logic
-    symptomSearchInput.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        if (!query) {
-            suggestionsBox.style.display = 'none';
-            return;
-        }
-
-        const matches = symptomsWithIcons.filter(s =>
-            s.name.toLowerCase().includes(query) && !aiState.selectedSymptoms.has(s.name)
-        );
-
-        if (matches.length > 0) {
-            suggestionsBox.innerHTML = matches.map(s => `<div>${s.icon} ${s.name}</div>`).join('');
-            suggestionsBox.style.display = 'block';
-        } else {
-            suggestionsBox.style.display = 'none';
-        }
-    });
-
-    suggestionsBox.addEventListener('click', (e) => {
-        const text = e.target.innerText.split(' ').slice(1).join(' '); // Remove icon
-        if (text) {
-            toggleAISymptom(text);
-            symptomSearchInput.value = '';
-            suggestionsBox.style.display = 'none';
-        }
-    });
-
-    // Slider
     if (severitySlider) {
         severitySlider.addEventListener('input', () => {
             aiState.severity = severitySlider.value;
@@ -384,114 +416,42 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const closeResultBtn = document.getElementById('close-result');
-    if (closeResultBtn) {
-        closeResultBtn.addEventListener('click', () => {
-            resultOverlay.style.display = 'none';
-        });
-    }
-
-    // Reset Flow
-    document.getElementById('new-check-btn').addEventListener('click', () => {
-        resultOverlay.style.display = 'none';
-        aiState.selectedSymptoms.clear();
-        renderChips();
-        updateGridSelection();
-        symptomSearchInput.value = '';
-        if (severitySlider) { severitySlider.value = 5; aiState.severity = 5; severityVal.innerText = '5/10'; severityVal.style.color = '#f59e0b'; }
-    });
-
-    function formatAIResponse(rawText) {
-        const lines = rawText.trim().split('\n').filter(l => l.trim() !== '');
-
-        const sectionIcons = {
-            "possible issue": "🔍",
-            "what it means": "💡",
-            "what this means": "💡",
-            "what you can do": "✅",
-            "see a doctor if": "⚠️"
-        };
-
-        let html = '';
-        let inList = false;
-
-        lines.forEach(line => {
-            let trimmed = line.trim();
-
-            // Bold
-            trimmed = trimmed.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-            // Section header (### Header)
-            const headerMatch = trimmed.match(/^#{1,4}\s+(.+)/);
-            if (headerMatch) {
-                if (inList) { html += '</ul>'; inList = false; }
-                const title = headerMatch[1].trim();
-                const key = title.toLowerCase().replace(/[^a-z\s]/g, '').trim();
-                const icon = sectionIcons[key] || '📋';
-                html += `<h3>${icon} ${title}</h3>`;
-                return;
-            }
-
-            // Bullet point (- item or • item)
-            const bulletMatch = trimmed.match(/^[-•]\s+(.+)/);
-            if (bulletMatch) {
-                if (!inList) { html += '<ul>'; inList = true; }
-                html += `<li>${bulletMatch[1]}</li>`;
-                return;
-            }
-
-            // Regular paragraph text
-            if (trimmed) {
-                if (inList) { html += '</ul>'; inList = false; }
-                html += `<p>${trimmed}</p>`;
-            }
-        });
-
-        if (inList) html += '</ul>';
-        return html;
-    }
-
-    // API Call
+    // Symptom analyze button → sends to chat
     if (checkBtn) {
         checkBtn.addEventListener('click', async () => {
             if (aiState.selectedSymptoms.size === 0) {
-                alert('Please select or search for at least one symptom.');
+                alert('Please select at least one symptom.');
                 return;
             }
 
-            aiState.isAnalyzing = true;
-            checkBtn.innerHTML = '<span class="spinner"></span> Analyzing Symptoms...';
-            checkBtn.disabled = true;
-
+            const symptoms = Array.from(aiState.selectedSymptoms);
             const duration = document.getElementById('symptom-duration').value;
 
+            // Show user message in chat
+            addChatBubble('user', '🩺 ' + symptoms.join(', ') + ' — Severity: ' + aiState.severity + '/10, Duration: ' + duration);
+
+            aiState.isAnalyzing = true;
+            checkBtn.innerHTML = '<span class="spinner"></span> Analyzing...';
+            checkBtn.disabled = true;
+            addTypingIndicator();
+
+            // Scroll chat into view
+            chatMessages.scrollIntoView({ behavior: 'smooth' });
+
             try {
-                const response = await fetch('http://localhost:3000/api/check-symptoms', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        symptoms: Array.from(aiState.selectedSymptoms),
-                        severity: aiState.severity,
-                        duration: duration
-                    })
+                const analysis = await sendToAPI({
+                    symptoms: symptoms,
+                    severity: aiState.severity,
+                    duration: duration
                 });
-
-                const data = await response.json();
-
-                if (data.analysis) {
-                    resultContent.innerHTML = formatAIResponse(data.analysis);
-                    resultOverlay.style.display = 'flex';
-                } else {
-                    resultContent.innerHTML = '<h3>⚠️ Error</h3><p>Sorry, I encountered an error during analysis. Please try again.</p>';
-                    resultOverlay.style.display = 'flex';
-                }
+                removeTypingIndicator();
+                addChatBubble('assistant', formatAIResponse(analysis), true);
             } catch (err) {
-                console.error(err);
-                resultContent.innerHTML = '<h3>⚠️ Connection Error</h3><p>Failed to connect to MediEase AI. Please ensure the server is running.</p>';
-                resultOverlay.style.display = 'flex';
+                removeTypingIndicator();
+                addChatBubble('assistant', '<p>Sorry, something went wrong. Please try again.</p>', true);
             } finally {
                 aiState.isAnalyzing = false;
-                checkBtn.innerHTML = 'Check My Symptoms';
+                checkBtn.innerHTML = 'Analyze My Symptoms';
                 checkBtn.disabled = false;
             }
         });
