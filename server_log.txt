@@ -1,0 +1,13 @@
+[dotenv@17.3.1] injecting env (7) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+✅ Supabase client initialized.
+Server running at http://localhost:3000
+--- Start Symptom Analysis ---
+Timestamp: 2026-03-06T09:29:27.584Z
+Payload: {
+  "symptoms": [
+    "headache"
+  ]
+}
+Calling Gemini API...
+--- End Symptom Analysis ---

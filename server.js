@@ -29,8 +29,7 @@ app.post('/api/check-symptoms', async (req, res) => {
             throw new Error('GEMINI_API_KEY is missing from environment variables');
         }
 
-        // Try gemini-3-flash-preview as confirmed by ListModels
-        const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const prompt = `
             You are a simple health assistant. Explain symptoms in very easy language.
