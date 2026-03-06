@@ -654,11 +654,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const hospitalSpecialty = document.getElementById('hospital-specialty');
     const hospitalDistance = document.getElementById('hospital-distance');
     const hospitalRating = document.getElementById('hospital-rating');
-    const hospitalCards = document.querySelectorAll('.hospital-card');
+    // Using allHospitalCards declared earlier
     const hospitalsCount = document.getElementById('hospitals-count');
 
     function filterHospitals() {
-        if (!hospitalCards) return;
+        if (!allHospitalCards) return;
 
         const query = hospitalSearch ? hospitalSearch.value.toLowerCase() : '';
         const specialty = hospitalSpecialty ? hospitalSpecialty.value : 'All Specialties';
@@ -667,7 +667,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let visibleCount = 0;
 
-        hospitalCards.forEach(card => {
+        allHospitalCards.forEach(card => {
             let isVisible = true;
 
             // 1. Search Filter
@@ -722,5 +722,83 @@ document.addEventListener('DOMContentLoaded', () => {
     if (hospitalSpecialty) hospitalSpecialty.addEventListener('change', filterHospitals);
     if (hospitalDistance) hospitalDistance.addEventListener('change', filterHospitals);
     if (hospitalRating) hospitalRating.addEventListener('change', filterHospitals);
+
+    // --- 7. Daily Health Tips Functionality ---
+    const healthTips = [
+        {
+            icon: '💧',
+            title: 'Stay Hydrated',
+            desc: 'Drink at least 8 glasses of water daily for optimal health.'
+        },
+        {
+            icon: '🚶',
+            title: 'Keep Moving',
+            desc: 'Aim for at least 30 minutes of moderate physical activity every day.'
+        },
+        {
+            icon: '😴',
+            title: 'Get Enough Sleep',
+            desc: 'Adults need 7-9 hours of quality sleep per night for proper recovery.'
+        }
+    ];
+
+    const tipIcon = document.getElementById('daily-tip-icon');
+    const tipTitle = document.getElementById('daily-tip-title');
+    const tipDesc = document.getElementById('daily-tip-desc');
+    const tipDots = document.querySelectorAll('.tip-dot');
+
+    let currentTipIndex = 0;
+
+    function updateDailyTip(index) {
+        if (!tipIcon || !tipTitle || !tipDesc) return;
+
+        currentTipIndex = index;
+
+        // Add fade out effect
+        tipIcon.style.opacity = 0;
+        tipTitle.style.opacity = 0;
+        tipDesc.style.opacity = 0;
+
+        setTimeout(() => {
+            tipIcon.innerText = healthTips[index].icon;
+            tipTitle.innerText = healthTips[index].title;
+            tipDesc.innerText = healthTips[index].desc;
+
+            // Add fade in effect
+            tipIcon.style.opacity = 1;
+            tipTitle.style.opacity = 1;
+            tipDesc.style.opacity = 1;
+        }, 150);
+
+        tipDots.forEach((dot, i) => {
+            if (i === index) {
+                dot.style.background = 'var(--primary)';
+            } else {
+                dot.style.background = 'rgba(255,255,255,0.2)';
+            }
+        });
+    }
+
+    if (tipDots.length > 0) {
+        let tipInterval;
+
+        function autoRotateTip() {
+            let nextIndex = (currentTipIndex + 1) % healthTips.length;
+            updateDailyTip(nextIndex);
+        }
+
+        tipDots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                const index = parseInt(dot.getAttribute('data-index'));
+                updateDailyTip(index);
+                // Reset interval to avoid switching immediately after user clicks
+                clearInterval(tipInterval);
+                tipInterval = setInterval(autoRotateTip, 2000);
+            });
+        });
+
+        // Auto rotate tips
+        tipInterval = setInterval(autoRotateTip, 2000);
+    }
 
 });
