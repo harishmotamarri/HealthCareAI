@@ -71,15 +71,41 @@ const appRouter = {
         ];
 
         if (globalSearch && suggestionsBox) {
+            // Helper to show default suggestions
+            const showDefaultSuggestions = () => {
+                suggestionsBox.innerHTML = '<div class="search-suggestion-header">Related Searches</div>';
+                searchSections.slice(0, 3).forEach(match => {
+                    const div = document.createElement('div');
+                    div.className = 'search-suggestion-item';
+                    div.innerHTML = `<span style="margin-right: 8px;">${match.icon}</span> ${match.title}`;
+                    div.addEventListener('click', () => {
+                        this.navigate(match.id);
+                        globalSearch.value = '';
+                        globalSearch.blur();
+                        suggestionsBox.style.display = 'none';
+                    });
+                    suggestionsBox.appendChild(div);
+                });
+                suggestionsBox.style.display = 'flex';
+            };
+
+            // Show defaults on focus only if there's a query
+            globalSearch.addEventListener('focus', (e) => {
+                if (e.target.value.trim().length > 0) {
+                    globalSearch.dispatchEvent(new Event('input'));
+                }
+            });
+
             // Handle input typing
             globalSearch.addEventListener('input', (e) => {
                 const query = e.target.value.toLowerCase().trim();
-                suggestionsBox.innerHTML = '';
 
                 if (query.length === 0) {
-                    suggestionsBox.style.display = 'none';
+                    showDefaultSuggestions();
                     return;
                 }
+
+                suggestionsBox.innerHTML = '';
 
                 const matches = searchSections.filter(section =>
                     section.title.toLowerCase().includes(query) ||
@@ -457,6 +483,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 2b. Medical Reports Feature ---
+    // Helper to get auth headers for API calls
+    async function getAuthHeaders() {
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        if (!session) return {};
+        return { 'Authorization': 'Bearer ' + session.access_token };
+    }
+
     const reportFileInput = document.getElementById('report-file-input');
     const reportBrowseBtn = document.getElementById('report-browse-btn');
     const reportDropZone = document.getElementById('report-drop-zone');
@@ -539,7 +572,12 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('report', file);
 
         try {
-            const res = await fetch('/api/reports/upload', { method: 'POST', body: formData });
+            const authHeaders = await getAuthHeaders();
+            const res = await fetch('/api/reports/upload', {
+                method: 'POST',
+                headers: authHeaders,
+                body: formData
+            });
             const data = await res.json();
 
             clearInterval(progressInterval);
@@ -564,7 +602,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load and render reports list
     async function loadReportsList() {
         try {
-            const res = await fetch('/api/reports');
+            const authHeaders = await getAuthHeaders();
+            const res = await fetch('/api/reports', { headers: authHeaders });
             const data = await res.json();
 
             if (!data.reports || data.reports.length === 0) {
@@ -601,8 +640,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // View a single report detail
-    window.viewReport = function (id) {
-        fetch('/api/reports').then(r => r.json()).then(data => {
+    window.viewReport = async function (id) {
+        const authHeaders = await getAuthHeaders();
+        fetch('/api/reports', { headers: authHeaders }).then(r => r.json()).then(data => {
             const report = data.reports.find(r => r.id === id);
             if (report) showReportDetail(report);
         });
@@ -633,7 +673,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.deleteReport = async function (id) {
         if (!confirm('Delete this report?')) return;
         try {
-            await fetch('/api/reports/' + id, { method: 'DELETE' });
+            const authHeaders = await getAuthHeaders();
+            await fetch('/api/reports/' + id, { method: 'DELETE', headers: authHeaders });
             loadReportsList();
         } catch (err) {
             alert('Failed to delete report.');
@@ -650,9 +691,10 @@ document.addEventListener('DOMContentLoaded', () => {
         reportAskAnswer.innerHTML = '<div style="display:flex; align-items:center; gap:10px;"><span class="report-spinner"></span> Thinking...</div>';
 
         try {
+            const authHeaders = await getAuthHeaders();
             const res = await fetch('/api/reports/ask', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', ...authHeaders },
                 body: JSON.stringify({ question })
             });
             const data = await res.json();
@@ -689,6 +731,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Expose functions globally so inline onclick handlers in HTML can use them
     window.openModal = function (cardElement) {
         if (!modal) return;
+
+        // Store current card's phone for "Call Now" button
+        if (cardElement && cardElement.dataset.phone) {
+            modal.dataset.currentPhone = cardElement.dataset.phone;
+        }
 
         // If a card element was passed, extract its data to populate the modal
         if (cardElement) {
@@ -752,22 +799,54 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modal) modal.classList.remove('active');
     }
 
-    // Attach click listeners to all Details buttons
+    // Attach click listeners to all Details buttons, phone buttons, and add directions
     const allHospitalCards = document.querySelectorAll('.hospital-card');
     allHospitalCards.forEach(card => {
         const detailsBtn = card.querySelector('button.btn-primary');
+        const phoneBtn = card.querySelector('button.btn-outline');
+
         if (detailsBtn) {
             detailsBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // prevent triggering the card's onclick if it has one
+                e.stopPropagation();
                 openModal(card);
             });
         }
 
-        // Ensure the card itself is also clickable if we want
-        card.addEventListener('click', () => {
+        // 📞 button on card → call the hospital
+        if (phoneBtn) {
+            phoneBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const phone = card.dataset.phone;
+                if (phone) window.location.href = 'tel:' + phone;
+            });
+        }
+
+        // Clicking the card body opens modal (but not from buttons)
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('button')) return;
             openModal(card);
         });
     });
+
+    // Modal "Call Now" and "Get Directions" buttons
+    const modalCallBtn = document.getElementById('modal-call-btn');
+    const modalDirBtn = document.getElementById('modal-directions-btn');
+
+    if (modalCallBtn) {
+        modalCallBtn.addEventListener('click', () => {
+            const phone = modal.dataset.currentPhone;
+            if (phone) window.location.href = 'tel:' + phone;
+        });
+    }
+
+    if (modalDirBtn) {
+        modalDirBtn.addEventListener('click', () => {
+            const address = document.getElementById('modal-hospital-address').innerText;
+            if (address) {
+                window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(address), '_blank');
+            }
+        });
+    }
 
     // Close modal if clicking outside the content box
     if (modal) {
@@ -976,5 +1055,256 @@ document.addEventListener('DOMContentLoaded', () => {
         // Auto rotate tips
         tipInterval = setInterval(autoRotateTip, 2000);
     }
+
+    // ============================================================
+    //  SECTION 7 — FIRST AID IMAGE ANALYZER
+    // ============================================================
+    (function initFirstAid() {
+        const uploadZone = document.getElementById('fa-upload-zone');
+        const fileInput = document.getElementById('fa-file-input');
+        const cameraBtn = document.getElementById('fa-camera-btn');
+        const browseBtn = document.getElementById('fa-browse-btn');
+        const previewWrap = document.getElementById('fa-preview');
+        const previewImg = document.getElementById('fa-preview-img');
+        const removeImgBtn = document.getElementById('fa-remove-img');
+        const analyzeBtn = document.getElementById('fa-analyze-btn');
+        const loadingEl = document.getElementById('fa-loading');
+        const resultsEl = document.getElementById('fa-results');
+        const uploadCard = document.getElementById('fa-upload-card');
+        const resetBtn = document.getElementById('fa-reset-btn');
+
+        if (!uploadZone) return; // guard
+
+        let selectedFile = null;
+
+        // --- Drag & drop ---
+        uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+        uploadZone.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) handleFileSelected(file);
+        });
+
+        // --- Browse ---
+        browseBtn.addEventListener('click', () => fileInput.click());
+        uploadZone.addEventListener('click', (e) => {
+            if (e.target === uploadZone || e.target.closest('.fa-upload-icon') || e.target.closest('h3') || e.target.closest('p')) {
+                fileInput.click();
+            }
+        });
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files[0]) handleFileSelected(fileInput.files[0]);
+        });
+
+        // --- Camera ---
+        cameraBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+
+            // Try to open real camera via getUserMedia
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+                    });
+
+                    // Build camera overlay UI
+                    const overlay = document.createElement('div');
+                    overlay.id = 'fa-camera-overlay';
+                    overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+
+                    const video = document.createElement('video');
+                    video.setAttribute('autoplay', '');
+                    video.setAttribute('playsinline', '');
+                    video.srcObject = stream;
+                    video.style.cssText = 'width:100%;max-height:calc(100vh - 100px);object-fit:contain;background:#000;';
+
+                    const controls = document.createElement('div');
+                    controls.style.cssText = 'display:flex;gap:24px;padding:16px;align-items:center;';
+
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.textContent = 'Cancel';
+                    cancelBtn.style.cssText = 'padding:12px 28px;border-radius:12px;border:1px solid rgba(255,255,255,0.3);background:transparent;color:#fff;font-size:1rem;cursor:pointer;';
+
+                    const snapBtn = document.createElement('button');
+                    snapBtn.innerHTML = '📸 Capture';
+                    snapBtn.style.cssText = 'padding:14px 36px;border-radius:14px;border:none;background:var(--primary,#00e5a3);color:#fff;font-size:1.05rem;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(0,229,163,0.3);';
+
+                    controls.appendChild(cancelBtn);
+                    controls.appendChild(snapBtn);
+                    overlay.appendChild(video);
+                    overlay.appendChild(controls);
+                    document.body.appendChild(overlay);
+
+                    const cleanup = () => {
+                        stream.getTracks().forEach(t => t.stop());
+                        overlay.remove();
+                    };
+
+                    cancelBtn.addEventListener('click', cleanup);
+
+                    snapBtn.addEventListener('click', () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        canvas.getContext('2d').drawImage(video, 0, 0);
+                        cleanup();
+                        canvas.toBlob((blob) => {
+                            if (blob) {
+                                const file = new File([blob], 'camera-photo.jpg', { type: 'image/jpeg' });
+                                handleFileSelected(file);
+                            }
+                        }, 'image/jpeg', 0.92);
+                    });
+
+                    return;
+                } catch (_) {
+                    // Camera denied or unavailable — fall through to file input
+                }
+            }
+
+            // Fallback: file input with capture hint (mobile)
+            const camInput = document.createElement('input');
+            camInput.type = 'file';
+            camInput.accept = 'image/*';
+            camInput.setAttribute('capture', 'environment');
+            camInput.onchange = () => { if (camInput.files[0]) handleFileSelected(camInput.files[0]); };
+            camInput.click();
+        });
+
+        function handleFileSelected(file) {
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File too large. Maximum size is 10MB.');
+                return;
+            }
+            selectedFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                uploadZone.style.display = 'none';
+                previewWrap.style.display = 'flex';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // --- Remove image ---
+        removeImgBtn.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            previewImg.src = '';
+            previewWrap.style.display = 'none';
+            uploadZone.style.display = 'flex';
+        });
+
+        // --- Analyze ---
+        analyzeBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+            previewWrap.style.display = 'none';
+            loadingEl.style.display = 'flex';
+            resultsEl.style.display = 'none';
+
+            try {
+                const formData = new FormData();
+                formData.append('injury', selectedFile);
+
+                const resp = await fetch('/api/firstaid/analyze', { method: 'POST', body: formData });
+                const data = await resp.json();
+
+                if (!resp.ok) throw new Error(data.error || 'Analysis failed');
+
+                renderResults(data.analysis);
+            } catch (err) {
+                alert('Error: ' + err.message);
+                previewWrap.style.display = 'flex';
+            } finally {
+                loadingEl.style.display = 'none';
+            }
+        });
+
+        // --- Reset ---
+        resetBtn.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            previewImg.src = '';
+            previewWrap.style.display = 'none';
+            uploadZone.style.display = 'flex';
+            uploadCard.style.display = '';
+            resultsEl.style.display = 'none';
+        });
+
+        // --- Render Results ---
+        function renderResults(a) {
+            // Severity banner
+            const banner = document.getElementById('fa-severity-banner');
+            const indicator = document.getElementById('fa-severity-indicator');
+            const colorMap = { green: '#22c55e', yellow: '#eab308', red: '#f97316' };
+            const bgMap = { green: 'rgba(34,197,94,0.08)', yellow: 'rgba(234,179,8,0.08)', red: 'rgba(249,115,22,0.08)' };
+            const borderMap = { green: 'rgba(34,197,94,0.25)', yellow: 'rgba(234,179,8,0.25)', red: 'rgba(249,115,22,0.25)' };
+            const labelMap = { green: 'MILD', yellow: 'MODERATE', red: 'SEVERE' };
+            const c = a.warning_color || 'green';
+
+            banner.style.background = bgMap[c];
+            banner.style.borderColor = borderMap[c];
+            indicator.style.background = colorMap[c];
+            indicator.style.boxShadow = `0 0 16px ${colorMap[c]}`;
+
+            // Severity tag
+            const tag = document.getElementById('fa-severity-tag');
+            tag.textContent = labelMap[c];
+            tag.style.background = colorMap[c];
+            tag.style.color = c === 'yellow' ? '#000' : '#fff';
+
+            document.getElementById('fa-injury-type').textContent = a.injury_type || '—';
+            document.getElementById('fa-injury-desc').textContent = a.description || '—';
+
+            // Score ring
+            const score = a.severity_score ?? 0;
+            document.getElementById('fa-score-num').textContent = score;
+            const ringFill = document.getElementById('fa-ring-fill');
+            ringFill.style.stroke = colorMap[c];
+            ringFill.setAttribute('stroke-dasharray', `${score * 10}, 100`);
+            document.querySelector('.fa-ring-bg').style.stroke = borderMap[c];
+
+            // Steps with stagger animation
+            const stepsList = document.getElementById('fa-steps-list');
+            stepsList.innerHTML = (a.first_aid_steps || []).map((s, i) =>
+                `<li style="animation-delay:${i * 0.08}s"><span class="fa-step-num">${i + 1}</span><span>${escHtml(s)}</span></li>`
+            ).join('');
+
+            // Warning signs
+            const warnList = document.getElementById('fa-warn-list');
+            warnList.innerHTML = (a.warning_signs || []).map((w, i) =>
+                `<li style="animation-delay:${i * 0.08}s"><span class="fa-dot" style="background:${colorMap[c]}"></span><span>${escHtml(w)}</span></li>`
+            ).join('');
+
+            // See doctor
+            const docList = document.getElementById('fa-doctor-list');
+            docList.innerHTML = (a.see_doctor_when || []).map((d, i) =>
+                `<li style="animation-delay:${i * 0.08}s"><span class="fa-dot" style="background:#3b82f6"></span><span>${escHtml(d)}</span></li>`
+            ).join('');
+
+            // Do NOT
+            const donotList = document.getElementById('fa-donot-list');
+            donotList.innerHTML = (a.do_not || []).map((d, i) =>
+                `<li style="animation-delay:${i * 0.08}s"><span class="fa-dot" style="background:#f97316"></span><span>${escHtml(d)}</span></li>`
+            ).join('');
+
+            // Color-code section cards by severity
+            document.querySelector('.fa-warn-card').style.borderTop = `3px solid ${colorMap[c]}`;
+            document.querySelector('.fa-doctor-card').style.borderTop = '3px solid #3b82f6';
+            document.querySelector('.fa-steps-card').style.borderTop = `3px solid ${colorMap[c]}`;
+
+            uploadCard.style.display = 'none';
+            resultsEl.style.display = 'block';
+            resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function escHtml(str) {
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+    })();
 
 });
