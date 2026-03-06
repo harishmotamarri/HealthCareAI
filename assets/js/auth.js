@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         signupCard.style.display = 'none';
                         confirmationCard.style.display = 'block';
                         if (emailDisplay) emailDisplay.textContent = email;
-                        
+
                         // Scroll to top to ensure they see the confirmation
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     } else {
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (error.message.includes('User already registered') || error.status === 400) {
                     errorMsg = 'This email address is already registered. Please use a different email or log in.';
                 }
-                
+
                 showMessage('auth-message', errorMsg, true);
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Create Account';
@@ -119,6 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const usernameInput = document.getElementById('login-username');
+            const username = usernameInput ? usernameInput.value : null;
             const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
             const submitBtn = loginForm.querySelector('button[type="submit"]');
 
@@ -133,6 +135,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (error) throw error;
+
+                // Update the user's full_name metadata if a username was provided during login
+                if (username) {
+                    const { error: updateError } = await window.supabaseClient.auth.updateUser({
+                        data: { full_name: username }
+                    });
+                    if (updateError) {
+                        console.error("Failed to update username:", updateError.message);
+                    }
+                }
 
                 // Handle Remember Me
                 if (rememberMe) {
@@ -157,9 +169,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (forgotPasswordLink) {
         forgotPasswordLink.addEventListener('click', async (e) => {
             e.preventDefault();
-            
+
             const email = document.getElementById('email').value;
-            
+
             if (!email) {
                 showMessage('auth-message', 'Please enter your email address first to reset your password.', true);
                 // Highlight the email field
@@ -205,11 +217,18 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // Populate user info if elements exist
             const user = session.user;
-            const fullName = user.user_metadata?.full_name || user.email;
-            const profileIcons = document.querySelectorAll('.profile-icon');
+            let fullName = user.user_metadata?.full_name;
+            if (!fullName || fullName.trim() === '') {
+                // Extract username from email
+                fullName = user.email.split('@')[0];
+                // Capitalize first letter
+                fullName = fullName.charAt(0).toUpperCase() + fullName.slice(1);
+            }
+
+            const profileIcons = document.querySelectorAll('.profile-icon, .profile-avatar');
 
             // Update Topbar and Sidebar Profile text
-            const sidebarName = document.querySelector('.sidebar-user-profile .user-details span:first-child');
+            const sidebarName = document.querySelector('.profile-name, .sidebar-user-profile .user-details span:first-child');
             const dashboardWelcome = document.querySelector('.welcome-section h1');
             const profileName = document.querySelector('#profile h1');
             const profileEmail = document.querySelector('#profile p');

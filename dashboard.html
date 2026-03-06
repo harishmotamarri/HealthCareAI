@@ -28,9 +28,9 @@
                 style="display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 1.1rem;">
                 <img src="assets/img/images.jpg" alt="MediEase Logo" width="28" height="28" style="border-radius: 4px;">
                 <div style="display: flex; flex-direction: column; line-height: 1.2;">
-                    <span id="topbar-title" style="color: #ffffff; font-family: 'Playfair Display', serif; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.5px; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">MediEase</span>
+                    <span id="topbar-title" style="color: var(--text-light); font-family: 'Playfair Display', serif; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.5px;">MediEase</span>
                     <span
-                        style="font-size: 0.55rem; font-weight: 500; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;">Don't
+                        style="font-size: 0.55rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;">Don't
                         just ask, know</span>
                 </div>
             </div>
@@ -190,8 +190,8 @@
 
 
             <div class="sidebar-footer">
-                <div class="account-profile-btn">
-                    <div class="profile-avatar">H</div>
+                <div class="account-profile-btn" style="cursor: default;">
+                    <div class="profile-avatar profile-icon">H</div>
                     <span class="profile-name">Harish</span>
                     <div class="hover-menu">
                         <a href="#" class="logout-link logout-btn"><span>🚪</span>Logout</a>
@@ -210,15 +210,15 @@
                     </div>
                     <div class="top-stats">
                         <div class="stat-box">
-                            <div class="stat-num">1</div>
+                            <div id="dash-reports-count" class="stat-num">0</div>
                             <div class="stat-label">Reports</div>
                         </div>
                         <div class="stat-box" style="border-top-color: #a855f7;">
-                            <div class="stat-num" style="color:#a855f7;">1</div>
+                            <div id="dash-symptoms-count" class="stat-num" style="color:#a855f7;">0</div>
                             <div class="stat-label">Sym. Checks</div>
                         </div>
                         <div class="stat-box" style="border-top-color: #3b82f6;">
-                            <div class="stat-num" style="color:#3b82f6;">0</div>
+                            <div id="dash-appointments-count" class="stat-num" style="color:#3b82f6;">0</div>
                             <div class="stat-label">Appointments</div>
                         </div>
                     </div>
@@ -362,10 +362,12 @@
 
             <!-- ===== MEDICAL REPORTS (Upload + View + Query) ===== -->
             <div id="reports" class="view-section">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
                     <div>
                         <h1>Medical Reports</h1>
-                        <p style="color:var(--text-muted); margin-top:4px;">Upload, analyze & query your medical reports with AI</p>
+                        <p style="color:var(--text-muted); margin-top:4px;">Upload, analyze & query your medical reports
+                            with AI</p>
                     </div>
                 </div>
 
@@ -374,26 +376,36 @@
                     <input type="file" id="report-file-input" accept=".pdf,.jpg,.jpeg,.png,.webp" hidden>
                     <div style="font-size: 3rem; margin-bottom: 12px;">📄</div>
                     <h3 style="margin-bottom: 6px;">Drag & Drop your report here</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 20px;">Supports PDF, JPG, PNG, WEBP (Max 10MB)</p>
-                    <button class="btn btn-primary" id="report-browse-btn" style="padding: 12px 24px;">Browse Files</button>
+                    <p style="color: var(--text-muted); margin-bottom: 20px;">Supports PDF, JPG, PNG, WEBP (Max 10MB)
+                    </p>
+                    <button class="btn btn-primary" id="report-browse-btn" style="padding: 12px 24px;">Browse
+                        Files</button>
                     <!-- Upload progress -->
                     <div id="upload-progress" style="display:none; margin-top: 20px; width: 100%;">
                         <div style="display:flex; align-items:center; gap:12px; justify-content:center;">
                             <span class="report-spinner"></span>
-                            <span id="upload-status-text" style="color:var(--text-muted);">Uploading & analyzing...</span>
+                            <span id="upload-status-text" style="color:var(--text-muted);">Uploading &
+                                analyzing...</span>
                         </div>
-                        <div class="upload-bar-track"><div class="upload-bar-fill" id="upload-bar-fill"></div></div>
+                        <div class="upload-bar-track">
+                            <div class="upload-bar-fill" id="upload-bar-fill"></div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Ask AI About Reports -->
                 <div class="card" style="margin-top: 24px;">
-                    <h3 style="margin-bottom: 12px; display:flex; align-items:center; gap:8px;">🧠 Ask About Your Reports</h3>
-                    <p style="color:var(--text-muted); margin-bottom: 16px; font-size:0.9rem;">Ask any question about your stored medical data and get AI-powered insights.</p>
+                    <h3 style="margin-bottom: 12px; display:flex; align-items:center; gap:8px;">🧠 Ask About Your
+                        Reports</h3>
+                    <p style="color:var(--text-muted); margin-bottom: 16px; font-size:0.9rem;">Ask any question about
+                        your stored medical data and get AI-powered insights.</p>
                     <div class="report-ask-bar">
-                        <input type="text" id="report-ask-input" placeholder="e.g. &quot;What's my cholesterol trend?&quot; or &quot;Summarize all my reports&quot;" autocomplete="off">
+                        <input type="text" id="report-ask-input"
+                            placeholder="e.g. &quot;What's my cholesterol trend?&quot; or &quot;Summarize all my reports&quot;"
+                            autocomplete="off">
                         <button id="report-ask-btn" class="chat-send-btn" title="Ask AI">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
                                 <line x1="22" y1="2" x2="11" y2="13"></line>
                                 <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                             </svg>
@@ -406,7 +418,8 @@
                 <div style="margin-top: 32px;">
                     <h3 style="margin-bottom: 16px;">Your Reports</h3>
                     <div id="reports-list" style="display: flex; flex-direction: column; gap: 16px;">
-                        <p id="no-reports-msg" style="color:var(--text-muted); text-align:center; padding:32px 0;">No reports uploaded yet. Upload your first report above!</p>
+                        <p id="no-reports-msg" style="color:var(--text-muted); text-align:center; padding:32px 0;">No
+                            reports uploaded yet. Upload your first report above!</p>
                     </div>
                 </div>
             </div>
@@ -432,7 +445,8 @@
                             <div class="chat-bubble assistant">
                                 <div class="bubble-avatar">✨</div>
                                 <div class="bubble-content">
-                                    <p>Hi! I'm your MediEase health assistant. You can ask me any health question, or select symptoms below for a checkup.</p>
+                                    <p>Hi! I'm your MediEase health assistant. You can ask me any health question, or
+                                        select symptoms below for a checkup.</p>
                                 </div>
                             </div>
                         </div>
@@ -443,7 +457,8 @@
                                 placeholder="Ask a health question... (e.g. &quot;Is it safe to take paracetamol daily?&quot;)"
                                 autocomplete="off">
                             <button id="chat-send-btn" class="chat-send-btn" title="Send">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
                                     <line x1="22" y1="2" x2="11" y2="13"></line>
                                     <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                                 </svg>
@@ -460,7 +475,10 @@
                                         <span>Tap to pick symptoms for a detailed checkup</span>
                                     </span>
                                 </span>
-                                <svg class="toggle-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                <svg class="toggle-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
                             </summary>
                             <div class="checker-interaction-zone">
                                 <!-- Selected Symptoms Chips -->
@@ -1177,7 +1195,7 @@
                 <div class="card profile-hero-card"
                     style="border-top: 4px solid var(--primary); margin-bottom: 24px;">
                     <div style="display: flex; align-items: center; gap: 24px;">
-                        <div
+                        <div class="profile-icon"
                             style="width: 80px; height: 80px; background: var(--primary); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold;">
                             H</div>
                         <div>
@@ -1189,39 +1207,30 @@
 
                 <div class="top-stats" style="margin-bottom: 24px;">
                     <div class="stat-box" style="flex: 1; padding: 24px;">
-                        <div style="font-size: 2rem; font-weight: bold; color:var(--primary);">1</div>
+                        <div id="profile-reports-count"
+                            style="font-size: 2rem; font-weight: bold; color:var(--primary);">0</div>
                         <div style="font-size: 0.9rem; color: var(--text-muted);">Reports</div>
                     </div>
                     <div class="stat-box" style="flex: 1; padding: 24px; border-top-color: #a855f7;">
-                        <div style="font-size: 2rem; font-weight: bold; color:#a855f7;">1</div>
+                        <div id="profile-symptoms-count" style="font-size: 2rem; font-weight: bold; color:#a855f7;">0
+                        </div>
                         <div style="font-size: 0.9rem; color: var(--text-muted);">Symptom Checks</div>
-                    </div>
-                    <div class="stat-box" style="flex: 1; padding: 24px; border-top-color: #3b82f6;">
-                        <div style="font-size: 2rem; font-weight: bold; color:#3b82f6;">0</div>
-                        <div style="font-size: 0.9rem; color: var(--text-muted);">Saved Hospitals</div>
                     </div>
                 </div>
 
                 <div
                     style="display: flex; gap: 32px; border-bottom: 1px solid var(--border-color); margin-bottom: 24px; padding-bottom: 12px;">
-                    <span
+                    <span id="tab-profile-reports"
                         style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 12px; font-weight: 500; cursor:pointer;">📄
                         Reports</span>
-                    <span style="color: var(--text-muted); cursor:pointer;">🩺 Symptom History</span>
-                    <span style="color: var(--text-muted); cursor:pointer;">🏥 Saved Hospitals</span>
+                    <span id="tab-profile-symptoms" style="color: var(--text-muted); cursor:pointer;">🩺 Symptom
+                        History</span>
                 </div>
 
-                <div class="card"
-                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; cursor:pointer;">
-                    <div style="display: flex; align-items: center; gap: 16px;">
-                        <div class="action-icon" style="margin:0;">📄</div>
-                        <div>
-                            <h4 style="margin-bottom: 4px; font-size: 1rem;">Annual Blood Test - January 2024</h4>
-                            <p style="font-size: 0.85rem; color: var(--text-muted);">04/03/2026</p>
-                        </div>
-                    </div>
-                    <span style="color: var(--text-muted); font-size: 1.5rem;">›</span>
+                <div id="profile-dynamic-content">
+                    <!-- Dynamic content filled by JS -->
                 </div>
+
 
                 <h3 style="margin-bottom: 16px; font-size: 1.1rem;">Quick Actions</h3>
                 <div style="display: flex; gap: 20px;">

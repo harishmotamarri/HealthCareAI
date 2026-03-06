@@ -473,6 +473,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 removeTypingIndicator();
                 addChatBubble('assistant', formatAIResponse(analysis), true);
+
+                // Increment Symptom Check count in Profile and Dashboard
+                const profileSymptomsCount = document.getElementById('profile-symptoms-count');
+                const dashSymptomsCount = document.getElementById('dash-symptoms-count');
+                if (profileSymptomsCount) {
+                    profileSymptomsCount.textContent = parseInt(profileSymptomsCount.textContent) + 1;
+                }
+                if (dashSymptomsCount) {
+                    dashSymptomsCount.textContent = parseInt(dashSymptomsCount.textContent) + 1;
+                }
+
             } catch (err) {
                 removeTypingIndicator();
                 addChatBubble('assistant', '<p>Sorry, something went wrong. Please try again.</p>', true);
@@ -480,6 +491,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 aiState.isAnalyzing = false;
                 checkBtn.innerHTML = 'Analyze My Symptoms';
                 checkBtn.disabled = false;
+            }
+        });
+    }
+
+    // --- Profile View Tabs Logic ---
+    const tabProfileReports = document.getElementById('tab-profile-reports');
+    const tabProfileSymptoms = document.getElementById('tab-profile-symptoms');
+
+    if (tabProfileReports && tabProfileSymptoms) {
+        tabProfileReports.addEventListener('click', () => {
+            tabProfileReports.style.color = 'var(--primary)';
+            tabProfileReports.style.borderBottom = '2px solid var(--primary)';
+
+            tabProfileSymptoms.style.color = 'var(--text-muted)';
+            tabProfileSymptoms.style.borderBottom = 'none';
+
+            // Reload reports when Reports tab is clicked
+            loadReportsList();
+        });
+
+        tabProfileSymptoms.addEventListener('click', () => {
+            tabProfileSymptoms.style.color = 'var(--primary)';
+            tabProfileSymptoms.style.borderBottom = '2px solid var(--primary)';
+
+            tabProfileReports.style.color = 'var(--text-muted)';
+            tabProfileReports.style.borderBottom = 'none';
+
+            // Show placeholder for symptom history since we don't have a backend table for it yet
+            const profileContent = document.getElementById('profile-dynamic-content');
+            if (profileContent) {
+                profileContent.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding: 20px 0;">No saved symptom history available.</p>';
             }
         });
     }
@@ -608,15 +650,30 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/reports', { headers: authHeaders });
             const data = await res.json();
 
+            // Profile references
+            const profileContent = document.getElementById('profile-dynamic-content');
+            const profileReportsCount = document.getElementById('profile-reports-count');
+            const dashReportsCount = document.getElementById('dash-reports-count'); // Main dashboard counter
+
             if (!data.reports || data.reports.length === 0) {
                 reportsList.innerHTML = '';
                 noReportsMsg.style.display = 'block';
                 reportsList.appendChild(noReportsMsg);
+
+                if (profileContent) {
+                    profileContent.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding: 20px 0;">No reports found</p>';
+                }
+                if (profileReportsCount) profileReportsCount.textContent = '0';
+                if (dashReportsCount) dashReportsCount.textContent = '0';
                 return;
             }
 
+            // Update Reports Counts
+            if (profileReportsCount) profileReportsCount.textContent = data.reports.length;
+            if (dashReportsCount) dashReportsCount.textContent = data.reports.length;
+
             noReportsMsg.style.display = 'none';
-            reportsList.innerHTML = data.reports.map(r => {
+            const htmlFragments = data.reports.map(r => {
                 const date = new Date(r.uploadedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 const sizeKB = (r.fileSize / 1024).toFixed(0);
                 const icon = r.mimeType === 'application/pdf' ? '📑' : '🖼️';
@@ -635,7 +692,30 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                 `;
-            }).join('');
+            });
+
+            reportsList.innerHTML = htmlFragments.join('');
+
+            // Also populate the miniature view for the Profile section
+            if (profileContent) {
+                profileContent.innerHTML = data.reports.map(r => {
+                    const date = new Date(r.uploadedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    return `
+                        <div class="card"
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; cursor:pointer;" onclick="window.viewReport('${r.id}')">
+                            <div style="display: flex; align-items: center; gap: 16px;">
+                                <div class="action-icon" style="margin:0;">📄</div>
+                                <div>
+                                    <h4 style="margin-bottom: 4px; font-size: 1rem;">${r.fileName}</h4>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted);">${date}</p>
+                                </div>
+                            </div>
+                            <span style="color: var(--text-muted); font-size: 1.5rem;">›</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
         } catch (err) {
             reportsList.innerHTML = '<p style="color:#ef4444; text-align:center;">Failed to load reports.</p>';
         }
@@ -857,6 +937,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeModal();
             }
         });
+
+        // Add event listener to "Call Now" button to increment Appointments stat
+        const callNowBtn = modal.querySelector('.btn-primary');
+        if (callNowBtn) {
+            callNowBtn.addEventListener('click', () => {
+                const dashAppointmentsCount = document.getElementById('dash-appointments-count');
+                if (dashAppointmentsCount) {
+                    dashAppointmentsCount.textContent = parseInt(dashAppointmentsCount.textContent) + 1;
+                }
+
+                // Visual feedback
+                const originalText = callNowBtn.innerHTML;
+                callNowBtn.innerHTML = '📞 Calling...';
+                setTimeout(() => {
+                    callNowBtn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
     }
 
     // --- 5. Locate Me Functionality ---
@@ -1108,73 +1206,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (fileInput.files[0]) handleFileSelected(fileInput.files[0]);
         });
 
-        // --- Camera ---
-        cameraBtn.addEventListener('click', async (e) => {
+        // --- Camera (opens native system camera) ---
+        cameraBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-
-            // Try to open real camera via getUserMedia
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
-                    });
-
-                    // Build camera overlay UI
-                    const overlay = document.createElement('div');
-                    overlay.id = 'fa-camera-overlay';
-                    overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;';
-
-                    const video = document.createElement('video');
-                    video.setAttribute('autoplay', '');
-                    video.setAttribute('playsinline', '');
-                    video.srcObject = stream;
-                    video.style.cssText = 'width:100%;max-height:calc(100vh - 100px);object-fit:contain;background:#000;';
-
-                    const controls = document.createElement('div');
-                    controls.style.cssText = 'display:flex;gap:24px;padding:16px;align-items:center;';
-
-                    const cancelBtn = document.createElement('button');
-                    cancelBtn.textContent = 'Cancel';
-                    cancelBtn.style.cssText = 'padding:12px 28px;border-radius:12px;border:1px solid rgba(255,255,255,0.3);background:transparent;color:#fff;font-size:1rem;cursor:pointer;';
-
-                    const snapBtn = document.createElement('button');
-                    snapBtn.innerHTML = '📸 Capture';
-                    snapBtn.style.cssText = 'padding:14px 36px;border-radius:14px;border:none;background:var(--primary,#00e5a3);color:#fff;font-size:1.05rem;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(0,229,163,0.3);';
-
-                    controls.appendChild(cancelBtn);
-                    controls.appendChild(snapBtn);
-                    overlay.appendChild(video);
-                    overlay.appendChild(controls);
-                    document.body.appendChild(overlay);
-
-                    const cleanup = () => {
-                        stream.getTracks().forEach(t => t.stop());
-                        overlay.remove();
-                    };
-
-                    cancelBtn.addEventListener('click', cleanup);
-
-                    snapBtn.addEventListener('click', () => {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = video.videoWidth;
-                        canvas.height = video.videoHeight;
-                        canvas.getContext('2d').drawImage(video, 0, 0);
-                        cleanup();
-                        canvas.toBlob((blob) => {
-                            if (blob) {
-                                const file = new File([blob], 'camera-photo.jpg', { type: 'image/jpeg' });
-                                handleFileSelected(file);
-                            }
-                        }, 'image/jpeg', 0.92);
-                    });
-
-                    return;
-                } catch (_) {
-                    // Camera denied or unavailable — fall through to file input
-                }
-            }
-
-            // Fallback: file input with capture hint (mobile)
             const camInput = document.createElement('input');
             camInput.type = 'file';
             camInput.accept = 'image/*';

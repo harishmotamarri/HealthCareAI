@@ -25,9 +25,9 @@
                 style="font-size: 1.2rem; text-decoration: none; color: inherit;">
                 <img src="assets/img/images.jpg" alt="MediEase Logo" width="32" height="32" style="border-radius: 6px;">
                 <div style="display: flex; flex-direction: column;">
-                    <span style="color: #ffffff; font-family: 'Playfair Display', serif; font-weight: 800; font-size: 1.35rem; letter-spacing: -0.5px; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">MediEase</span>
+                    <span style="color: var(--text-main); font-family: 'Playfair Display', serif; font-weight: 800; font-size: 1.35rem; letter-spacing: -0.5px;">MediEase</span>
                     <span
-                        style="font-size: 0.6rem; font-weight: 500; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;">Don't
+                        style="font-size: 0.6rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;">Don't
                         just ask, know</span>
                 </div>
             </a>
@@ -51,7 +51,8 @@
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
                 </button>
-                <a href="index.html" class="btn btn-outline" style="border: 1px solid var(--border-color);">Back to Home</a>
+                <a href="index.html" class="btn btn-outline" style="border: 1px solid var(--border-color);">Back to
+                    Home</a>
             </div>
         </div>
     </nav>
@@ -59,23 +60,35 @@
     <div class="auth-container">
         <div class="card auth-card">
             <div class="auth-header text-center">
-                <h2 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 12px;">Welcome Back to <span class="text-gradient">MediEase</span></h2>
-                <p class="text-muted" style="margin-bottom: 30px; line-height: 1.5;"><strong>Continue your health journey with<br> AI clarity.</strong></p>
+                <h2 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 12px;">Welcome Back to <span
+                        class="text-gradient">MediEase</span></h2>
+                <p class="text-muted" style="margin-bottom: 30px; line-height: 1.5;"><strong>Continue your health
+                        journey with<br> AI clarity.</strong></p>
                 <!-- Notification area for errors/success -->
-                <div id="auth-message" style="display: none; margin-bottom: 20px; padding: 12px; border-radius: 8px; font-size: 0.9rem;"></div>
+                <div id="auth-message"
+                    style="display: none; margin-bottom: 20px; padding: 12px; border-radius: 8px; font-size: 0.9rem;">
+                </div>
             </div>
             <form id="login-form" class="flex flex-col gap-5">
                 <div class="form-group">
+                    <label for="login-username" style="font-weight: 700; color: var(--text-main);">Username</label>
+                    <input type="text" id="login-username" class="form-control" placeholder="Enter your username"
+                        required>
+                </div>
+                <div class="form-group">
                     <label for="email" style="font-weight: 700; color: var(--text-main);">Email Address</label>
-                    <input type="email" id="email" class="form-control" placeholder="Enter your registered email" required>
+                    <input type="email" id="email" class="form-control" placeholder="Enter your registered email"
+                        required>
                 </div>
                 <div class="form-group">
                     <label for="password" style="font-weight: 700; color: var(--text-main);">Password</label>
-                    <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+                    <input type="password" id="password" class="form-control" placeholder="Enter your password"
+                        required>
                 </div>
                 <div class="flex justify-between items-center" style="font-size: 0.9rem; padding: 4px 0;">
                     <label class="flex items-center gap-2" style="cursor: pointer; color: var(--text-muted);">
-                        <input type="checkbox" id="remember-me" style="accent-color: var(--primary-green); width: 16px; height: 16px;"> Remember me
+                        <input type="checkbox" id="remember-me"
+                            style="accent-color: var(--primary-green); width: 16px; height: 16px;"> Remember me
                     </label>
                     <a href="#" id="forgot-password-link" class="text-gradient hover-underline"
                         style="text-decoration: none; font-weight: 700;">Forgot Password?</a>
@@ -97,21 +110,38 @@
     <script src="assets/js/auth.js"></script>
 
     <!-- Custom Popup for Password Reset -->
-    <div id="custom-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 9999; justify-content: center; items-center: center;">
-        <div class="card" style="width: 100%; max-width: 450px; text-align: center; padding: 40px; border: 1px solid var(--border-color); animation: modalEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
-            <div style="width: 80px; height: 80px; background: rgba(34, 197, 94, 0.1); color: var(--primary-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+    <div id="custom-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 9999; justify-content: center; items-center: center;">
+        <div class="card"
+            style="width: 100%; max-width: 450px; text-align: center; padding: 40px; border: 1px solid var(--border-color); animation: modalEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+            <div
+                style="width: 80px; height: 80px; background: rgba(34, 197, 94, 0.1); color: var(--primary-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
             </div>
             <h3 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 12px;">Link Sent!</h3>
-            <p class="text-muted" style="line-height: 1.6; margin-bottom: 32px;">We've sent a password reset link to <br><strong id="modal-email-display" class="text-gradient"></strong>. Please check your inbox and spam folder.</p>
-            <button onclick="document.getElementById('custom-modal').style.display='none'" class="btn btn-gradient" style="width: 100%; padding: 14px; font-weight: 700;">Understood</button>
+            <p class="text-muted" style="line-height: 1.6; margin-bottom: 32px;">We've sent a password reset link to
+                <br><strong id="modal-email-display" class="text-gradient"></strong>. Please check your inbox and spam
+                folder.
+            </p>
+            <button onclick="document.getElementById('custom-modal').style.display='none'" class="btn btn-gradient"
+                style="width: 100%; padding: 14px; font-weight: 700;">Understood</button>
         </div>
     </div>
 
     <style>
         @keyframes modalEnter {
-            from { opacity: 0; transform: scale(0.9) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
     </style>
 
