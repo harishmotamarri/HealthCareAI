@@ -609,6 +609,100 @@ textarea.form-control {
     color: var(--text-muted);
 }
 
+.chat-voice-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+}
+
+.chat-voice-btn:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: rgba(0, 229, 163, 0.08);
+}
+
+.chat-voice-btn.listening {
+    color: #ef4444;
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    animation: voice-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes voice-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3); }
+    50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+}
+
+[data-theme="light"] .chat-voice-btn {
+    border-color: rgba(5, 150, 105, 0.2);
+}
+
+[data-theme="light"] .chat-voice-btn:hover {
+    background: rgba(5, 150, 105, 0.06);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+[data-theme="light"] .chat-voice-btn.listening {
+    color: #ef4444;
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.06);
+}
+
+.bubble-read-btn {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    align-self: flex-end;
+    margin-top: 4px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+.bubble-read-btn:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: rgba(0, 230, 180, 0.08);
+}
+.bubble-read-btn.speaking {
+    color: var(--primary);
+    border-color: var(--primary);
+    animation: pulse-speak 1s ease-in-out infinite;
+}
+@keyframes pulse-speak {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+[data-theme="light"] .bubble-read-btn {
+    color: rgba(0, 0, 0, 0.4);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+[data-theme="light"] .bubble-read-btn:hover {
+    color: #0ea5e9;
+    border-color: #0ea5e9;
+    background: rgba(14, 165, 233, 0.06);
+}
+[data-theme="light"] .bubble-read-btn.speaking {
+    color: #0ea5e9;
+    border-color: #0ea5e9;
+}
+
 .chat-send-btn {
     width: 44px;
     height: 44px;

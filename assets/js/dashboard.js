@@ -364,7 +364,23 @@ document.addEventListener('DOMContentLoaded', () => {
             bubble.innerHTML = `
                 <div class="bubble-avatar">✨</div>
                 <div class="bubble-content">${isHtml ? content : '<p>' + content + '</p>'}</div>
+                <button class="bubble-read-btn" title="Read aloud">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                </button>
             `;
+            const readBtn = bubble.querySelector('.bubble-read-btn');
+            readBtn.addEventListener('click', function() {
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                    readBtn.classList.remove('speaking');
+                    return;
+                }
+                const text = bubble.querySelector('.bubble-content').textContent;
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.onend = () => readBtn.classList.remove('speaking');
+                readBtn.classList.add('speaking');
+                window.speechSynthesis.speak(utterance);
+            });
         } else {
             bubble.innerHTML = `<div class="bubble-content"><p>${content}</p></div>`;
         }
@@ -430,6 +446,58 @@ document.addEventListener('DOMContentLoaded', () => {
     chatInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') handleChatSend();
     });
+
+    // --- Voice input (Web Speech API) ---
+    const chatVoiceBtn = document.getElementById('chat-voice-btn');
+    if (chatVoiceBtn && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+        let isListening = false;
+
+        chatVoiceBtn.addEventListener('click', () => {
+            if (isListening) {
+                recognition.stop();
+                return;
+            }
+            chatInput.value = '';
+            chatInput.placeholder = 'Listening...';
+            chatVoiceBtn.classList.add('listening');
+            isListening = true;
+            recognition.start();
+        });
+
+        recognition.onresult = (event) => {
+            let transcript = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                transcript += event.results[i][0].transcript;
+            }
+            chatInput.value = transcript;
+        };
+
+        recognition.onend = () => {
+            isListening = false;
+            chatVoiceBtn.classList.remove('listening');
+            chatInput.placeholder = 'Ask a health question...';
+            if (chatInput.value.trim()) {
+                handleChatSend();
+            }
+        };
+
+        recognition.onerror = (event) => {
+            isListening = false;
+            chatVoiceBtn.classList.remove('listening');
+            chatInput.placeholder = 'Ask a health question...';
+            if (event.error !== 'no-speech' && event.error !== 'aborted') {
+                chatInput.value = '';
+                chatInput.placeholder = 'Voice input not available — type instead';
+            }
+        };
+    } else if (chatVoiceBtn) {
+        chatVoiceBtn.style.display = 'none';
+    }
 
     // --- Symptom pill logic (optional section) ---
     function renderChips() {
