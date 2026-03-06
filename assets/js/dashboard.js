@@ -57,6 +57,91 @@ const appRouter = {
                 e.currentTarget.classList.toggle('selected');
             });
         });
+
+        // Initialize Global Search Input
+        const globalSearch = document.getElementById('global-search');
+        const suggestionsBox = document.getElementById('global-search-suggestions');
+
+        const searchSections = [
+            { id: 'dashboard', title: 'Dashboard', icon: '📊', keywords: ['home', 'main', 'dash'] },
+            { id: 'analyzer', title: 'Report Analyzer', icon: '📄', keywords: ['upload', 'pdf', 'scan'] },
+            { id: 'reports', title: 'Medical Reports', icon: '📁', keywords: ['history', 'past', 'records'] },
+            { id: 'symptoms', title: 'Symptom Checker', icon: '🩺', keywords: ['check', 'health', 'sick'] },
+            { id: 'hospitals', title: 'Hospital Finder', icon: '🏥', keywords: ['clinic', 'doctor', 'find'] },
+            { id: 'firstaid', title: 'First Aid Guide', icon: '🚑', keywords: ['emergency', 'help', 'guide'] }
+        ];
+
+        if (globalSearch && suggestionsBox) {
+            // Handle input typing
+            globalSearch.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                suggestionsBox.innerHTML = '';
+
+                if (query.length === 0) {
+                    suggestionsBox.style.display = 'none';
+                    return;
+                }
+
+                const matches = searchSections.filter(section =>
+                    section.title.toLowerCase().includes(query) ||
+                    section.keywords.some(k => k.includes(query))
+                );
+
+                if (matches.length > 0) {
+                    // Limit to top 3 suggestions
+                    matches.slice(0, 3).forEach(match => {
+                        const div = document.createElement('div');
+                        div.className = 'search-suggestion-item';
+                        div.innerHTML = `<span style="margin-right: 8px;">${match.icon}</span> ${match.title}`;
+                        div.addEventListener('click', () => {
+                            this.navigate(match.id);
+                            globalSearch.value = '';
+                            suggestionsBox.style.display = 'none';
+                        });
+                        suggestionsBox.appendChild(div);
+                    });
+                    suggestionsBox.style.display = 'flex';
+                } else {
+                    const div = document.createElement('div');
+                    div.className = 'search-suggestion-item empty';
+                    div.style.cursor = 'default';
+                    div.textContent = 'No matching sections';
+                    suggestionsBox.appendChild(div);
+                    suggestionsBox.style.display = 'flex';
+                }
+            });
+
+            // Handle clicking outside to close
+            document.addEventListener('click', (e) => {
+                if (!globalSearch.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+
+            globalSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const query = e.target.value.toLowerCase().trim();
+                    let target = null;
+
+                    if (query.includes('dash') || query.includes('home')) target = 'dashboard';
+                    else if (query.includes('analyz') || query.includes('upload')) target = 'analyzer';
+                    else if (query.includes('report') || query.includes('medical') || query.includes('histor')) target = 'reports';
+                    else if (query.includes('symptom') || query.includes('check')) target = 'symptoms';
+                    else if (query.includes('hospital') || query.includes('find') || query.includes('clinic')) target = 'hospitals';
+                    else if (query.includes('first') || query.includes('aid') || query.includes('emerg')) target = 'firstaid';
+
+                    if (target) {
+                        this.navigate(target);
+                        e.target.value = ''; // clean input
+                        globalSearch.blur(); // remove focus
+                        suggestionsBox.style.display = 'none';
+                    } else if (query.length > 0) {
+                        e.target.style.border = '1px solid #ef4444';
+                        setTimeout(() => e.target.style.border = '1px solid var(--border-color)', 1000);
+                    }
+                }
+            });
+        }
     }
 };
 
