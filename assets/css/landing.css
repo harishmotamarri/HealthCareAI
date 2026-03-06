@@ -70,10 +70,10 @@
 [data-theme="light"] .mock-window {
     background: #ffffff !important;
     border: 1px solid var(--border-color);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
-[data-theme="light"] .mock-window > div:last-child {
+[data-theme="light"] .mock-window>div:last-child {
     background: #f1f5f9 !important;
 }
 
@@ -176,6 +176,7 @@ body {
 .text-gradient {
     background: linear-gradient(135deg, var(--primary-green), var(--primary-purple));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -565,4 +566,88 @@ nav.scrolled {
     100% {
         transform: translateY(40px) scale(1.1);
     }
+}
+
+/* Light Mode Overrides for UI UX PRO MAX and Helpers */
+[data-theme="light"] body {
+    background-image:
+        radial-gradient(circle at 15% 30%, rgba(5, 150, 105, 0.04), transparent 30%),
+        radial-gradient(circle at 85% 60%, rgba(124, 58, 237, 0.04), transparent 30%),
+        radial-gradient(circle at 50% 10%, rgba(5, 150, 105, 0.05), transparent 40%);
+}
+
+[data-theme="light"] .card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .card:hover {
+    background-color: var(--bg-card-hover);
+    border-color: rgba(5, 150, 105, 0.2);
+    box-shadow: 0 16px 36px -6px rgba(5, 150, 105, 0.1);
+}
+
+[data-theme="light"] nav.scrolled {
+    background: rgba(248, 250, 252, 0.85);
+    border-bottom: 1px solid var(--border-color);
+}
+
+[data-theme="light"] .btn-outline {
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+
+[data-theme="light"] .btn-outline:hover {
+    background: var(--bg-card-hover);
+    border-color: rgba(5, 150, 105, 0.3);
+}
+
+[data-theme="light"] .mock-window {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05), 0 0 30px rgba(5, 150, 105, 0.05) !important;
+}
+
+[data-theme="light"] .mock-header {
+    background: var(--bg-card-hover) !important;
+}
+
+.section-subtle-bg {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="light"] .section-subtle-bg {
+    background: var(--bg-card-hover);
+}
+
+.testimonial-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 24px;
+    border-radius: 12px;
+    border-left: 4px solid var(--primary-green);
+}
+
+[data-theme="light"] .testimonial-card {
+    background: var(--bg-card);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary-green);
+}
+
+.mock-file-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 14px 16px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+[data-theme="light"] .mock-file-card {
+    background: var(--bg-card-hover);
+    border: 1px solid var(--border-color);
 }

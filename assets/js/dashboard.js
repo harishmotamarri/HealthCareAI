@@ -67,6 +67,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- 0. Theme Toggle Logic ---
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const rootElement = document.documentElement;
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+
+    // Set initial theme
+    rootElement.setAttribute('data-theme', savedTheme);
+
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = rootElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            rootElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    }
+
     // --- 1. Router Logic (Sidebar Navigation) ---
     const navItems = document.querySelectorAll('.nav-item');
     const viewSections = document.querySelectorAll('.view-section');
@@ -157,16 +174,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const severityVal = document.getElementById('severity-val');
 
     const symptomsWithIcons = [
+        // General / Systemic
         { name: "Headache", icon: "🤕" },
         { name: "Fever", icon: "🌡️" },
-        { name: "Cough", icon: "🌬️" },
         { name: "Fatigue", icon: "🛌" },
-        { name: "Nausea", icon: "🤢" },
-        { name: "Chest Pain", icon: "🫀" },
-        { name: "Dizziness", icon: "😵" },
-        { name: "Sore Throat", icon: "🗣️" },
+        { name: "Chills", icon: "🥶" },
+        { name: "Sweating", icon: "💦" },
         { name: "Body Aches", icon: "💪" },
-        { name: "Shortness of Breath", icon: "🫁" }
+        { name: "Weakness", icon: "🔋" },
+
+        // Respiratory / ENT
+        { name: "Cough", icon: "🌬️" },
+        { name: "Sore Throat", icon: "🗣️" },
+        { name: "Shortness of Breath", icon: "🫁" },
+        { name: "Runny Nose", icon: "🤧" },
+        { name: "Congestion", icon: "👃" },
+        { name: "Loss of Smell", icon: "🚫👃" },
+
+        // Gastrointestinal
+        { name: "Nausea", icon: "🤢" },
+        { name: "Vomiting", icon: "🤮" },
+        { name: "Diarrhea", icon: "🚽" },
+        { name: "Stomach Ache", icon: "😖" },
+        { name: "Heartburn", icon: "🔥" },
+        { name: "Loss of Appetite", icon: "🍽️" },
+
+        // Cardiovascular / Neurological
+        { name: "Chest Pain", icon: "🫀" },
+        { name: "Palpitations", icon: "💓" },
+        { name: "Dizziness", icon: "😵" },
+        { name: "Fainting", icon: "💫" },
+        { name: "Confusion", icon: "❓" },
+        { name: "Numbness", icon: "🧊" },
+
+        // Musculoskeletal / Skin
+        { name: "Joint Pain", icon: "🦴" },
+        { name: "Muscle Cramps", icon: "🦵" },
+        { name: "Back Pain", icon: "🧍" },
+        { name: "Rash", icon: "🔴" },
+        { name: "Itching", icon: "🤏" },
+        // Vision / Eye
+        { name: "Blurry Vision", icon: "👓" },
+        { name: "Red Eye", icon: "👁️" }
     ];
 
     function renderChips() {
@@ -217,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const matches = symptomsWithIcons.filter(s => 
+        const matches = symptomsWithIcons.filter(s =>
             s.name.toLowerCase().includes(query) && !aiState.selectedSymptoms.has(s.name)
         );
 
@@ -269,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function formatAIResponse(text) {
         // Clean white space
         let formatted = text.trim();
-        
+
         // Define section headers we expect
         const sections = [
             "Possible Issue",
@@ -293,7 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Convert bullet points to list items
         formatted = formatted.replace(/•\s*(.*?)(?=<br>|<h3>|$)/g, '<li>$1</li>');
-        
+
         // Wrap groups of <li> in <ul>
         formatted = formatted.replace(/(<li>.*?<\/li>)+/g, '<ul>$&</ul>');
 
@@ -329,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 const data = await response.json();
-                
+
                 if (data.analysis) {
                     resultContent.innerHTML = formatAIResponse(data.analysis.replace(/\n/g, '<br>'));
                     resultOverlay.style.display = 'flex';

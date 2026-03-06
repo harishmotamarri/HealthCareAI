@@ -6,6 +6,8 @@ const path = require('path');
 
 dotenv.config();
 
+const supabase = require('./supabase');
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -22,7 +24,7 @@ app.post('/api/check-symptoms', async (req, res) => {
 
     try {
         const { description, symptoms, duration, severity } = req.body;
-        
+
         if (!process.env.GEMINI_API_KEY) {
             throw new Error('GEMINI_API_KEY is missing from environment variables');
         }
@@ -72,9 +74,9 @@ app.post('/api/check-symptoms', async (req, res) => {
         console.error('Error Name:', error.name);
         console.error('Error Message:', error.message);
         console.error('Stack Trace:', error.stack);
-        
-        res.status(500).json({ 
-            error: 'Failed to analyze symptoms.', 
+
+        res.status(500).json({
+            error: 'Failed to analyze symptoms.',
             details: error.message,
             stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });

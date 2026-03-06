@@ -4,7 +4,8 @@
   "description": "MediMind AI is a comprehensive frontend web application acting as a Personal AI Doctor UI dashboard. It transforms complex medical documents like prescriptions, lab reports, and symptoms into simple, actionable health insights.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,7 @@
   "homepage": "https://github.com/harishmotamarri/HealthCareAI#readme",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@supabase/supabase-js": "^2.98.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1"
