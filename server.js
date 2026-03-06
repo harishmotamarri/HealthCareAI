@@ -50,7 +50,7 @@ app.post('/api/check-symptoms', async (req, res) => {
             ### Possible Issue
             One short sentence explaining the likely issue.
 
-            ### What This Means
+            ### What It Means
             One short sentence explaining what might be happening.
 
             ### What You Can Do

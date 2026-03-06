@@ -584,13 +584,20 @@
 
                         <!-- Result Section -->
                         <div id="symptom-result" class="analysis-result-overlay" style="display: none;">
-                            <div class="result-header">
-                                <div class="pulse-indicator"></div>
-                                <h4>AI Analysis Complete</h4>
-                            </div>
-                            <div id="symptom-analysis-content" class="result-text-body"></div>
-                            <div class="result-actions">
-                                <button id="new-check-btn" class="btn btn-outline">Start Over</button>
+                            <div class="result-card">
+                                <div class="result-header">
+                                    <div class="pulse-indicator"></div>
+                                    <div class="header-text">
+                                        <h4>AI Analysis Complete</h4>
+                                        <p>Based on your reported symptoms</p>
+                                    </div>
+                                    <button id="close-result" class="close-btn" title="Close">&times;</button>
+                                </div>
+                                <div id="symptom-analysis-content" class="result-text-body"></div>
+                                <div class="result-footer">
+                                    <span class="quick-disclaimer">For informational purposes only</span>
+                                    <button id="new-check-btn" class="btn btn-primary">Start New Check</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -607,27 +614,50 @@
                 <h1 style="margin-bottom: 8px;">Find Healthcare</h1>
                 <p style="color: var(--text-muted); margin-bottom: 24px;">Locate hospitals and specialists near you</p>
 
-                <div style="display: flex; gap: 16px; margin-bottom: 24px;">
-                    <input type="text" class="form-control" placeholder="Search hospitals, clinics..." style="flex: 2;">
-                    <select class="form-control" style="flex: 1;">
-                        <option>All Specialties</option>
-                        <option>Cardiology</option>
-                    </select>
-                    <select class="form-control" style="flex: 1;">
-                        <option>Any Distance</option>
-                        <option>Within 5 miles</option>
-                    </select>
-                    <select class="form-control" style="flex: 1;">
-                        <option>Any Rating</option>
-                        <option>4+ Stars</option>
-                    </select>
-                    <button class="btn btn-outline" style="flex: 1;">More Filters</button>
+                <div id="user-location-display"
+                    style="display: none; align-items: center; gap: 8px; margin-bottom: 16px; padding: 12px; background: rgba(0, 229, 163, 0.1); border: 1px solid rgba(0, 229, 163, 0.3); border-radius: 8px; color: var(--primary);">
+                    📍 <span id="location-text">Fetching location...</span>
                 </div>
 
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">11 hospitals found</p>
+                <div style="display: flex; gap: 16px; margin-bottom: 24px;">
+                    <div style="flex: 2; display: flex; gap: 8px;">
+                        <input type="text" id="hospital-search" class="form-control"
+                            placeholder="Search hospitals, clinics..." style="flex: 1;">
+                        <button id="locate-me-btn" class="btn btn-primary"
+                            style="white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 8px;">📍
+                            Locate Me</button>
+                    </div>
+                    <select id="hospital-specialty" class="form-control" style="flex: 1;">
+                        <option>All Specialties</option>
+                        <option>Cardiology</option>
+                        <option>Neurology</option>
+                        <option>Orthopedics</option>
+                        <option>Pediatrics</option>
+                        <option>Oncology</option>
+                        <option>General Practice</option>
+                        <option>Dermatology</option>
+                        <option>Psychiatry</option>
+                        <option>Gynecology</option>
+                        <option>Ophthalmology</option>
+                        <option>Urology</option>
+                    </select>
+                    <select id="hospital-distance" class="form-control" style="flex: 1;">
+                        <option>Any Distance</option>
+                        <option>Within 5 km</option>
+                        <option>Within 10 km</option>
+                    </select>
+                    <select id="hospital-rating" class="form-control" style="flex: 1;">
+                        <option>Any Rating</option>
+                        <option>4+ Stars</option>
+                        <option>3.5+ Stars</option>
+                    </select>
+                </div>
 
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-                    <div class="card hospital-card" onclick="openModal()">
+                <p id="hospitals-count" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">11
+                    hospitals found</p>
+
+                <div id="hospital-cards-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                    <div class="card hospital-card">
                         <div
                             style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
@@ -643,7 +673,7 @@
                             Dr,
                             New York, NY 10001</p>
                         <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
-                            <span style="color: var(--primary);">0.8 mi</span>
+                            <span style="color: var(--primary);">1.3 km</span>
                             <span style="color: #f59e0b;">~15 min wait</span>
                             <span style="color: #3b82f6;">24/7</span>
                         </div>
@@ -674,7 +704,7 @@
                             New
                             York, NY 10002</p>
                         <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
-                            <span style="color: var(--primary);">1.2 mi</span>
+                            <span style="color: var(--primary);">1.9 km</span>
                             <span style="color: #f59e0b;">~25 min wait</span>
                             <span style="color: #3b82f6;">24/7</span>
                         </div>
@@ -690,22 +720,27 @@
                     </div>
 
                     <div class="card hospital-card">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
+                                <span
+                                    style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
                                 <h3 style="font-size: 1.1rem;">Mercy Health Clinic</h3>
                             </div>
                             <span style="color: var(--text-muted); cursor:pointer;">♡</span>
                         </div>
-                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.8 <span style="color: var(--text-muted);">(412 reviews)</span></p>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">789 Wellness Way, New York, NY 10003</p>
+                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.8 <span
+                                style="color: var(--text-muted);">(412 reviews)</span></p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">789 Wellness Way,
+                            New York, NY 10003</p>
                         <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
-                            <span style="color: var(--primary);">1.5 mi</span>
+                            <span style="color: var(--primary);">2.4 km</span>
                             <span style="color: #f59e0b;">~10 min wait</span>
                             <span style="color: #3b82f6;">8AM - 8PM</span>
                         </div>
                         <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
-                            <span class="small-tag">General Practice</span><span class="small-tag">Family Medicine</span>
+                            <span class="small-tag">General Practice</span><span class="small-tag">Family
+                                Medicine</span>
                         </div>
                         <div style="display: flex; gap: 8px;">
                             <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
@@ -714,17 +749,21 @@
                     </div>
 
                     <div class="card hospital-card">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
+                                <span
+                                    style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
                                 <h3 style="font-size: 1.1rem;">Sunrise Children's Hospital</h3>
                             </div>
                             <span style="color: var(--text-muted); cursor:pointer;">♡</span>
                         </div>
-                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.9 <span style="color: var(--text-muted);">(850 reviews)</span></p>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">321 Kids Blvd, New York, NY 10004</p>
+                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.9 <span
+                                style="color: var(--text-muted);">(850 reviews)</span></p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">321 Kids Blvd, New
+                            York, NY 10004</p>
                         <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
-                            <span style="color: var(--primary);">2.1 mi</span>
+                            <span style="color: var(--primary);">3.4 km</span>
                             <span style="color: #f59e0b;">~5 min wait</span>
                             <span style="color: #3b82f6;">24/7</span>
                         </div>
@@ -736,19 +775,23 @@
                             <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
                         </div>
                     </div>
-                    
+
                     <div class="card hospital-card">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
+                                <span
+                                    style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
                                 <h3 style="font-size: 1.1rem;">Oceanview Cardiac Center</h3>
                             </div>
                             <span style="color: var(--text-muted); cursor:pointer;">♡</span>
                         </div>
-                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.6 <span style="color: var(--text-muted);">(312 reviews)</span></p>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">555 Heart St, New York, NY 10005</p>
+                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.6 <span
+                                style="color: var(--text-muted);">(312 reviews)</span></p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">555 Heart St, New
+                            York, NY 10005</p>
                         <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
-                            <span style="color: var(--primary);">3.0 mi</span>
+                            <span style="color: var(--primary);">4.8 km</span>
                             <span style="color: #f59e0b;">~20 min wait</span>
                             <span style="color: #3b82f6;">24/7</span>
                         </div>
@@ -762,17 +805,21 @@
                     </div>
 
                     <div class="card hospital-card">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
+                                <span
+                                    style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
                                 <h3 style="font-size: 1.1rem;">Pine Valley Orthopedics</h3>
                             </div>
                             <span style="color: var(--text-muted); cursor:pointer;">♡</span>
                         </div>
-                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.4 <span style="color: var(--text-muted);">(198 reviews)</span></p>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">888 Bone Ln, New York, NY 10006</p>
+                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.4 <span
+                                style="color: var(--text-muted);">(198 reviews)</span></p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">888 Bone Ln, New
+                            York, NY 10006</p>
                         <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
-                            <span style="color: var(--primary);">4.2 mi</span>
+                            <span style="color: var(--primary);">6.8 km</span>
                             <span style="color: #f59e0b;">~30 min wait</span>
                             <span style="color: #3b82f6;">9AM - 5PM</span>
                         </div>
@@ -786,17 +833,21 @@
                     </div>
 
                     <div class="card hospital-card">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
+                                <span
+                                    style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
                                 <h3 style="font-size: 1.1rem;">Green Cross ER</h3>
                             </div>
                             <span style="color: var(--text-muted); cursor:pointer;">♡</span>
                         </div>
-                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.3 <span style="color: var(--text-muted);">(524 reviews)</span></p>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">999 Fast Ave, New York, NY 10007</p>
+                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.3 <span
+                                style="color: var(--text-muted);">(524 reviews)</span></p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">999 Fast Ave, New
+                            York, NY 10007</p>
                         <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
-                            <span style="color: var(--primary);">1.0 mi</span>
+                            <span style="color: var(--primary);">1.6 km</span>
                             <span style="color: #ef4444;">~50 min wait</span>
                             <span style="color: #3b82f6;">24/7</span>
                         </div>
@@ -810,17 +861,21 @@
                     </div>
 
                     <div class="card hospital-card">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
+                                <span
+                                    style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
                                 <h3 style="font-size: 1.1rem;">Silverstein Eye Institute</h3>
                             </div>
                             <span style="color: var(--text-muted); cursor:pointer;">♡</span>
                         </div>
-                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.7 <span style="color: var(--text-muted);">(145 reviews)</span></p>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">111 Vision Dr, New York, NY 10008</p>
+                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.7 <span
+                                style="color: var(--text-muted);">(145 reviews)</span></p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">111 Vision Dr, New
+                            York, NY 10008</p>
                         <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
-                            <span style="color: var(--primary);">2.5 mi</span>
+                            <span style="color: var(--primary);">4.0 km</span>
                             <span style="color: #f59e0b;">~15 min wait</span>
                             <span style="color: #3b82f6;">8AM - 6PM</span>
                         </div>
@@ -834,17 +889,21 @@
                     </div>
 
                     <div class="card hospital-card">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
+                                <span
+                                    style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
                                 <h3 style="font-size: 1.1rem;">Brooklyn Women's Care</h3>
                             </div>
                             <span style="color: var(--text-muted); cursor:pointer;">♡</span>
                         </div>
-                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.8 <span style="color: var(--text-muted);">(312 reviews)</span></p>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">222 Care Ct, Brooklyn, NY 11201</p>
+                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.8 <span
+                                style="color: var(--text-muted);">(312 reviews)</span></p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">222 Care Ct,
+                            Brooklyn, NY 11201</p>
                         <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
-                            <span style="color: var(--primary);">5.5 mi</span>
+                            <span style="color: var(--primary);">8.9 km</span>
                             <span style="color: #f59e0b;">~10 min wait</span>
                             <span style="color: #3b82f6;">9AM - 7PM</span>
                         </div>
@@ -858,17 +917,21 @@
                     </div>
 
                     <div class="card hospital-card">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
+                                <span
+                                    style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
                                 <h3 style="font-size: 1.1rem;">New Hope Oncology</h3>
                             </div>
                             <span style="color: var(--text-muted); cursor:pointer;">♡</span>
                         </div>
-                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.9 <span style="color: var(--text-muted);">(467 reviews)</span></p>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">333 Heal Rd, New York, NY 10009</p>
+                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.9 <span
+                                style="color: var(--text-muted);">(467 reviews)</span></p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">333 Heal Rd, New
+                            York, NY 10009</p>
                         <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
-                            <span style="color: var(--primary);">6.0 mi</span>
+                            <span style="color: var(--primary);">9.7 km</span>
                             <span style="color: #f59e0b;">~5 min wait</span>
                             <span style="color: #3b82f6;">8AM - 5PM</span>
                         </div>
@@ -882,22 +945,82 @@
                     </div>
 
                     <div class="card hospital-card">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
+                                <span
+                                    style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
                                 <h3 style="font-size: 1.1rem;">Harmony Mental Health</h3>
                             </div>
                             <span style="color: var(--text-muted); cursor:pointer;">♡</span>
                         </div>
-                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.5 <span style="color: var(--text-muted);">(210 reviews)</span></p>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">444 Peace Pl, New York, NY 10010</p>
+                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.5 <span
+                                style="color: var(--text-muted);">(210 reviews)</span></p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">444 Peace Pl, New
+                            York, NY 10010</p>
                         <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
-                            <span style="color: var(--primary);">1.8 mi</span>
+                            <span style="color: var(--primary);">2.9 km</span>
                             <span style="color: #f59e0b;">~0 min wait</span>
                             <span style="color: #3b82f6;">9AM - 8PM</span>
                         </div>
                         <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
                             <span class="small-tag">Psychiatry</span><span class="small-tag">Psychology</span>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
+                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        </div>
+                    </div>
+
+                    <div class="card hospital-card">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span
+                                    style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
+                                <h3 style="font-size: 1.1rem;">CMR Hospital</h3>
+                            </div>
+                            <span style="color: var(--text-muted); cursor:pointer;">♡</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.6 <span
+                                style="color: var(--text-muted);">(450 reviews)</span></p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">Kandlakoya, Medchal
+                            Road, Hyderabad, TS 501401</p>
+                        <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
+                            <span style="color: var(--primary);">0.2 km</span>
+                            <span style="color: #f59e0b;">~10 min wait</span>
+                            <span style="color: #3b82f6;">24/7</span>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
+                            <span class="small-tag">General Medicine</span><span class="small-tag">Emergency</span>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
+                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        </div>
+                    </div>
+
+                    <div class="card hospital-card">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span
+                                    style="background: rgba(0, 229, 163, 0.1); color: var(--primary); padding: 4px; border-radius: 4px; font-size: 12px;">📍</span>
+                                <h3 style="font-size: 1.1rem;">SV Super Speciality Hospital</h3>
+                            </div>
+                            <span style="color: var(--text-muted); cursor:pointer;">♡</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: #f59e0b; margin-bottom: 12px;">★ 4.8 <span
+                                style="color: var(--text-muted);">(780 reviews)</span></p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">Bhavani Nagar,
+                            Tirupati, AP 517501</p>
+                        <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
+                            <span style="color: var(--primary);">11.6 km</span>
+                            <span style="color: #f59e0b;">~15 min wait</span>
+                            <span style="color: #3b82f6;">24/7</span>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
+                            <span class="small-tag">Cardiology</span><span class="small-tag">Neurology</span>
                         </div>
                         <div style="display: flex; gap: 8px;">
                             <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
@@ -912,8 +1035,10 @@
                     <div
                         style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
                         <div>
-                            <h2 style="font-size: 1.5rem; margin-bottom: 8px;">City General Hospital</h2>
-                            <p style="color: var(--text-muted);">123 Medical Center Dr, New York, NY 10001</p>
+                            <h2 id="modal-hospital-name" style="font-size: 1.5rem; margin-bottom: 8px;">City General
+                                Hospital</h2>
+                            <p id="modal-hospital-address" style="color: var(--text-muted);">123 Medical Center Dr, New
+                                York, NY 10001</p>
                         </div>
                         <button class="btn btn-outline" style="border:none; font-size: 1.2rem;"
                             onclick="closeModal()">✕</button>
@@ -921,22 +1046,26 @@
 
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
                         <div class="card" style="text-align: center; padding: 16px;">
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #f59e0b;">4.7 ★</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">328 reviews</div>
+                            <div id="modal-hospital-rating"
+                                style="font-size: 1.5rem; font-weight: bold; color: #f59e0b;">4.7 ★</div>
+                            <div id="modal-hospital-reviews" style="font-size: 0.8rem; color: var(--text-muted);">328
+                                reviews</div>
                         </div>
                         <div class="card" style="text-align: center; padding: 16px;">
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #ef4444;">~15 min</div>
+                            <div id="modal-hospital-wait" style="font-size: 1.5rem; font-weight: bold; color: #ef4444;">
+                                ~15 min</div>
                             <div style="font-size: 0.8rem; color: var(--text-muted);">Est. wait time</div>
                         </div>
                         <div class="card" style="text-align: center; padding: 16px;">
-                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">0.8 mi</div>
+                            <div id="modal-hospital-distance"
+                                style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">1.3 km</div>
                             <div style="font-size: 0.8rem; color: var(--text-muted);">Distance</div>
                         </div>
                     </div>
 
                     <div class="input-group">
-                        <p style="margin-bottom: 12px; font-weight: 500;">Specialties</p>
-                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <p style="margin-bottom: 12px; font-weight: 500;">Details & Specialties</p>
+                        <div id="modal-hospital-tags" style="display: flex; flex-wrap: wrap; gap: 8px;">
                             <span class="small-tag"
                                 style="background: rgba(0, 229, 163, 0.1); color: var(--primary);">Open
                                 24/7</span>
