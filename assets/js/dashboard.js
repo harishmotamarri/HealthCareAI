@@ -57,6 +57,117 @@ const appRouter = {
                 e.currentTarget.classList.toggle('selected');
             });
         });
+
+        // Initialize Global Search Input
+        const globalSearch = document.getElementById('global-search');
+        const suggestionsBox = document.getElementById('global-search-suggestions');
+
+        const searchSections = [
+            { id: 'dashboard', title: 'Dashboard', icon: '📊', keywords: ['home', 'main', 'dash'] },
+            { id: 'analyzer', title: 'Report Analyzer', icon: '📄', keywords: ['upload', 'pdf', 'scan'] },
+            { id: 'reports', title: 'Medical Reports', icon: '📁', keywords: ['history', 'past', 'records'] },
+            { id: 'symptoms', title: 'Symptom Checker', icon: '🩺', keywords: ['check', 'health', 'sick'] },
+            { id: 'hospitals', title: 'Hospital Finder', icon: '🏥', keywords: ['clinic', 'doctor', 'find'] },
+            { id: 'firstaid', title: 'First Aid Guide', icon: '🚑', keywords: ['emergency', 'help', 'guide'] }
+        ];
+
+        if (globalSearch && suggestionsBox) {
+            // Helper to show default suggestions
+            const showDefaultSuggestions = () => {
+                suggestionsBox.innerHTML = '<div class="search-suggestion-header">Related Searches</div>';
+                searchSections.slice(0, 3).forEach(match => {
+                    const div = document.createElement('div');
+                    div.className = 'search-suggestion-item';
+                    div.innerHTML = `<span style="margin-right: 8px;">${match.icon}</span> ${match.title}`;
+                    div.addEventListener('click', () => {
+                        this.navigate(match.id);
+                        globalSearch.value = '';
+                        globalSearch.blur();
+                        suggestionsBox.style.display = 'none';
+                    });
+                    suggestionsBox.appendChild(div);
+                });
+                suggestionsBox.style.display = 'flex';
+            };
+
+            // Show defaults on focus if empty
+            globalSearch.addEventListener('focus', (e) => {
+                if (e.target.value.trim().length === 0) {
+                    showDefaultSuggestions();
+                }
+            });
+
+            // Handle input typing
+            globalSearch.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+
+                if (query.length === 0) {
+                    showDefaultSuggestions();
+                    return;
+                }
+
+                suggestionsBox.innerHTML = '';
+
+                const matches = searchSections.filter(section =>
+                    section.title.toLowerCase().includes(query) ||
+                    section.keywords.some(k => k.includes(query))
+                );
+
+                if (matches.length > 0) {
+                    // Limit to top 3 suggestions
+                    matches.slice(0, 3).forEach(match => {
+                        const div = document.createElement('div');
+                        div.className = 'search-suggestion-item';
+                        div.innerHTML = `<span style="margin-right: 8px;">${match.icon}</span> ${match.title}`;
+                        div.addEventListener('click', () => {
+                            this.navigate(match.id);
+                            globalSearch.value = '';
+                            suggestionsBox.style.display = 'none';
+                        });
+                        suggestionsBox.appendChild(div);
+                    });
+                    suggestionsBox.style.display = 'flex';
+                } else {
+                    const div = document.createElement('div');
+                    div.className = 'search-suggestion-item empty';
+                    div.style.cursor = 'default';
+                    div.textContent = 'No matching sections';
+                    suggestionsBox.appendChild(div);
+                    suggestionsBox.style.display = 'flex';
+                }
+            });
+
+            // Handle clicking outside to close
+            document.addEventListener('click', (e) => {
+                if (!globalSearch.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+
+            globalSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const query = e.target.value.toLowerCase().trim();
+                    let target = null;
+
+                    if (query.includes('dash') || query.includes('home')) target = 'dashboard';
+                    else if (query.includes('analyz') || query.includes('upload')) target = 'analyzer';
+                    else if (query.includes('report') || query.includes('medical') || query.includes('histor')) target = 'reports';
+                    else if (query.includes('symptom') || query.includes('check')) target = 'symptoms';
+                    else if (query.includes('hospital') || query.includes('find') || query.includes('clinic')) target = 'hospitals';
+                    else if (query.includes('first') || query.includes('aid') || query.includes('emerg')) target = 'firstaid';
+
+                    if (target) {
+                        this.navigate(target);
+                        e.target.value = ''; // clean input
+                        globalSearch.blur(); // remove focus
+                        suggestionsBox.style.display = 'none';
+                    } else if (query.length > 0) {
+                        e.target.style.border = '1px solid #ef4444';
+                        setTimeout(() => e.target.style.border = '1px solid var(--border-color)', 1000);
+                    }
+                }
+            });
+        }
     }
 };
 
@@ -313,43 +424,57 @@ document.addEventListener('DOMContentLoaded', () => {
         renderChips();
         updateGridSelection();
         symptomSearchInput.value = '';
+        if (severitySlider) { severitySlider.value = 5; aiState.severity = 5; severityVal.innerText = '5/10'; severityVal.style.color = '#f59e0b'; }
     });
 
-    function formatAIResponse(text) {
-        // Clean white space
-        let formatted = text.trim();
+    function formatAIResponse(rawText) {
+        const lines = rawText.trim().split('\n').filter(l => l.trim() !== '');
 
-        // Define section headers we expect
-        const sections = [
-            "Possible Issue",
-            "What It Means",
-            "What You Can Do",
-            "See a Doctor If"
-        ];
-
-        // Replace section names with styled icons + headings
-        const icons = {
-            "Possible Issue": "🔍",
-            "What It Means": "💡",
-            "What You Can Do": "✅",
-            "See a Doctor If": "⚠️"
+        const sectionIcons = {
+            "possible issue": "🔍",
+            "what it means": "💡",
+            "what this means": "💡",
+            "what you can do": "✅",
+            "see a doctor if": "⚠️"
         };
 
-        sections.forEach(section => {
-            const regex = new RegExp(`(${section})`, 'gi');
-            formatted = formatted.replace(regex, `<h3>${icons[section]} $1</h3>`);
+        let html = '';
+        let inList = false;
+
+        lines.forEach(line => {
+            let trimmed = line.trim();
+
+            // Bold
+            trimmed = trimmed.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+            // Section header (### Header)
+            const headerMatch = trimmed.match(/^#{1,4}\s+(.+)/);
+            if (headerMatch) {
+                if (inList) { html += '</ul>'; inList = false; }
+                const title = headerMatch[1].trim();
+                const key = title.toLowerCase().replace(/[^a-z\s]/g, '').trim();
+                const icon = sectionIcons[key] || '📋';
+                html += `<h3>${icon} ${title}</h3>`;
+                return;
+            }
+
+            // Bullet point (- item or • item)
+            const bulletMatch = trimmed.match(/^[-•]\s+(.+)/);
+            if (bulletMatch) {
+                if (!inList) { html += '<ul>'; inList = true; }
+                html += `<li>${bulletMatch[1]}</li>`;
+                return;
+            }
+
+            // Regular paragraph text
+            if (trimmed) {
+                if (inList) { html += '</ul>'; inList = false; }
+                html += `<p>${trimmed}</p>`;
+            }
         });
 
-        // Convert bullet points to list items
-        formatted = formatted.replace(/•\s*(.*?)(?=<br>|<h3>|$)/g, '<li>$1</li>');
-
-        // Wrap groups of <li> in <ul>
-        formatted = formatted.replace(/(<li>.*?<\/li>)+/g, '<ul>$&</ul>');
-
-        // Bold refinement
-        formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-        return formatted;
+        if (inList) html += '</ul>';
+        return html;
     }
 
     // API Call
@@ -380,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (data.analysis) {
-                    resultContent.innerHTML = formatAIResponse(data.analysis.replace(/\n/g, '<br>'));
+                    resultContent.innerHTML = formatAIResponse(data.analysis);
                     resultOverlay.style.display = 'flex';
                 } else {
                     resultContent.innerHTML = '<h3>⚠️ Error</h3><p>Sorry, I encountered an error during analysis. Please try again.</p>';
