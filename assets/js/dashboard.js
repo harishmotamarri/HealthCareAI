@@ -64,8 +64,7 @@ const appRouter = {
 
         const searchSections = [
             { id: 'dashboard', title: 'Dashboard', icon: '📊', keywords: ['home', 'main', 'dash'] },
-            { id: 'analyzer', title: 'Report Analyzer', icon: '📄', keywords: ['upload', 'pdf', 'scan'] },
-            { id: 'reports', title: 'Medical Reports', icon: '📁', keywords: ['history', 'past', 'records'] },
+            { id: 'reports', title: 'Medical Reports', icon: '📁', keywords: ['upload', 'pdf', 'scan', 'history', 'past', 'records'] },
             { id: 'symptoms', title: 'Symptom Checker', icon: '🩺', keywords: ['check', 'health', 'sick'] },
             { id: 'hospitals', title: 'Hospital Finder', icon: '🏥', keywords: ['clinic', 'doctor', 'find'] },
             { id: 'firstaid', title: 'First Aid Guide', icon: '🚑', keywords: ['emergency', 'help', 'guide'] }
@@ -124,7 +123,7 @@ const appRouter = {
                     let target = null;
 
                     if (query.includes('dash') || query.includes('home')) target = 'dashboard';
-                    else if (query.includes('analyz') || query.includes('upload')) target = 'analyzer';
+                    else if (query.includes('analyz') || query.includes('upload')) target = 'reports';
                     else if (query.includes('report') || query.includes('medical') || query.includes('histor')) target = 'reports';
                     else if (query.includes('symptom') || query.includes('check')) target = 'symptoms';
                     else if (query.includes('hospital') || query.includes('find') || query.includes('clinic')) target = 'hospitals';
@@ -456,6 +455,223 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // --- 2b. Medical Reports Feature ---
+    const reportFileInput = document.getElementById('report-file-input');
+    const reportBrowseBtn = document.getElementById('report-browse-btn');
+    const reportDropZone = document.getElementById('report-drop-zone');
+    const uploadProgress = document.getElementById('upload-progress');
+    const uploadBarFill = document.getElementById('upload-bar-fill');
+    const uploadStatusText = document.getElementById('upload-status-text');
+    const reportsList = document.getElementById('reports-list');
+    const noReportsMsg = document.getElementById('no-reports-msg');
+    const reportAskInput = document.getElementById('report-ask-input');
+    const reportAskBtn = document.getElementById('report-ask-btn');
+    const reportAskAnswer = document.getElementById('report-ask-answer');
+    const reportDetailContent = document.getElementById('report-detail-content');
+    const backToReports = document.getElementById('back-to-reports');
+
+    // Navigate back from report detail to reports list
+    if (backToReports) {
+        backToReports.addEventListener('click', () => {
+            appRouter.navigate('reports');
+        });
+    }
+
+    // Browse button triggers file input
+    if (reportBrowseBtn && reportFileInput) {
+        reportBrowseBtn.addEventListener('click', () => reportFileInput.click());
+    }
+
+    // Drag & drop
+    if (reportDropZone) {
+        reportDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            reportDropZone.classList.add('drag-over');
+        });
+        reportDropZone.addEventListener('dragleave', () => {
+            reportDropZone.classList.remove('drag-over');
+        });
+        reportDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            reportDropZone.classList.remove('drag-over');
+            if (e.dataTransfer.files.length > 0) {
+                uploadReport(e.dataTransfer.files[0]);
+            }
+        });
+    }
+
+    // File input change
+    if (reportFileInput) {
+        reportFileInput.addEventListener('change', () => {
+            if (reportFileInput.files.length > 0) {
+                uploadReport(reportFileInput.files[0]);
+                reportFileInput.value = '';
+            }
+        });
+    }
+
+    async function uploadReport(file) {
+        const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+        if (!allowed.includes(file.type)) {
+            alert('Only PDF, JPG, PNG, WEBP files are allowed.');
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            alert('File too large. Max 10MB.');
+            return;
+        }
+
+        // Show progress
+        uploadProgress.style.display = 'block';
+        uploadBarFill.style.width = '0%';
+        uploadStatusText.textContent = 'Uploading & analyzing with AI...';
+
+        // Animate progress bar
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += Math.random() * 8;
+            if (progress > 90) progress = 90;
+            uploadBarFill.style.width = progress + '%';
+        }, 300);
+
+        const formData = new FormData();
+        formData.append('report', file);
+
+        try {
+            const res = await fetch('/api/reports/upload', { method: 'POST', body: formData });
+            const data = await res.json();
+
+            clearInterval(progressInterval);
+            uploadBarFill.style.width = '100%';
+            uploadStatusText.textContent = 'Analysis complete!';
+
+            if (!res.ok) throw new Error(data.error || 'Upload failed');
+
+            setTimeout(() => {
+                uploadProgress.style.display = 'none';
+                loadReportsList();
+                // Show the detail view of the just-uploaded report
+                showReportDetail(data.report);
+            }, 800);
+        } catch (err) {
+            clearInterval(progressInterval);
+            uploadProgress.style.display = 'none';
+            alert('Upload failed: ' + err.message);
+        }
+    }
+
+    // Load and render reports list
+    async function loadReportsList() {
+        try {
+            const res = await fetch('/api/reports');
+            const data = await res.json();
+
+            if (!data.reports || data.reports.length === 0) {
+                reportsList.innerHTML = '';
+                noReportsMsg.style.display = 'block';
+                reportsList.appendChild(noReportsMsg);
+                return;
+            }
+
+            noReportsMsg.style.display = 'none';
+            reportsList.innerHTML = data.reports.map(r => {
+                const date = new Date(r.uploadedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const sizeKB = (r.fileSize / 1024).toFixed(0);
+                const icon = r.mimeType === 'application/pdf' ? '📑' : '🖼️';
+                return `
+                    <div class="report-card" data-id="${r.id}">
+                        <div style="display:flex; align-items:center; gap:16px; flex:1; cursor:pointer;" onclick="window.viewReport('${r.id}')">
+                            <div class="report-icon">${icon}</div>
+                            <div style="flex:1; min-width:0;">
+                                <h4 style="margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.fileName}</h4>
+                                <p style="margin:4px 0 0; font-size:0.82rem; color:var(--text-muted);">${r.reportType} &bull; ${date} &bull; ${sizeKB} KB</p>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <button class="btn-view-report" onclick="window.viewReport('${r.id}')" title="View analysis">View</button>
+                            <button class="btn-delete-report" onclick="window.deleteReport('${r.id}')" title="Delete">&times;</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (err) {
+            reportsList.innerHTML = '<p style="color:#ef4444; text-align:center;">Failed to load reports.</p>';
+        }
+    }
+
+    // View a single report detail
+    window.viewReport = function (id) {
+        fetch('/api/reports').then(r => r.json()).then(data => {
+            const report = data.reports.find(r => r.id === id);
+            if (report) showReportDetail(report);
+        });
+    };
+
+    function showReportDetail(report) {
+        const date = new Date(report.uploadedAt).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+        const analysisHtml = formatAIResponse(report.analysis);
+
+        reportDetailContent.innerHTML = `
+            <div class="report-detail-header">
+                <div>
+                    <h2 style="margin:0 0 4px;">${report.fileName}</h2>
+                    <p style="color:var(--text-muted); margin:0; font-size:0.9rem;">${report.reportType} &bull; Uploaded ${date}</p>
+                </div>
+            </div>
+            <div class="card report-analysis-card" style="margin-top:20px;">
+                <h3 style="margin-bottom:16px; display:flex; align-items:center; gap:8px;">🤖 AI Analysis</h3>
+                <div class="report-analysis-body">${analysisHtml}</div>
+            </div>
+        `;
+
+        // Switch to report detail view
+        appRouter.navigate('report-detail');
+    }
+
+    // Delete a report
+    window.deleteReport = async function (id) {
+        if (!confirm('Delete this report?')) return;
+        try {
+            await fetch('/api/reports/' + id, { method: 'DELETE' });
+            loadReportsList();
+        } catch (err) {
+            alert('Failed to delete report.');
+        }
+    };
+
+    // Ask AI about reports
+    async function handleReportAsk() {
+        const question = reportAskInput.value.trim();
+        if (!question) return;
+
+        reportAskBtn.disabled = true;
+        reportAskAnswer.style.display = 'block';
+        reportAskAnswer.innerHTML = '<div style="display:flex; align-items:center; gap:10px;"><span class="report-spinner"></span> Thinking...</div>';
+
+        try {
+            const res = await fetch('/api/reports/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Error');
+
+            reportAskAnswer.innerHTML = `<div class="report-ai-answer">${formatAIResponse(data.answer)}</div>`;
+        } catch (err) {
+            reportAskAnswer.innerHTML = `<p style="color:#ef4444;">Failed to get answer: ${err.message}</p>`;
+        } finally {
+            reportAskBtn.disabled = false;
+            reportAskInput.value = '';
+        }
+    }
+
+    if (reportAskBtn) reportAskBtn.addEventListener('click', handleReportAsk);
+    if (reportAskInput) reportAskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleReportAsk(); });
+
+    // Load reports on page load
+    loadReportsList();
 
     // --- 3. Settings Toggles ---
 

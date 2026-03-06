@@ -111,18 +111,10 @@
                     </svg>
                     <span>Dashboard</span>
                 </a>
-                <a class="nav-item" data-target="analyzer">
+                <a class="nav-item" data-target="reports">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                         <polyline points="14 2 14 8 20 8"></polyline>
-                    </svg>
-                    <span>Report Analyzer</span>
-                </a>
-                <a class="nav-item" data-target="reports">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="20" x2="18" y2="10"></line>
-                        <line x1="12" y1="20" x2="12" y2="4"></line>
-                        <line x1="6" y1="20" x2="6" y2="14"></line>
                     </svg>
                     <span>Medical Reports</span>
                 </a>
@@ -188,7 +180,7 @@
 
                 <h2 class="section-title">Quick Actions</h2>
                 <div class="quick-actions">
-                    <div class="action-card link-trigger" data-target="analyzer">
+                    <div class="action-card link-trigger" data-target="reports">
                         <div class="action-icon">📄</div>
                         <h3>Upload Report</h3>
                         <p>Analyze documents</p>
@@ -317,164 +309,62 @@
                 </div>
             </div>
 
-            <div id="analyzer" class="view-section">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+            <!-- ===== MEDICAL REPORTS (Upload + View + Query) ===== -->
+            <div id="reports" class="view-section">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
                     <div>
-                        <h1>Report Analyzer</h1>
-                        <p style="color:var(--text-muted); margin-top:4px;">Upload medical reports for instant AI
-                            analysis
-                        </p>
+                        <h1>Medical Reports</h1>
+                        <p style="color:var(--text-muted); margin-top:4px;">Upload, analyze & query your medical reports with AI</p>
                     </div>
                 </div>
 
-                <div class="card"
-                    style="text-align: center; padding: 60px 20px; border: 2px dashed var(--border-color); cursor: pointer; transition: all 0.3s; margin-bottom: 32px;"
-                    onmouseover="this.style.borderColor='var(--primary)'; this.style.backgroundColor='rgba(0, 229, 163, 0.05)';"
-                    onmouseout="this.style.borderColor='var(--border-color)'; this.style.backgroundColor='transparent';">
-                    <div style="font-size: 3rem; margin-bottom: 16px;">📄</div>
-                    <h3 style="margin-bottom: 8px;">Drag & Drop your report here</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 24px;">Supports PDF, JPG, PNG (Max 10MB)</p>
-                    <button class="btn btn-primary" style="padding: 12px 24px;">Browse Files</button>
+                <!-- Upload Zone -->
+                <div class="card report-upload-zone" id="report-drop-zone">
+                    <input type="file" id="report-file-input" accept=".pdf,.jpg,.jpeg,.png,.webp" hidden>
+                    <div style="font-size: 3rem; margin-bottom: 12px;">📄</div>
+                    <h3 style="margin-bottom: 6px;">Drag & Drop your report here</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 20px;">Supports PDF, JPG, PNG, WEBP (Max 10MB)</p>
+                    <button class="btn btn-primary" id="report-browse-btn" style="padding: 12px 24px;">Browse Files</button>
+                    <!-- Upload progress -->
+                    <div id="upload-progress" style="display:none; margin-top: 20px; width: 100%;">
+                        <div style="display:flex; align-items:center; gap:12px; justify-content:center;">
+                            <span class="report-spinner"></span>
+                            <span id="upload-status-text" style="color:var(--text-muted);">Uploading & analyzing...</span>
+                        </div>
+                        <div class="upload-bar-track"><div class="upload-bar-fill" id="upload-bar-fill"></div></div>
+                    </div>
                 </div>
 
-                <h3 style="margin-bottom: 16px;">Recent Analysis</h3>
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <div class="activity-item link-trigger" data-target="reports" style="cursor:pointer; margin:0;">
-                        <div style="display: flex; align-items: center; gap:16px;">
-                            <div class="action-icon"
-                                style="margin:0; width:36px; height:36px; font-size:14px; background: rgba(34, 197, 94, 0.1); color: #22c55e;">
-                                ✓</div>
-                            <div>
-                                <h4>Blood Test - Alpha Labs</h4>
-                                <p style="margin-top:2px; font-size:0.85rem;">Analyzed today • No critical issues found
-                                </p>
-                            </div>
-                        </div>
-                        <span style="color: var(--primary); font-size: 0.9rem;">View Report &rarr;</span>
+                <!-- Ask AI About Reports -->
+                <div class="card" style="margin-top: 24px;">
+                    <h3 style="margin-bottom: 12px; display:flex; align-items:center; gap:8px;">🧠 Ask About Your Reports</h3>
+                    <p style="color:var(--text-muted); margin-bottom: 16px; font-size:0.9rem;">Ask any question about your stored medical data and get AI-powered insights.</p>
+                    <div class="report-ask-bar">
+                        <input type="text" id="report-ask-input" placeholder="e.g. &quot;What's my cholesterol trend?&quot; or &quot;Summarize all my reports&quot;" autocomplete="off">
+                        <button id="report-ask-btn" class="chat-send-btn" title="Ask AI">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
                     </div>
-                    <div class="activity-item link-trigger" data-target="reports" style="cursor:pointer; margin:0;">
-                        <div style="display: flex; align-items: center; gap:16px;">
-                            <div class="action-icon"
-                                style="margin:0; width:36px; height:36px; font-size:14px; background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                                ⚠</div>
-                            <div>
-                                <h4>MRI Scan - Lower Back</h4>
-                                <p style="margin-top:2px; font-size:0.85rem;">Analyzed 3 days ago • 1 minor issue
-                                    detected
-                                </p>
-                            </div>
-                        </div>
-                        <span style="color: var(--primary); font-size: 0.9rem;">View Report &rarr;</span>
+                    <div id="report-ask-answer" style="display:none; margin-top:16px;"></div>
+                </div>
+
+                <!-- Reports List -->
+                <div style="margin-top: 32px;">
+                    <h3 style="margin-bottom: 16px;">Your Reports</h3>
+                    <div id="reports-list" style="display: flex; flex-direction: column; gap: 16px;">
+                        <p id="no-reports-msg" style="color:var(--text-muted); text-align:center; padding:32px 0;">No reports uploaded yet. Upload your first report above!</p>
                     </div>
                 </div>
             </div>
 
-            <div id="reports" class="view-section">
-                <span class="back-link link-trigger" data-target="analyzer">&larr; Back to Analyzer</span>
-
-                <div class="card"
-                    style="margin-top: 20px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.2);">
-                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
-                        <div class="action-icon" style="margin:0; background:rgba(34, 197, 94, 0.1); color:#22c55e;">✓
-                        </div>
-                        <h3 style="font-size: 1.1rem; color: #22c55e;">Summary: Normal</h3>
-                    </div>
-                    <p style="color: var(--text-light); font-size: 0.95rem; line-height: 1.5;">Overall, your blood work
-                        shows healthy results with one area to monitor. Your hemoglobin and glucose levels are
-                        excellent.
-                        LDL cholesterol is slightly elevated but manageable with lifestyle changes.</p>
-                </div>
-
-                <div class="card" style="margin-top: 24px;">
-                    <h3
-                        style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                        Test Results & Findings
-                        <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">3 items
-                            analyzed</span>
-                    </h3>
-
-                    <div class="result-row">
-                        <div>
-                            <h4 style="display:flex; align-items:center; gap:8px;">✓ Hemoglobin <span
-                                    class="badge badge-normal">Normal</span></h4>
-                            <div style="display: flex; gap: 40px; margin-top: 12px;">
-                                <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Your
-                                        Result</span><span style="font-size: 1.2rem; font-weight: 600;">14.5 <small
-                                            style="font-weight:normal; font-size:0.8rem;">g/dL</small></span></div>
-                                <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Normal
-                                        Range</span><span style="font-size: 1rem; font-weight: 500;">12-16 g/dL</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="result-row">
-                        <div>
-                            <h4 style="display:flex; align-items:center; gap:8px; color:#f59e0b;">⚠ LDL Cholesterol
-                                <span class="badge badge-warning">Borderline</span>
-                            </h4>
-                            <div style="display: flex; gap: 40px; margin-top: 12px;">
-                                <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Your
-                                        Result</span><span
-                                        style="font-size: 1.2rem; font-weight: 600; color:#f59e0b;">145
-                                        <small
-                                            style="font-weight:normal; font-size:0.8rem; color:var(--text-light);">mg/dL</small></span>
-                                </div>
-                                <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Normal
-                                        Range</span><span style="font-size: 1rem; font-weight: 500;">
-                                        <100 mg/dL</span>
-                                </div>
-                            </div>
-                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 12px;">Your LDL
-                                cholesterol
-                                is slightly elevated. Consider dietary changes and regular exercise.</p>
-                        </div>
-                    </div>
-
-                    <div class="result-row" style="border-bottom: none;">
-                        <div>
-                            <h4 style="display:flex; align-items:center; gap:8px;">✓ Glucose (Fasting) <span
-                                    class="badge badge-normal">Normal</span></h4>
-                            <div style="display: flex; gap: 40px; margin-top: 12px;">
-                                <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Your
-                                        Result</span><span style="font-size: 1.2rem; font-weight: 600;">92 <small
-                                            style="font-weight:normal; font-size:0.8rem;">mg/dL</small></span></div>
-                                <div><span style="font-size: 0.8rem; color: var(--text-muted); display:block;">Normal
-                                        Range</span><span style="font-size: 1rem; font-weight: 500;">70-100 mg/dL</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card"
-                    style="margin-top: 24px; background: rgba(0, 229, 163, 0.05); border: 1px solid rgba(0, 229, 163, 0.3);">
-                    <h3
-                        style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; color: var(--primary);">
-                        ✓
-                        Recommendations</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Suggested actions
-                        based on
-                        your results</p>
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                        <div style="display: flex; gap: 12px; align-items: flex-start;">
-                            <span
-                                style="background: var(--primary); color: #000; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; flex-shrink: 0;">1</span>
-                            <span style="font-size: 0.95rem;">Maintain a heart-healthy diet with reduced saturated
-                                fats</span>
-                        </div>
-                        <div style="display: flex; gap: 12px; align-items: flex-start;">
-                            <span
-                                style="background: var(--primary); color: #000; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; flex-shrink: 0;">2</span>
-                            <span style="font-size: 0.95rem;">Aim for 30 minutes of moderate exercise daily</span>
-                        </div>
-                        <div style="display: flex; gap: 12px; align-items: flex-start;">
-                            <span
-                                style="background: var(--primary); color: #000; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; flex-shrink: 0;">3</span>
-                            <span style="font-size: 0.95rem;">Schedule a follow-up test in 6 months to monitor
-                                cholesterol</span>
-                        </div>
-                    </div>
+            <!-- Single Report Detail View -->
+            <div id="report-detail" class="view-section">
+                <span class="back-link" id="back-to-reports" style="cursor:pointer;">&larr; Back to Reports</span>
+                <div id="report-detail-content" style="margin-top: 20px;">
+                    <!-- Dynamically filled by JS -->
                 </div>
             </div>
 
