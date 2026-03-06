@@ -8,6 +8,15 @@ const multer = require('multer');
 
 dotenv.config();
 
+// --- Validate required environment variables ---
+const requiredEnv = ['GROQ_API_KEY', 'SUPABASE_URL'];
+for (const key of requiredEnv) {
+    if (!process.env[key]) {
+        console.error(`❌ Missing required env var: ${key}. Check your .env file.`);
+        process.exit(1);
+    }
+}
+
 const supabase = require('./supabase');
 
 const app = express();
@@ -439,16 +448,8 @@ If no medicines found, return: []`;
 });
 
 app.post('/api/check-symptoms', async (req, res) => {
-    console.log('--- Start Health Chat ---');
-    console.log('Timestamp:', new Date().toISOString());
-    console.log('Payload:', JSON.stringify(req.body, null, 2));
-
     try {
         const { message, symptoms, duration, severity } = req.body;
-
-        if (!process.env.GROQ_API_KEY) {
-            throw new Error('GROQ_API_KEY is missing from environment variables');
-        }
 
         if (!message && (!symptoms || symptoms.length === 0)) {
             return res.status(400).json({ error: 'Please provide a message or select symptoms.' });
@@ -516,22 +517,11 @@ app.post('/api/check-symptoms', async (req, res) => {
             temperature: 0.3,
         });
         const text = result.choices[0].message.content;
-        console.log('AI response generated successfully. Length:', text.length);
 
         res.json({ analysis: text });
     } catch (error) {
-        console.error('--- ERROR IN HEALTH CHAT ---');
-        console.error('Error Name:', error.name);
-        console.error('Error Message:', error.message);
-        console.error('Stack Trace:', error.stack);
-
-        res.status(500).json({
-            error: 'Failed to get response.',
-            details: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-        });
-    } finally {
-        console.log('--- End Health Chat ---');
+        console.error('Health chat error:', error.message);
+        res.status(500).json({ error: 'Failed to get response.' });
     }
 });
 
@@ -591,5 +581,5 @@ app.delete('/api/medications/:id', requireAuth, async (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+    console.log(`\n🚀 MediEase server running at http://localhost:${port}\n`);
 });

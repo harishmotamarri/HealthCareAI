@@ -112,11 +112,13 @@
                     <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                 </svg>
             </button>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2">
-                <path
-                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
-                </path>
-            </svg>
+            <a href="tel:108" title="Call 108 Emergency" style="display:flex; align-items:center; text-decoration:none;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" style="cursor:pointer;">
+                    <path
+                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                    </path>
+                </svg>
+            </a>
             <div class="profile-menu-container">
                 <div class="profile-icon">H</div>
                 <div class="profile-dropdown">
@@ -642,9 +644,9 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
                             <span class="small-tag">Cardiology</span><span class="small-tag">Neurology</span><span class="small-tag">Oncology</span><span class="small-tag">Orthopedics</span><span class="small-tag">+3 more</span>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
-                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        <div class="hospital-btn-row">
+                            <button class="btn btn-outline hospital-call-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>
+                            <button class="btn btn-primary hospital-details-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> View Details</button>
                         </div>
                     </div>
 
@@ -667,9 +669,9 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
                             <span class="small-tag">General Medicine</span><span class="small-tag">Emergency</span><span class="small-tag">Trauma</span><span class="small-tag">Surgery</span>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
-                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        <div class="hospital-btn-row">
+                            <button class="btn btn-outline hospital-call-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>
+                            <button class="btn btn-primary hospital-details-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> View Details</button>
                         </div>
                     </div>
 
@@ -692,9 +694,9 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
                             <span class="small-tag">Cardiology</span><span class="small-tag">Neurosurgery</span><span class="small-tag">Nephrology</span><span class="small-tag">+2 more</span>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
-                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        <div class="hospital-btn-row">
+                            <button class="btn btn-outline hospital-call-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>
+                            <button class="btn btn-primary hospital-details-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> View Details</button>
                         </div>
                     </div>
 
@@ -717,9 +719,9 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
                             <span class="small-tag">General Medicine</span><span class="small-tag">Orthopedics</span><span class="small-tag">Pediatrics</span>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
-                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        <div class="hospital-btn-row">
+                            <button class="btn btn-outline hospital-call-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>
+                            <button class="btn btn-primary hospital-details-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> View Details</button>
                         </div>
                     </div>
 
@@ -742,9 +744,9 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
                             <span class="small-tag">Multi-Specialty</span><span class="small-tag">Emergency</span><span class="small-tag">Organ Transplant</span>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
-                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        <div class="hospital-btn-row">
+                            <button class="btn btn-outline hospital-call-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>
+                            <button class="btn btn-primary hospital-details-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> View Details</button>
                         </div>
                     </div>
 
@@ -767,9 +769,9 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
                             <span class="small-tag">Cardiology</span><span class="small-tag">Neurology</span><span class="small-tag">Oncology</span><span class="small-tag">Gastroenterology</span>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
-                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        <div class="hospital-btn-row">
+                            <button class="btn btn-outline hospital-call-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>
+                            <button class="btn btn-primary hospital-details-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> View Details</button>
                         </div>
                     </div>
 
@@ -792,9 +794,9 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
                             <span class="small-tag">Emergency</span><span class="small-tag">Orthopedics</span><span class="small-tag">General Surgery</span>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
-                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        <div class="hospital-btn-row">
+                            <button class="btn btn-outline hospital-call-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>
+                            <button class="btn btn-primary hospital-details-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> View Details</button>
                         </div>
                     </div>
 
@@ -817,9 +819,9 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
                             <span class="small-tag">Cardiology</span><span class="small-tag">Oncology</span><span class="small-tag">Transplant</span><span class="small-tag">Neurology</span><span class="small-tag">+5 more</span>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
-                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        <div class="hospital-btn-row">
+                            <button class="btn btn-outline hospital-call-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>
+                            <button class="btn btn-primary hospital-details-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> View Details</button>
                         </div>
                     </div>
 
@@ -842,9 +844,9 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
                             <span class="small-tag">Orthopedics</span><span class="small-tag">Joint Replacement</span><span class="small-tag">Spine Surgery</span>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
-                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        <div class="hospital-btn-row">
+                            <button class="btn btn-outline hospital-call-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>
+                            <button class="btn btn-primary hospital-details-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> View Details</button>
                         </div>
                     </div>
 
@@ -867,9 +869,9 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
                             <span class="small-tag">Multi-Specialty</span><span class="small-tag">Gastroenterology</span><span class="small-tag">Pulmonology</span>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
-                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        <div class="hospital-btn-row">
+                            <button class="btn btn-outline hospital-call-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>
+                            <button class="btn btn-primary hospital-details-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> View Details</button>
                         </div>
                     </div>
 
@@ -892,9 +894,9 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
                             <span class="small-tag">Orthopedics</span><span class="small-tag">Urology</span><span class="small-tag">Gynecology</span>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
-                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        <div class="hospital-btn-row">
+                            <button class="btn btn-outline hospital-call-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>
+                            <button class="btn btn-primary hospital-details-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> View Details</button>
                         </div>
                     </div>
 
@@ -917,9 +919,9 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
                             <span class="small-tag">Cardiology</span><span class="small-tag">Cardiac Surgery</span><span class="small-tag">Pulmonology</span>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
-                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        <div class="hospital-btn-row">
+                            <button class="btn btn-outline hospital-call-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>
+                            <button class="btn btn-primary hospital-details-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> View Details</button>
                         </div>
                     </div>
 
@@ -942,9 +944,9 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
                             <span class="small-tag">General Medicine</span><span class="small-tag">Emergency</span><span class="small-tag">Orthopedics</span><span class="small-tag">Pediatrics</span>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-outline" style="flex: 1; padding: 8px;">📞</button>
-                            <button class="btn btn-primary" style="flex: 2; padding: 8px;">Details</button>
+                        <div class="hospital-btn-row">
+                            <button class="btn btn-outline hospital-call-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call</button>
+                            <button class="btn btn-primary hospital-details-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> View Details</button>
                         </div>
                     </div>
 
@@ -995,9 +997,9 @@
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 16px; margin-top: 32px;">
-                        <button id="modal-call-btn" class="btn btn-primary" style="flex: 1; justify-content: center; padding: 12px;">📞 Call Now</button>
-                        <button id="modal-directions-btn" class="btn btn-outline" style="flex: 1; justify-content: center; padding: 12px;">Get Directions</button>
+                    <div style="display: flex; gap: 12px; margin-top: 32px;">
+                        <button id="modal-call-btn" class="btn btn-outline hospital-call-btn" style="flex: 1; justify-content: center; padding: 12px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call Now</button>
+                        <button id="modal-directions-btn" class="btn btn-primary hospital-details-btn" style="flex: 1; justify-content: center; padding: 12px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg> Get Directions</button>
                     </div>
                 </div>
             </div>
@@ -1112,6 +1114,29 @@
                         </div>
                         <p class="fa-loading-title">AI is analyzing your image...</p>
                         <p class="fa-loading-sub">Identifying injury type, severity & first aid steps</p>
+                    </div>
+                </div>
+
+                <!-- Browser Camera Modal -->
+                <div class="fa-camera-overlay" id="fa-camera-overlay" style="display:none;">
+                    <div class="fa-camera-modal">
+                        <div class="fa-camera-header">
+                            <h3>Take Photo</h3>
+                            <button class="fa-camera-close" id="fa-camera-close">&times;</button>
+                        </div>
+                        <div class="fa-camera-body">
+                            <video id="fa-camera-video" autoplay playsinline></video>
+                            <canvas id="fa-camera-canvas" style="display:none;"></canvas>
+                        </div>
+                        <div class="fa-camera-footer">
+                            <button class="btn fa-btn-switch" id="fa-camera-switch" title="Switch camera">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                            </button>
+                            <button class="btn fa-btn-capture" id="fa-camera-capture">
+                                <div class="fa-capture-ring"></div>
+                            </button>
+                            <div style="width:44px;"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -1252,41 +1277,14 @@
                         Emergency Contact</h3>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Who to contact in an
                         emergency</p>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 20px; align-items: end;">
                         <div class="input-group" style="margin:0;"><label>Contact Name</label><input type="text"
-                                class="form-control" placeholder="e.g., John Doe"></div>
-                        <div class="input-group" style="margin:0;"><label>Phone Number</label><input type="text"
-                                class="form-control" placeholder="+1 (555) 000-0000"></div>
+                                id="emergency-contact-name" class="form-control" placeholder="e.g., John Doe"></div>
+                        <div class="input-group" style="margin:0;"><label>Phone Number</label><input type="tel"
+                                id="emergency-contact-phone" class="form-control" placeholder="+91 98765 43210"></div>
+                        <button class="btn btn-primary" id="emergency-save-btn" style="padding: 10px 20px; height: 42px;">Save</button>
                     </div>
-                </div>
-
-                <div class="card" style="margin-bottom: 24px;">
-                    <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-size: 1.1rem;">🔔
-                        Notifications</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">How you receive
-                        updates
-                    </p>
-                    <div class="setting-row">
-                        <div>
-                            <h4 style="margin-bottom: 4px; font-weight: 500;">Email Notifications</h4>
-                            <p style="font-size:0.85rem; color:var(--text-muted);">Receive updates via email</p>
-                        </div>
-                        <div class="toggle on"></div>
-                    </div>
-                    <div class="setting-row">
-                        <div>
-                            <h4 style="margin-bottom: 4px; font-weight: 500;">Push Notifications</h4>
-                            <p style="font-size:0.85rem; color:var(--text-muted);">Receive push notifications</p>
-                        </div>
-                        <div class="toggle"></div>
-                    </div>
-                    <div class="setting-row" style="border:none;">
-                        <div>
-                            <h4 style="margin-bottom: 4px; font-weight: 500;">Health Reminders</h4>
-                            <p style="font-size:0.85rem; color:var(--text-muted);">Get periodic health tips</p>
-                        </div>
-                        <div class="toggle on"></div>
-                    </div>
+                    <p id="emergency-save-msg" style="display:none; margin-top:12px; font-size:0.85rem; color:var(--primary);">✅ Emergency contact saved!</p>
                 </div>
 
                 <div class="card" style="margin-bottom: 24px;">
@@ -1308,10 +1306,10 @@
                     </div>
                     <div class="setting-row" style="border:none;">
                         <div>
-                            <h4 style="margin-bottom: 4px; font-weight: 500;">Dark Mode</h4>
-                            <p style="font-size:0.85rem; color:var(--text-muted);">Use dark theme</p>
+                            <h4 style="margin-bottom: 4px; font-weight: 500;">Light Mode</h4>
+                            <p style="font-size:0.85rem; color:var(--text-muted);">Use light theme</p>
                         </div>
-                        <div class="toggle on"></div>
+                        <div class="toggle" id="settings-dark-toggle"></div>
                     </div>
                 </div>
 
@@ -1335,10 +1333,6 @@
                     </div>
                 </div>
 
-                <div style="display: flex; justify-content: center; margin-top: 32px;">
-                    <button class="btn btn-primary" style="padding: 14px 40px; font-size: 1rem;">💾 Save
-                        Settings</button>
-                </div>
             </div>
         </main>
 

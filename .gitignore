@@ -1,9 +1,14 @@
 # Dependencies
 node_modules/
 
-# Environment
+# Environment variables
 .env
-.env.*
+.env.local
+.env.production
+
+# Uploads (user-generated content)
+uploads/*
+!uploads/.gitkeep
 
 # Build outputs
 dist/
@@ -11,19 +16,18 @@ build/
 
 # Logs
 *.log
+npm-debug.log*
 server_err.txt
 server_log.txt
 
 # OS files
 .DS_Store
 Thumbs.db
-
-# Uploads (user-generated)
-uploads/*
-!uploads/.gitkeep
+Desktop.ini
 
 # IDE
 .vscode/
+.idea/
 
 # Vercel
 .vercel

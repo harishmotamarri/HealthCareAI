@@ -1,26 +1,34 @@
 {
-  "name": "aicare",
+  "name": "mediease",
   "version": "1.0.0",
-  "description": "MediMind AI is a comprehensive frontend web application acting as a Personal AI Doctor UI dashboard. It transforms complex medical documents like prescriptions, lab reports, and symptoms into simple, actionable health insights.",
-  "main": "index.js",
+  "description": "MediEase – AI-powered healthcare dashboard. Upload medical reports, check symptoms, get first aid guidance, and manage medications.",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
     "dev": "node server.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/harishmotamarri/HealthCareAI.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "healthcare",
+    "ai",
+    "medical",
+    "express",
+    "supabase"
+  ],
+  "author": "Harish Motamarri",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "bugs": {
     "url": "https://github.com/harishmotamarri/HealthCareAI/issues"
   },
   "homepage": "https://github.com/harishmotamarri/HealthCareAI#readme",
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.98.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",

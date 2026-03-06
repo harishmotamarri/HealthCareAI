@@ -181,18 +181,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 0. Theme Toggle Logic ---
     const themeToggleBtn = document.getElementById('theme-toggle');
+    const darkModeToggle = document.getElementById('settings-dark-toggle');
     const rootElement = document.documentElement;
     const savedTheme = localStorage.getItem('theme') || 'dark';
 
+    function applyTheme(theme) {
+        rootElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        if (darkModeToggle) {
+            darkModeToggle.classList.toggle('on', theme === 'dark');
+        }
+    }
+
     // Set initial theme
-    rootElement.setAttribute('data-theme', savedTheme);
+    applyTheme(savedTheme);
 
     if (themeToggleBtn) {
         themeToggleBtn.addEventListener('click', () => {
-            const currentTheme = rootElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            rootElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+            const newTheme = rootElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            applyTheme(newTheme);
+        });
+    }
+
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', () => {
+            const newTheme = rootElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+        });
+    }
+
+    // --- 0b. Emergency Contact (localStorage) ---
+    const ecName = document.getElementById('emergency-contact-name');
+    const ecPhone = document.getElementById('emergency-contact-phone');
+    const ecSaveBtn = document.getElementById('emergency-save-btn');
+    const ecMsg = document.getElementById('emergency-save-msg');
+
+    if (ecName && ecPhone) {
+        const saved = JSON.parse(localStorage.getItem('emergencyContact') || '{}');
+        if (saved.name) ecName.value = saved.name;
+        if (saved.phone) ecPhone.value = saved.phone;
+
+        ecSaveBtn.addEventListener('click', () => {
+            const name = ecName.value.trim();
+            const phone = ecPhone.value.trim();
+            if (!name || !phone) {
+                alert('Please fill in both name and phone number.');
+                return;
+            }
+            localStorage.setItem('emergencyContact', JSON.stringify({ name, phone }));
+            ecMsg.style.display = 'block';
+            setTimeout(() => { ecMsg.style.display = 'none'; }, 3000);
         });
     }
 
@@ -884,8 +922,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Attach click listeners to all Details buttons, phone buttons, and add directions
     const allHospitalCards = document.querySelectorAll('.hospital-card');
     allHospitalCards.forEach(card => {
-        const detailsBtn = card.querySelector('button.btn-primary');
-        const phoneBtn = card.querySelector('button.btn-outline');
+        const detailsBtn = card.querySelector('.hospital-details-btn');
+        const phoneBtn = card.querySelector('.hospital-call-btn');
 
         if (detailsBtn) {
             detailsBtn.addEventListener('click', (e) => {
@@ -1206,15 +1244,80 @@ document.addEventListener('DOMContentLoaded', () => {
             if (fileInput.files[0]) handleFileSelected(fileInput.files[0]);
         });
 
-        // --- Camera (opens native system camera) ---
+        // --- Camera (opens browser camera via getUserMedia) ---
+        const cameraOverlay = document.getElementById('fa-camera-overlay');
+        const cameraVideo = document.getElementById('fa-camera-video');
+        const cameraCanvas = document.getElementById('fa-camera-canvas');
+        const cameraClose = document.getElementById('fa-camera-close');
+        const cameraCapture = document.getElementById('fa-camera-capture');
+        const cameraSwitch = document.getElementById('fa-camera-switch');
+        let cameraStream = null;
+        let facingMode = 'environment';
+
+        async function startCamera() {
+            // Stop any existing stream
+            stopCamera();
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+                    audio: false
+                });
+                cameraVideo.srcObject = cameraStream;
+            } catch (err) {
+                // If environment camera fails, try without constraint
+                try {
+                    cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                    cameraVideo.srcObject = cameraStream;
+                } catch (err2) {
+                    alert('Could not access camera. Please check permissions.');
+                    closeCameraModal();
+                }
+            }
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(t => t.stop());
+                cameraStream = null;
+            }
+            if (cameraVideo) cameraVideo.srcObject = null;
+        }
+
+        function closeCameraModal() {
+            stopCamera();
+            if (cameraOverlay) cameraOverlay.style.display = 'none';
+        }
+
         cameraBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            const camInput = document.createElement('input');
-            camInput.type = 'file';
-            camInput.accept = 'image/*';
-            camInput.setAttribute('capture', 'environment');
-            camInput.onchange = () => { if (camInput.files[0]) handleFileSelected(camInput.files[0]); };
-            camInput.click();
+            if (cameraOverlay) {
+                cameraOverlay.style.display = 'flex';
+                startCamera();
+            }
+        });
+
+        if (cameraClose) cameraClose.addEventListener('click', closeCameraModal);
+        if (cameraOverlay) cameraOverlay.addEventListener('click', (e) => {
+            if (e.target === cameraOverlay) closeCameraModal();
+        });
+
+        if (cameraSwitch) cameraSwitch.addEventListener('click', () => {
+            facingMode = facingMode === 'environment' ? 'user' : 'environment';
+            startCamera();
+        });
+
+        if (cameraCapture) cameraCapture.addEventListener('click', () => {
+            if (!cameraVideo || !cameraVideo.videoWidth) return;
+            cameraCanvas.width = cameraVideo.videoWidth;
+            cameraCanvas.height = cameraVideo.videoHeight;
+            cameraCanvas.getContext('2d').drawImage(cameraVideo, 0, 0);
+            cameraCanvas.toBlob((blob) => {
+                if (blob) {
+                    const file = new File([blob], 'camera-photo.jpg', { type: 'image/jpeg' });
+                    handleFileSelected(file);
+                }
+                closeCameraModal();
+            }, 'image/jpeg', 0.9);
         });
 
         function handleFileSelected(file) {
