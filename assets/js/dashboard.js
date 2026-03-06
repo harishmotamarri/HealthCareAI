@@ -34,8 +34,6 @@ const appRouter = {
         const targetNav = document.querySelector(`.nav-item[data-target="${targetViewId}"]`);
         if (targetNav) {
             targetNav.classList.add('active');
-            // Update Topbar Title
-            document.getElementById('current-page-title').textContent = targetNav.textContent.trim();
         }
     },
 
@@ -128,13 +126,10 @@ document.addEventListener('DOMContentLoaded', () => {
             targetView.classList.add('active');
         }
 
-        // Highlight Sidebar and Change Title
+        // Highlight Sidebar
         const matchingNav = document.querySelector(`.nav-item[data-target="${targetId}"]`);
         if (matchingNav) {
             matchingNav.classList.add('active');
-            topbarTitle.textContent = matchingNav.textContent.trim();
-        } else if (targetId === 'profile') {
-            topbarTitle.textContent = 'Profile';
         }
 
         // Close mobile sidebar on view switch
@@ -178,16 +173,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const severityVal = document.getElementById('severity-val');
 
     const symptomsWithIcons = [
+        // General / Systemic
         { name: "Headache", icon: "🤕" },
         { name: "Fever", icon: "🌡️" },
-        { name: "Cough", icon: "🌬️" },
         { name: "Fatigue", icon: "🛌" },
-        { name: "Nausea", icon: "🤢" },
-        { name: "Chest Pain", icon: "🫀" },
-        { name: "Dizziness", icon: "😵" },
-        { name: "Sore Throat", icon: "🗣️" },
+        { name: "Chills", icon: "🥶" },
+        { name: "Sweating", icon: "💦" },
         { name: "Body Aches", icon: "💪" },
-        { name: "Shortness of Breath", icon: "🫁" }
+        { name: "Weakness", icon: "🔋" },
+
+        // Respiratory / ENT
+        { name: "Cough", icon: "🌬️" },
+        { name: "Sore Throat", icon: "🗣️" },
+        { name: "Shortness of Breath", icon: "🫁" },
+        { name: "Runny Nose", icon: "🤧" },
+        { name: "Congestion", icon: "👃" },
+        { name: "Loss of Smell", icon: "🚫👃" },
+
+        // Gastrointestinal
+        { name: "Nausea", icon: "🤢" },
+        { name: "Vomiting", icon: "🤮" },
+        { name: "Diarrhea", icon: "🚽" },
+        { name: "Stomach Ache", icon: "😖" },
+        { name: "Heartburn", icon: "🔥" },
+        { name: "Loss of Appetite", icon: "🍽️" },
+
+        // Cardiovascular / Neurological
+        { name: "Chest Pain", icon: "🫀" },
+        { name: "Palpitations", icon: "💓" },
+        { name: "Dizziness", icon: "😵" },
+        { name: "Fainting", icon: "💫" },
+        { name: "Confusion", icon: "❓" },
+        { name: "Numbness", icon: "🧊" },
+
+        // Musculoskeletal / Skin
+        { name: "Joint Pain", icon: "🦴" },
+        { name: "Muscle Cramps", icon: "🦵" },
+        { name: "Back Pain", icon: "🧍" },
+        { name: "Rash", icon: "🔴" },
+        { name: "Itching", icon: "🤏" },
+        // Vision / Eye
+        { name: "Blurry Vision", icon: "👓" },
+        { name: "Red Eye", icon: "👁️" }
     ];
 
     function renderChips() {

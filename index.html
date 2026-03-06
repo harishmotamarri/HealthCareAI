@@ -21,7 +21,12 @@
         <div class="container flex items-center justify-between">
             <div class="flex items-center gap-2 font-bold" style="font-size: 1.2rem;">
                 <img src="assets/img/images.jpg" alt="MediEase Logo" width="32" height="32" style="border-radius: 6px;">
-                MediEase <span class="text-gradient"></span>
+                <div style="display: flex; flex-direction: column;">
+                    <span>MediEase <span class="text-gradient"></span></span>
+                    <span
+                        style="font-size: 0.6rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;">Don't
+                        just ask, know</span>
+                </div>
             </div>
             <div class="nav-links flex gap-6" style="display: none;"> <a href="#features">Features</a>
                 <a href="#how-it-works">How It Works</a>
@@ -71,53 +76,136 @@
         });
     </script>
 
-    <header class="hero">
-        <div class="container grid grid-cols-2 gap-12 items-center">
-            <div>
-                <div class="badge text-muted">✦ AI-POWERED HEALTHCARE INTELLIGENCE</div>
-                <h1>Your Personal <br><span class="text-gradient">AI Doctor</span><br>Is Here.</h1>
-                <p class="text-muted" style="font-size: 1.15rem; margin-bottom: 32px; max-width: 480px;">
-                    Dont just ask, know. MediEase transforms complex prescriptions, lab reports, and symptoms into
-                    clear, actionable health
-                    insights. Understand your health like never before.
-                </p>
-                <div class="flex gap-4 items-center">
-                    <a href="signup.html" class="btn btn-gradient" style="padding: 14px 28px; font-size: 1.05rem;">Try
-                        MediEase Free →</a>
-                    <a href="#" class="btn btn-outline" style="padding: 14px 28px; font-size: 1.05rem;">▶ Watch Demo</a>
+    <header class="hero" style="position: relative; overflow: hidden;">
+        <!-- Glowing gradient effect directly behind the hero text -->
+        <div
+            style="position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0, 229, 163, 0.15) 0%, transparent 60%); top: 50%; left: 0%; transform: translateY(-50%); z-index: -1;">
+        </div>
+
+        <div class="container grid grid-cols-2 gap-12 items-center" style="z-index: 1;">
+            <div style="padding-right: 2rem;">
+                <!-- Updated animated badge -->
+                <div class="badge text-muted"
+                    style="margin-bottom: 24px; border-color: rgba(0, 229, 163, 0.3); background: rgba(0, 229, 163, 0.05); color: var(--primary-green); padding: 8px 16px;">
+                    <span
+                        style="display: inline-block; width: 8px; height: 8px; background: var(--primary-green); border-radius: 50%; margin-right: 8px; box-shadow: 0 0 10px var(--primary-green);"></span>
+                    Transforming Patient Care
                 </div>
+
+                <h1
+                    style="font-size: 5rem; line-height: 1.05; letter-spacing: -1.5px; margin-bottom: 24px; font-weight: 800;">
+                    Your Personal<br>
+                    <span class="text-gradient"
+                        style="background: linear-gradient(135deg, #00e5a3, #3b82f6); -webkit-background-clip: text; background-clip: text; color: transparent;">AI
+                        Doctor</span><br>
+                    Is Here.
+                </h1>
+
+                <p class="text-muted"
+                    style="font-size: 1.25rem; line-height: 1.6; margin-bottom: 40px; max-width: 520px;">
+                    MediEase translates complex medical prescriptions, confusing lab reports, and
+                    uncertain symptoms into clear, actionable health insights.
+                </p>
+
+                <div class="flex gap-4 items-center">
+                    <a href="signup.html" class="btn btn-gradient"
+                        style="padding: 16px 32px; font-size: 1.1rem; border-radius: 12px; box-shadow: 0 8px 20px rgba(0, 229, 163, 0.25);">Try
+                        MediEase →</a>
+                    <a href="assets/img/AI-Powered_Patient_Intelligence_Platform_Your_Smar.mp4" target="_blank"
+                        class="btn btn-outline"
+                        style="padding: 16px 32px; font-size: 1.1rem; border-radius: 12px; background: rgba(255,255,255,0.03);">
+                        <span style="margin-right: 8px;">▶</span> Watch Demo
+                    </a>
+                </div>
+
             </div>
 
-            <div class="hero-visual justify-center flex">
-                <div class="mock-window">
-                    <div class="mock-header">
+            <div class="hero-visual flex justify-center w-full"
+                style="perspective: 1000px; transform-style: preserve-3d;">
+                <div class="mock-window"
+                    style="transform: rotateY(-5deg) rotateX(5deg) translateZ(20px); box-shadow: -20px 30px 60px rgba(0,0,0,0.6), 0 0 20px rgba(0, 229, 163, 0.15); transition: transform 0.5s ease; border-radius: 16px;">
+                    <div class="mock-header" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding: 16px;">
                         <div class="mock-dot red"></div>
                         <div class="mock-dot yellow"></div>
                         <div class="mock-dot green"></div>
+                        <div
+                            style="margin-left:auto; font-size:0.75rem; color: var(--text-muted); font-family: monospace;">
+                            mediease-ai-engine.exe</div>
                     </div>
-                    <div style="padding: 24px; background: #0b1120;">
+                    <div
+                        style="padding: 32px; background: linear-gradient(180deg, #0b1120 0%, #070b14 100%); position: relative;">
+                        <!-- Scanline animation effect -->
                         <div
-                            style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 0.85rem;">
-                            📄 PRESCRIPTION UPLOADED
+                            style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: rgba(0, 229, 163, 0.5); box-shadow: 0 0 10px var(--primary-green); animation: scan 3s infinite linear; opacity: 0.5;">
                         </div>
+
                         <div
-                            style="border-left: 2px solid var(--primary-green); padding-left: 16px; margin-bottom: 16px;">
-                            <p class="font-bold text-gradient" style="font-size: 0.8rem; margin-bottom: 4px;">AI
-                                ANALYZING...</p>
-                            <p style="font-size: 0.95rem;"><strong>Metformin 500mg</strong> — Used to control blood
-                                sugar levels in Type 2 diabetes. Take with meals to reduce stomach upset. Common side
-                                effects include nausea and stomach discomfort.</p>
+                            style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 14px 16px; border-radius: 12px; margin-bottom: 20px; font-size: 0.8rem; display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 1.2rem;">📄</span>
+                            <div>
+                                <span
+                                    style="display:block; font-weight: 600; color: var(--text-light);">PRESCRIPTION_UPLOAD.JPG</span>
+                                <span style="display:block; color: var(--text-muted); font-size: 0.7rem;">Scanning
+                                    document for medical entities...</span>
+                            </div>
                         </div>
+
                         <div
-                            style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px;">
-                            <p style="color: var(--accent-green); font-size: 0.85rem; font-weight: 600;">✓ Medication
-                                Schedule Set</p>
-                            <p class="text-muted" style="font-size: 0.8rem;">Next dose: 8:00 AM with Breakfast</p>
+                            style="border-left: 3px solid var(--primary-green); padding-left: 20px; margin-bottom: 24px; position: relative;">
+                            <div
+                                style="position: absolute; left: -7px; top: 0; width: 11px; height: 11px; border-radius: 50%; background: var(--primary-green); box-shadow: 0 0 8px var(--primary-green);">
+                            </div>
+                            <p class="font-bold text-gradient"
+                                style="font-size: 0.85rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
+                                AI Analysis Complete</p>
+                            <h4 style="font-size: 1.1rem; color: #fff; margin-bottom: 6px;">Metformin 500mg</h4>
+                            <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5;">Used to control
+                                blood sugar levels in Type 2 diabetes. Take with meals to reduce stomach upset. Common
+                                side effects include nausea natively.</p>
+                        </div>
+
+                        <div
+                            style="background: linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%); border: 1px solid rgba(16, 185, 129, 0.2); border-left: 4px solid var(--accent-green); padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p
+                                    style="color: var(--accent-green); font-size: 0.9rem; font-weight: 700; margin-bottom: 2px;">
+                                    ✓ Smart Schedule Active</p>
+                                <p class="text-muted" style="font-size: 0.8rem;">Next dose: 8:00 AM with Breakfast</p>
+                            </div>
+                            <button
+                                style="background: var(--accent-green); border: none; color: #fff; border-radius: 8px; padding: 6px 12px; font-weight: bold; font-size: 0.75rem; cursor: pointer;">Remind
+                                Me</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <style>
+            @keyframes scan {
+                0% {
+                    top: 0%;
+                    opacity: 0;
+                }
+
+                10% {
+                    opacity: 1;
+                }
+
+                90% {
+                    opacity: 1;
+                }
+
+                100% {
+                    top: 100%;
+                    opacity: 0;
+                }
+            }
+
+            .hero-visual .mock-window:hover {
+                transform: rotateY(0deg) rotateX(0deg) translateZ(0px) !important;
+            }
+        </style>
     </header>
 
     <section id="problem" style="background: rgba(255,255,255,0.02); border-top: 1px solid var(--border-color);">
@@ -167,7 +255,7 @@
                     <p class="text-muted" style="font-size: 0.85rem;">miss doses</p>
                 </div>
                 <div>
-                    <h3 class="font-bold text-gradient" style="font-size: 2rem;">$528B</h3>
+                    <h3 class="font-bold text-gradient" style="font-size: 2rem;">₹9,200 cr</h3>
                     <p class="text-muted" style="font-size: 0.85rem;">wasted yearly</p>
                 </div>
                 <div>
@@ -278,8 +366,7 @@
                     <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 16px;">Upload any handwritten or
                         digital prescription. AI identifies each medicine, explains its purpose, correct dosage, timing,
                         potential side effects, and dangerous interactions.</p>
-                    <a href="#" class="text-gradient"
-                        style="font-size: 0.85rem; font-weight: 600; text-decoration: none;">Try Now →</a>
+
                 </div>
                 <div class="card relative overflow-hidden">
                     <span
@@ -290,8 +377,7 @@
                     <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 16px;">Paste or upload lab results.
                         AI highlights abnormal values in red/yellow, explains what each biomarker means, and assesses
                         urgency level from 1-5.</p>
-                    <a href="#" class="text-gradient"
-                        style="font-size: 0.85rem; font-weight: 600; text-decoration: none;">Try Now →</a>
+
                 </div>
                 <div class="card relative overflow-hidden">
                     <span
@@ -302,8 +388,6 @@
                     <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 16px;">Enter symptoms in natural
                         language. AI maps to possible conditions, ranks by likelihood, assigns urgency level, and
                         recommends whether to seek immediate care.</p>
-                    <a href="#" class="text-gradient"
-                        style="font-size: 0.85rem; font-weight: 600; text-decoration: none;">Try Now →</a>
                 </div>
                 <div class="card">
                     <div style="font-size: 24px; margin-bottom: 16px;">💬</div>
@@ -311,8 +395,6 @@
                     <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 16px;">Ask anything. Get medical
                         clarity. A conversational AI trained on medical literature. Ask about symptoms, drug
                         interactions, or anything health-related.</p>
-                    <a href="#" class="text-gradient"
-                        style="font-size: 0.85rem; font-weight: 600; text-decoration: none;">Try Now →</a>
                 </div>
                 <div class="card">
                     <div style="font-size: 24px; margin-bottom: 16px;">🗓️</div>
@@ -320,8 +402,6 @@
                     <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 16px;">Never miss a dose. Input your
                         prescriptions and AI generates a personalized medication schedule with reminders, meal timing
                         instructions, and interaction warnings.</p>
-                    <a href="#" class="text-gradient"
-                        style="font-size: 0.85rem; font-weight: 600; text-decoration: none;">Try Now →</a>
                 </div>
                 <div class="card">
                     <div style="font-size: 24px; margin-bottom: 16px;">📝</div>
@@ -329,8 +409,6 @@
                     <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 16px;">Translate medical jargon to
                         plain English. Upload any doctor's note or discharge summary. AI rewrites it in simple language
                         a patient can understand.</p>
-                    <a href="#" class="text-gradient"
-                        style="font-size: 0.85rem; font-weight: 600; text-decoration: none;">Try Now →</a>
                 </div>
             </div>
         </div>
@@ -367,6 +445,13 @@
                             optimized
                             inference pipelines and edge computing architecture.</p>
                     </div>
+                    <div class="card" style="padding: 24px;">
+                        <h4 class="font-semibold" style="margin-bottom: 8px; color: #3b82f6;">
+                            Context-Aware Diagnosis
+                        </h4>
+                        <p class="text-muted" style="font-size: 0.85rem;">Integrates multiple data points—from lab
+                            history to active symptoms—for holistic, highly personalized patient intelligence.</p>
+                    </div>
                 </div>
                 <div class="card flex flex-col justify-center"
                     style="background: linear-gradient(135deg, rgba(0, 229, 163, 0.05), rgba(139, 92, 246, 0.05));">
@@ -401,60 +486,25 @@
             </div>
         </div>
     </section>
-    <footer style="background: #05080f; border-top: 1px solid var(--border-color); padding: 80px 0 40px;">
-        <div class="container">
-            <div class="grid grid-cols-4 gap-8" style="margin-bottom: 60px;">
-                <div style="grid-column: span 1;">
-                    <div class="flex items-center gap-2 font-bold" style="font-size: 1.2rem; margin-bottom: 16px;">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-green)"
-                            stroke-width="2">
-                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                        </svg>
-                        MediEase <span class="text-gradient"></span>
-                    </div>
-                    <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 24px;">AI-powered patient
-                        intelligence. Transforming complex medical information into clear, actionable health
-                        insights.
-                    </p>
-                </div>
-
-                <div>
-                    <h4 class="font-semibold" style="margin-bottom: 16px; font-size: 0.95rem;">Product</h4>
-                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem;"
-                        class="text-muted">
-                        <li><a href="#" style="color: inherit; text-decoration: none;">Features</a></li>
-                        <li><a href="#" style="color: inherit; text-decoration: none;">How It Works</a></li>
-                        <li><a href="#" style="color: inherit; text-decoration: none;">Pricing</a></li>
-                        <li><a href="#" style="color: inherit; text-decoration: none;">Roadmap</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="font-semibold" style="margin-bottom: 16px; font-size: 0.95rem;">Company</h4>
-                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem;"
-                        class="text-muted">
-                        <li><a href="#" style="color: inherit; text-decoration: none;">About</a></li>
-                        <li><a href="#" style="color: inherit; text-decoration: none;">Blog</a></li>
-                        <li><a href="#" style="color: inherit; text-decoration: none;">Careers</a></li>
-                        <li><a href="#" style="color: inherit; text-decoration: none;">Contact</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="font-semibold" style="margin-bottom: 16px; font-size: 0.95rem;">Legal</h4>
-                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem;"
-                        class="text-muted">
-                        <li><a href="#" style="color: inherit; text-decoration: none;">Privacy Policy</a></li>
-                        <li><a href="#" style="color: inherit; text-decoration: none;">Terms of Service</a></li>
-                        <li><a href="#" style="color: inherit; text-decoration: none;">HIPAA Compliance</a></li>
-                    </ul>
-                </div>
+    <footer style="background: #03060c; border-top: 1px solid var(--border-color); padding: 40px 0;">
+        <div class="container flex justify-between items-end">
+            <div class="flex flex-col gap-2">
+                <a href="index.html" class="flex items-center gap-2 font-bold"
+                    style="font-size: 1.4rem; color: var(--text-main); text-decoration: none;">
+                    <img src="assets/img/images.jpg" alt="MediEase Logo" width="32" height="32"
+                        style="border-radius: 8px;">
+                    MediEase
+                </a>
+                <p class="text-muted" style="font-size: 0.85rem; margin: 0;">
+                    &copy; 2026 MediEase Technologies. All rights reserved.
+                </p>
             </div>
 
-            <div class="flex justify-between items-center text-muted"
-                style="font-size: 0.8rem; border-top: 1px solid var(--border-color); padding-top: 24px;">
-                <p>© 2026 MediEase. All rights reserved.</p>
-                <p>Built with ❤️ for patients everywhere.</p>
+            <div class="text-muted" style="font-size: 0.85rem;font-size: 20px;">
+                <p style="margin: 0;">
+                    Made by <span style="color: var(--primary-green); font-weight: 600;">Team
+                        Hell-Fire</span>
+                </p>
             </div>
         </div>
     </footer>
