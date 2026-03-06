@@ -987,38 +987,7 @@
             <!-- ===================== MEDICATION PLANNER ===================== -->
             <div id="medications" class="view-section">
                 <h1 style="margin-bottom: 8px;">Medication Planner</h1>
-                <p style="color: var(--text-muted); margin-bottom: 24px;">Upload prescriptions, track medicines & get reminders</p>
-
-                <!-- Upload Prescription -->
-                <div class="card med-upload-card" id="med-upload-card">
-                    <div class="med-upload-zone" id="med-upload-zone">
-                        <input type="file" id="med-file-input" accept="image/jpeg,image/png,image/webp,application/pdf" hidden>
-                        <div style="text-align:center;">
-                            <div style="font-size:3rem; margin-bottom:12px;">📋</div>
-                            <h3 style="margin-bottom: 8px;">Upload Prescription</h3>
-                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">Drop your prescription image here or click to browse</p>
-                            <div style="display: flex; gap: 12px; justify-content: center;">
-                                <button class="btn btn-primary" id="med-browse-btn" style="padding: 10px 24px;">📁 Browse Files</button>
-                                <button class="btn btn-outline" id="med-camera-btn" style="padding: 10px 24px;">📷 Camera</button>
-                            </div>
-                            <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 12px;">Supports JPG, PNG, WEBP, PDF &bull; Max 10MB</p>
-                        </div>
-                    </div>
-                    <!-- Upload progress -->
-                    <div id="med-upload-progress" style="display:none; padding: 24px; text-align:center;">
-                        <div class="spinner" style="margin: 0 auto 16px;"></div>
-                        <p id="med-upload-status" style="color: var(--text-muted);">Analyzing prescription with AI...</p>
-                    </div>
-                </div>
-
-                <!-- Extracted Meds Preview (shown after AI analysis) -->
-                <div id="med-extracted-preview" class="card" style="display:none; margin-top: 20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                        <h3 style="display:flex; align-items:center; gap:8px;">✨ AI Extracted Medicines</h3>
-                        <button class="btn btn-primary" id="med-add-all-btn" style="padding:8px 20px;">+ Add All to Planner</button>
-                    </div>
-                    <div id="med-extracted-list"></div>
-                </div>
+                <p style="color: var(--text-muted); margin-bottom: 24px;">Track medicines & get reminders</p>
 
                 <!-- Manual Add Medicine -->
                 <div class="card" style="margin-top: 20px;">
@@ -1065,7 +1034,7 @@
                     <div id="med-empty-state" class="card" style="text-align:center; padding:40px;">
                         <div style="font-size:3rem; margin-bottom:12px;">💊</div>
                         <h3 style="margin-bottom:8px;">No medications yet</h3>
-                        <p style="color:var(--text-muted); font-size:0.9rem;">Upload a prescription or add medicines manually to get started</p>
+                        <p style="color:var(--text-muted); font-size:0.9rem;">Add medicines manually to get started</p>
                     </div>
                     <div id="med-list" class="med-cards-grid"></div>
                 </div>

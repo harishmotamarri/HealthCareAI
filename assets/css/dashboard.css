@@ -3317,3 +3317,130 @@ body {
 [data-theme="light"] .med-timeline-item {
     background: rgba(255,255,255,0.7);
 }
+
+/* ===== Medication Alert Popup ===== */
+.med-alert-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: medAlertFadeIn 0.3s ease;
+}
+
+.med-alert-overlay.med-alert-closing {
+    animation: medAlertFadeOut 0.3s ease forwards;
+}
+
+.med-alert-box {
+    background: var(--bg-card);
+    border: 1px solid var(--primary);
+    border-radius: 20px;
+    padding: 32px;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 0 40px rgba(0, 229, 163, 0.25), 0 20px 60px rgba(0, 0, 0, 0.4);
+    animation: medAlertSlideUp 0.35s ease;
+}
+
+.med-alert-closing .med-alert-box {
+    animation: medAlertSlideDown 0.3s ease forwards;
+}
+
+.med-alert-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.med-alert-icon-ring {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(0, 229, 163, 0.12);
+    border: 2px solid var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    animation: medAlertPulse 1.5s ease-in-out infinite;
+}
+
+.med-alert-icon {
+    font-size: 2rem;
+}
+
+.med-alert-header h2 {
+    font-size: 1.3rem;
+    color: var(--text-light);
+    margin-bottom: 6px;
+}
+
+.med-alert-header p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.med-alert-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.med-alert-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(0, 229, 163, 0.06);
+    border: 1px solid rgba(0, 229, 163, 0.2);
+}
+
+.med-alert-pill {
+    font-size: 1.5rem;
+}
+
+.med-alert-item strong {
+    color: var(--text-light);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.med-alert-detail {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.med-alert-actions {
+    display: flex;
+    gap: 10px;
+}
+
+@keyframes medAlertFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes medAlertFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes medAlertSlideUp {
+    from { transform: translateY(30px) scale(0.95); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes medAlertSlideDown {
+    from { transform: translateY(0) scale(1); opacity: 1; }
+    to { transform: translateY(30px) scale(0.95); opacity: 0; }
+}
+
+@keyframes medAlertPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0, 229, 163, 0.3); }
+    50% { box-shadow: 0 0 0 12px rgba(0, 229, 163, 0); }
+}

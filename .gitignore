@@ -1,7 +1,33 @@
+# Dependencies
 node_modules/
-.DS_Store
+
+# Environment
 .env
+.env.*
+
+# Build outputs
 dist/
 build/
+
+# Logs
 *.log
+server_err.txt
+server_log.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Uploads (user-generated)
+uploads/*
+!uploads/.gitkeep
+
+# IDE
+.vscode/
+
+# Vercel
 .vercel
+
+# Test files
+test-upload.*
+reports-data.json

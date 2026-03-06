@@ -1319,15 +1319,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===================== MEDICATION PLANNER =====================
     (function initMedicationPlanner() {
-        const STORAGE_KEY = 'mediease_medications';
-        const uploadZone = document.getElementById('med-upload-zone');
-        const fileInput = document.getElementById('med-file-input');
-        const browseBtn = document.getElementById('med-browse-btn');
-        const cameraBtn = document.getElementById('med-camera-btn');
-        const uploadProgress = document.getElementById('med-upload-progress');
-        const extractedPreview = document.getElementById('med-extracted-preview');
-        const extractedList = document.getElementById('med-extracted-list');
-        const addAllBtn = document.getElementById('med-add-all-btn');
         const medList = document.getElementById('med-list');
         const medEmptyState = document.getElementById('med-empty-state');
         const medActiveCount = document.getElementById('med-active-count');
@@ -1335,17 +1326,55 @@ document.addEventListener('DOMContentLoaded', () => {
         const scheduleTimeline = document.getElementById('med-schedule-timeline');
         const manualAddBtn = document.getElementById('med-manual-add-btn');
 
-        if (!uploadZone) return;
+        if (!medList) return;
 
-        let extractedMeds = [];
+        let medications = [];
+        const notifiedSet = new Set(); // track already-notified times this session
 
-        function loadMedications() {
-            try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-            catch { return []; }
+        // --- API helpers ---
+        async function fetchMedications() {
+            try {
+                const headers = await getAuthHeaders();
+                if (!headers.Authorization) { medications = []; renderMedications(); return; }
+                const resp = await fetch('/api/medications', { headers });
+                const data = await resp.json();
+                if (!resp.ok) throw new Error(data.error);
+                medications = data.medications || [];
+            } catch (err) {
+                console.error('Failed to load medications:', err);
+                medications = [];
+            }
+            renderMedications();
         }
 
-        function saveMedications(meds) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(meds));
+        async function apiAddMedication(med) {
+            try {
+                const headers = await getAuthHeaders();
+                headers['Content-Type'] = 'application/json';
+                const resp = await fetch('/api/medications', {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(med)
+                });
+                const data = await resp.json();
+                if (!resp.ok) throw new Error(data.error);
+                return data.medication;
+            } catch (err) {
+                console.error('Failed to add medication:', err);
+                alert('Failed to save medication. Please try again.');
+                return null;
+            }
+        }
+
+        async function apiDeleteMedication(id) {
+            try {
+                const headers = await getAuthHeaders();
+                const resp = await fetch('/api/medications/' + id, { method: 'DELETE', headers });
+                if (!resp.ok) { const d = await resp.json(); throw new Error(d.error); }
+            } catch (err) {
+                console.error('Failed to delete medication:', err);
+                alert('Failed to remove medication. Please try again.');
+            }
         }
 
         function escMed(str) {
@@ -1368,10 +1397,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- Render medication cards ---
         function renderMedications() {
-            const meds = loadMedications();
             medList.innerHTML = '';
 
-            if (meds.length === 0) {
+            if (medications.length === 0) {
                 medEmptyState.style.display = 'block';
                 medActiveCount.textContent = '0 active';
                 scheduleSection.style.display = 'none';
@@ -1379,11 +1407,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             medEmptyState.style.display = 'none';
-            medActiveCount.textContent = `${meds.length} active`;
+            medActiveCount.textContent = `${medications.length} active`;
 
-            meds.forEach((med, idx) => {
+            medications.forEach((med) => {
                 const card = document.createElement('div');
                 card.className = 'med-card';
+                const nextReminder = getTimesForFrequency(med.frequency)[0];
                 card.innerHTML = `
                     <div class="med-card-header">
                         <div>
@@ -1397,21 +1426,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="med-card-tag timing">${escMed(med.timing)}</span>
                         ${med.duration ? `<span class="med-card-tag duration">${escMed(med.duration)}</span>` : ''}
                     </div>
-                    ${med.nextReminder ? `<div class="med-card-reminder">🔔 Next: ${escMed(med.nextReminder)}</div>` : ''}
+                    <div class="med-card-reminder">🔔 Next: ${escMed(nextReminder)}</div>
                     <div class="med-card-actions">
-                        <button class="med-taken-action" data-idx="${idx}">✅ Taken</button>
-                        <button class="med-delete-btn" data-idx="${idx}">🗑️ Remove</button>
+                        <button class="med-taken-action">✅ Taken</button>
+                        <button class="med-delete-btn" data-id="${med.id}">🗑️ Remove</button>
                     </div>
                 `;
                 medList.appendChild(card);
             });
 
             medList.querySelectorAll('.med-delete-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const m = loadMedications();
-                    m.splice(parseInt(btn.dataset.idx), 1);
-                    saveMedications(m);
-                    renderMedications();
+                btn.addEventListener('click', async () => {
+                    const id = btn.dataset.id;
+                    btn.disabled = true;
+                    btn.textContent = '⏳';
+                    await apiDeleteMedication(id);
+                    await fetchMedications();
                 });
             });
 
@@ -1424,7 +1454,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
 
-            renderSchedule(meds);
+            renderSchedule(medications);
         }
 
         // --- Render today's schedule ---
@@ -1459,144 +1489,142 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // --- Upload prescription ---
-        uploadZone.addEventListener('click', (e) => {
-            if (e.target.closest('button')) return;
-            fileInput.click();
-        });
-        browseBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
-
-        uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
-        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
-        uploadZone.addEventListener('drop', e => {
-            e.preventDefault();
-            uploadZone.classList.remove('drag-over');
-            if (e.dataTransfer.files[0]) analyzePrescription(e.dataTransfer.files[0]);
-        });
-
-        fileInput.addEventListener('change', () => {
-            if (fileInput.files[0]) analyzePrescription(fileInput.files[0]);
-            fileInput.value = '';
-        });
-
-        cameraBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const camInput = document.createElement('input');
-            camInput.type = 'file';
-            camInput.accept = 'image/*';
-            camInput.setAttribute('capture', 'environment');
-            camInput.onchange = () => { if (camInput.files[0]) analyzePrescription(camInput.files[0]); };
-            camInput.click();
-        });
-
-        async function analyzePrescription(file) {
-            const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
-            if (!allowed.includes(file.type)) { alert('Only PDF, JPG, PNG, WEBP files are allowed.'); return; }
-            if (file.size > 10 * 1024 * 1024) { alert('File too large. Max 10MB.'); return; }
-
-            uploadZone.style.display = 'none';
-            uploadProgress.style.display = 'block';
-            extractedPreview.style.display = 'none';
-
-            try {
-                const formData = new FormData();
-                formData.append('prescription', file);
-                const headers = await getAuthHeaders();
-                const resp = await fetch('/api/prescriptions/extract', { method: 'POST', headers, body: formData });
-                const data = await resp.json();
-                if (!resp.ok) throw new Error(data.error || 'Analysis failed');
-                extractedMeds = data.medicines || [];
-                renderExtractedMeds(extractedMeds);
-            } catch (err) {
-                alert('Error: ' + err.message);
-            } finally {
-                uploadProgress.style.display = 'none';
-                uploadZone.style.display = 'block';
-            }
-        }
-
-        function renderExtractedMeds(meds) {
-            if (meds.length === 0) { extractedPreview.style.display = 'none'; return; }
-            extractedPreview.style.display = 'block';
-            extractedList.innerHTML = '';
-
-            meds.forEach((med, idx) => {
-                const item = document.createElement('div');
-                item.className = 'med-extracted-item';
-                item.innerHTML = `
-                    <div class="med-extracted-info">
-                        <span class="med-extracted-name">💊 ${escMed(med.name)}</span>
-                        <span class="med-extracted-detail">${escMed(med.dosage)} · ${escMed(med.frequency)} · ${escMed(med.timing)}${med.duration ? ' · ' + escMed(med.duration) : ''}</span>
-                    </div>
-                    <button class="btn btn-outline med-add-single" data-idx="${idx}" style="padding:6px 14px; font-size:0.8rem;">+ Add</button>
-                `;
-                extractedList.appendChild(item);
-            });
-
-            extractedList.querySelectorAll('.med-add-single').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const i = parseInt(btn.dataset.idx);
-                    addMedication(extractedMeds[i]);
-                    btn.textContent = '✅ Added';
-                    btn.disabled = true;
-                    btn.style.color = '#22c55e';
-                    btn.style.borderColor = '#22c55e';
-                });
-            });
-        }
-
-        addAllBtn.addEventListener('click', () => {
-            extractedMeds.forEach(med => addMedication(med));
-            extractedPreview.style.display = 'none';
-            extractedMeds = [];
-        });
-
-        manualAddBtn.addEventListener('click', () => {
+        // --- Manual add ---
+        manualAddBtn.addEventListener('click', async () => {
             const name = document.getElementById('med-manual-name').value.trim();
             const dosage = document.getElementById('med-manual-dosage').value.trim();
             const frequency = document.getElementById('med-manual-frequency').value;
             const timing = document.getElementById('med-manual-timing').value;
             if (!name) { alert('Please enter a medicine name.'); return; }
-            addMedication({ name, dosage: dosage || '1 tablet', frequency, timing });
-            document.getElementById('med-manual-name').value = '';
-            document.getElementById('med-manual-dosage').value = '';
+            manualAddBtn.disabled = true;
+            manualAddBtn.textContent = 'Saving...';
+            const saved = await apiAddMedication({ name, dosage: dosage || '1 tablet', frequency, timing });
+            manualAddBtn.disabled = false;
+            manualAddBtn.textContent = 'Add';
+            if (saved) {
+                document.getElementById('med-manual-name').value = '';
+                document.getElementById('med-manual-dosage').value = '';
+                await fetchMedications();
+            }
         });
 
-        function addMedication(med) {
-            const meds = loadMedications();
-            meds.push({
-                name: med.name,
-                dosage: med.dosage || '1 tablet',
-                frequency: med.frequency || 'Once daily',
-                timing: med.timing || 'After food',
-                duration: med.duration || '',
-                nextReminder: getTimesForFrequency(med.frequency || 'Once daily')[0],
-                addedAt: new Date().toISOString()
+        // --- Medication Alert Popup ---
+        function showMedAlertPopup(medsList) {
+            // Remove existing popup if any
+            const old = document.getElementById('med-alert-popup');
+            if (old) old.remove();
+
+            const medsHtml = medsList.map(m =>
+                `<div class="med-alert-item">
+                    <span class="med-alert-pill">💊</span>
+                    <div>
+                        <strong>${escMed(m.name)}</strong>
+                        <span class="med-alert-detail">${escMed(m.dosage)} — ${escMed(m.timing)}</span>
+                    </div>
+                </div>`
+            ).join('');
+
+            const popup = document.createElement('div');
+            popup.id = 'med-alert-popup';
+            popup.className = 'med-alert-overlay';
+            popup.innerHTML = `
+                <div class="med-alert-box">
+                    <div class="med-alert-header">
+                        <div class="med-alert-icon-ring">
+                            <span class="med-alert-icon">💊</span>
+                        </div>
+                        <h2>Time for Your Medicine!</h2>
+                        <p>Don't forget to take the following:</p>
+                    </div>
+                    <div class="med-alert-list">${medsHtml}</div>
+                    <div class="med-alert-actions">
+                        <button class="btn btn-primary med-alert-taken-btn" style="flex:2; padding:12px;">✅ I've Taken It</button>
+                        <button class="btn btn-outline med-alert-snooze-btn" style="flex:1; padding:12px;">⏰ Snooze 5m</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(popup);
+
+            // Play alert sound
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = 880;
+                osc.type = 'sine';
+                gain.gain.value = 0.3;
+                osc.start();
+                setTimeout(() => { osc.stop(); ctx.close(); }, 300);
+                setTimeout(() => {
+                    const ctx2 = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc2 = ctx2.createOscillator();
+                    const gain2 = ctx2.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(ctx2.destination);
+                    osc2.frequency.value = 1100;
+                    osc2.type = 'sine';
+                    gain2.gain.value = 0.3;
+                    osc2.start();
+                    setTimeout(() => { osc2.stop(); ctx2.close(); }, 300);
+                }, 350);
+            } catch (e) { /* audio not supported */ }
+
+            popup.querySelector('.med-alert-taken-btn').addEventListener('click', () => {
+                popup.classList.add('med-alert-closing');
+                setTimeout(() => popup.remove(), 300);
             });
-            saveMedications(meds);
-            renderMedications();
+
+            popup.querySelector('.med-alert-snooze-btn').addEventListener('click', () => {
+                popup.classList.add('med-alert-closing');
+                setTimeout(() => popup.remove(), 300);
+                // Re-trigger after 5 min
+                setTimeout(() => showMedAlertPopup(medsList), 5 * 60 * 1000);
+            });
         }
 
-        // Browser notification reminders (every 60s check)
-        if ('Notification' in window) {
-            if (Notification.permission === 'default') Notification.requestPermission();
-            setInterval(() => {
-                if (Notification.permission !== 'granted') return;
-                const meds = loadMedications();
-                const currentTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-                meds.forEach(med => {
-                    getTimesForFrequency(med.frequency).forEach(t => {
-                        if (t === currentTime) {
-                            new Notification('💊 MediEase Medication Reminder', {
-                                body: `Time to take ${med.name} — ${med.dosage} (${med.timing})`
-                            });
-                        }
-                    });
+        // --- Check reminders every 30s ---
+        function checkMedReminders() {
+            if (medications.length === 0) return;
+            const now = new Date();
+            const currentTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            const dateKey = now.toDateString();
+
+            const dueMeds = [];
+            medications.forEach(med => {
+                getTimesForFrequency(med.frequency).forEach(t => {
+                    const notifKey = `${dateKey}-${med.id}-${t}`;
+                    if (t === currentTime && !notifiedSet.has(notifKey)) {
+                        notifiedSet.add(notifKey);
+                        dueMeds.push(med);
+                    }
                 });
-            }, 60000);
+            });
+
+            if (dueMeds.length > 0) {
+                // Browser notification
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    dueMeds.forEach(med => {
+                        new Notification('💊 MediEase Medication Reminder', {
+                            body: `Time to take ${med.name} — ${med.dosage} (${med.timing})`,
+                            icon: 'assets/img/favicon.png',
+                            requireInteraction: true
+                        });
+                    });
+                }
+                // In-app popup
+                showMedAlertPopup(dueMeds);
+            }
         }
 
-        renderMedications();
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+        setInterval(checkMedReminders, 30000);
+
+        // Initial load from Supabase
+        fetchMedications();
     })();
 
 });
