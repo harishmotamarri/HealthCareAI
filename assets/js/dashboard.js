@@ -132,9 +132,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const matchingNav = document.querySelector(`.nav-item[data-target="${targetId}"]`);
         if (matchingNav) {
             matchingNav.classList.add('active');
-            topbarTitle.innerText = matchingNav.innerText.trim();
+            topbarTitle.textContent = matchingNav.textContent.trim();
         } else if (targetId === 'profile') {
-            topbarTitle.innerText = 'Profile';
+            topbarTitle.textContent = 'Profile';
         }
 
         // Close mobile sidebar on view switch
