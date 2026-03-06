@@ -412,19 +412,216 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('hospitalModal');
 
     // Expose functions globally so inline onclick handlers in HTML can use them
-    window.openModal = function () {
+    window.openModal = function (cardElement) {
+        if (!modal) return;
+
+        // If a card element was passed, extract its data to populate the modal
+        if (cardElement) {
+            const nameEl = cardElement.querySelector('h3');
+            const addressEl = cardElement.querySelector('p:nth-of-type(2)');
+            const ratingReviewsEl = cardElement.querySelector('p:nth-of-type(1)');
+            const distWaitOpenEl = cardElement.querySelector('div:nth-of-type(2)');
+            const tagsContainer = cardElement.querySelector('div:nth-of-type(3)');
+
+            if (nameEl) document.getElementById('modal-hospital-name').innerText = nameEl.innerText;
+            if (addressEl) document.getElementById('modal-hospital-address').innerText = addressEl.innerText;
+
+            if (ratingReviewsEl) {
+                const text = ratingReviewsEl.innerText;
+                const ratingMatch = text.match(/★\s*([\d\.]+)/);
+                const reviewsMatch = text.match(/\(([^)]+)\)/);
+
+                if (ratingMatch) document.getElementById('modal-hospital-rating').innerText = `${ratingMatch[1]} ★`;
+                if (reviewsMatch) document.getElementById('modal-hospital-reviews').innerText = reviewsMatch[1];
+            }
+
+            if (distWaitOpenEl) {
+                const spans = distWaitOpenEl.querySelectorAll('span');
+                if (spans.length >= 3) {
+                    document.getElementById('modal-hospital-distance').innerText = spans[0].innerText;
+                    document.getElementById('modal-hospital-wait').innerText = spans[1].innerText;
+                    // The 3rd span is opening hours, we'll add it as a tag
+                    const openTag = document.createElement('span');
+                    openTag.className = 'small-tag';
+                    openTag.style.background = 'rgba(0, 229, 163, 0.1)';
+                    openTag.style.color = 'var(--primary)';
+                    openTag.innerText = `Open ${spans[2].innerText}`;
+
+                    const modalTags = document.getElementById('modal-hospital-tags');
+                    if (modalTags) {
+                        modalTags.innerHTML = ''; // clear old tags
+                        modalTags.appendChild(openTag);
+                    }
+                }
+            }
+
+            if (tagsContainer) {
+                const modalTags = document.getElementById('modal-hospital-tags');
+                if (modalTags) {
+                    // Clone all tags from the card (except the +1 more, we'll just clone them all for now)
+                    const tags = tagsContainer.querySelectorAll('.small-tag');
+                    tags.forEach(tag => {
+                        if (!tag.innerText.includes('+')) {
+                            const newTag = tag.cloneNode(true);
+                            modalTags.appendChild(newTag);
+                        }
+                    });
+                }
+            }
+        }
+
         modal.classList.add('active');
     }
 
     window.closeModal = function () {
-        modal.classList.remove('active');
+        if (modal) modal.classList.remove('active');
     }
 
-    // Close modal if clicking outside the content box
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            closeModal();
+    // Attach click listeners to all Details buttons
+    const allHospitalCards = document.querySelectorAll('.hospital-card');
+    allHospitalCards.forEach(card => {
+        const detailsBtn = card.querySelector('button.btn-primary');
+        if (detailsBtn) {
+            detailsBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // prevent triggering the card's onclick if it has one
+                openModal(card);
+            });
         }
+
+        // Ensure the card itself is also clickable if we want
+        card.addEventListener('click', () => {
+            openModal(card);
+        });
     });
+
+    // Close modal if clicking outside the content box
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    }
+
+    // --- 5. Locate Me Functionality ---
+    const locateMeBtn = document.getElementById('locate-me-btn');
+    const locationDisplay = document.getElementById('user-location-display');
+    const locationText = document.getElementById('location-text');
+
+    if (locateMeBtn) {
+        locateMeBtn.addEventListener('click', () => {
+            if (navigator.geolocation) {
+                locationDisplay.style.display = 'flex';
+                locationText.innerText = 'Fetching location...';
+                locateMeBtn.disabled = true;
+
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    try {
+                        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+                        const data = await response.json();
+
+                        let locationName = 'Unknown Location';
+                        if (data && data.address) {
+                            locationName = data.address.city || data.address.town || data.address.village || data.address.county || 'Your Location';
+                        }
+                        locationText.innerText = `Current Location: ${locationName} (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+                    } catch (err) {
+                        console.error('Error fetching location name:', err);
+                        locationText.innerText = `Current Location: Coordinates (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+                    } finally {
+                        locateMeBtn.disabled = false;
+                    }
+                }, (error) => {
+                    console.error('Geolocation error:', error);
+                    let errMsg = 'Failed to get location.';
+                    if (error.code === 1) errMsg = 'Location access denied by user.';
+                    else if (error.code === 2) errMsg = 'Position unavailable.';
+                    else if (error.code === 3) errMsg = 'Location request timed out.';
+                    locationText.innerText = errMsg;
+                    locateMeBtn.disabled = false;
+                });
+            } else {
+                locationDisplay.style.display = 'flex';
+                locationText.innerText = 'Geolocation is not supported by your browser.';
+            }
+        });
+    }
+
+    // --- 6. Hospital Filtering Functionality ---
+    const hospitalSearch = document.getElementById('hospital-search');
+    const hospitalSpecialty = document.getElementById('hospital-specialty');
+    const hospitalDistance = document.getElementById('hospital-distance');
+    const hospitalRating = document.getElementById('hospital-rating');
+    const hospitalCards = document.querySelectorAll('.hospital-card');
+    const hospitalsCount = document.getElementById('hospitals-count');
+
+    function filterHospitals() {
+        if (!hospitalCards) return;
+
+        const query = hospitalSearch ? hospitalSearch.value.toLowerCase() : '';
+        const specialty = hospitalSpecialty ? hospitalSpecialty.value : 'All Specialties';
+        const distanceFilter = hospitalDistance ? hospitalDistance.value : 'Any Distance';
+        const ratingFilter = hospitalRating ? hospitalRating.value : 'Any Rating';
+
+        let visibleCount = 0;
+
+        hospitalCards.forEach(card => {
+            let isVisible = true;
+
+            // 1. Search Filter
+            if (query) {
+                const cardText = card.innerText.toLowerCase();
+                if (!cardText.includes(query)) isVisible = false;
+            }
+
+            // 2. Specialty Filter
+            if (isVisible && specialty !== 'All Specialties') {
+                const tags = Array.from(card.querySelectorAll('.small-tag')).map(t => t.innerText.toLowerCase());
+                if (!tags.includes(specialty.toLowerCase())) isVisible = false;
+            }
+
+            // 3. Distance Filter
+            if (isVisible && distanceFilter !== 'Any Distance') {
+                const distanceMatch = card.innerText.match(/([\d\.]+)\s*(mi|km)/);
+                if (distanceMatch) {
+                    let dist = parseFloat(distanceMatch[1]);
+                    // No conversion needed, unit is km
+
+                    if (distanceFilter === 'Within 5 km' && dist > 5) isVisible = false;
+                    if (distanceFilter === 'Within 10 km' && dist > 10) isVisible = false;
+                }
+            }
+
+            // 4. Rating Filter
+            if (isVisible && ratingFilter !== 'Any Rating') {
+                const ratingMatch = card.innerText.match(/★\s*([\d\.]+)/);
+                if (ratingMatch) {
+                    const rating = parseFloat(ratingMatch[1]);
+                    if (ratingFilter === '4+ Stars' && rating < 4.0) isVisible = false;
+                    if (ratingFilter === '3.5+ Stars' && rating < 3.5) isVisible = false;
+                }
+            }
+
+            if (isVisible) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // Update hospitals found count text
+        if (hospitalsCount) {
+            hospitalsCount.innerText = `${visibleCount} hospital${visibleCount !== 1 ? 's' : ''} found`;
+        }
+    }
+
+    if (hospitalSearch) hospitalSearch.addEventListener('input', filterHospitals);
+    if (hospitalSpecialty) hospitalSpecialty.addEventListener('change', filterHospitals);
+    if (hospitalDistance) hospitalDistance.addEventListener('change', filterHospitals);
+    if (hospitalRating) hospitalRating.addEventListener('change', filterHospitals);
 
 });
