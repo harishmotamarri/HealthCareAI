@@ -68,7 +68,8 @@ const appRouter = {
             { id: 'symptoms', title: 'Symptom Checker', icon: '🩺', keywords: ['check', 'health', 'sick'] },
             { id: 'hospitals', title: 'Hospital Finder', icon: '🏥', keywords: ['clinic', 'doctor', 'find'] },
             { id: 'firstaid', title: 'First Aid Guide', icon: '🚑', keywords: ['emergency', 'help', 'guide'] },
-            { id: 'medications', title: 'Medication Planner', icon: '💊', keywords: ['medicine', 'prescription', 'pill', 'drug', 'reminder', 'medication'] }
+            { id: 'medications', title: 'Medication Planner', icon: '💊', keywords: ['medicine', 'prescription', 'pill', 'drug', 'reminder', 'medication'] },
+            { id: 'insurances', title: 'Claim Insurances', icon: '🛡️', keywords: ['insurance', 'claim', 'coverage', 'policy', 'health'] }
         ];
 
         if (globalSearch && suggestionsBox) {
@@ -168,6 +169,62 @@ const appRouter = {
                     }
                 }
             });
+
+            // Voice Search Implementation
+            const micBtn = document.getElementById('global-search-mic-btn');
+            if (micBtn) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (SpeechRecognition) {
+                    const recognition = new SpeechRecognition();
+                    recognition.continuous = false;
+                    recognition.interimResults = false;
+                    recognition.lang = 'en-US';
+
+                    let isListening = false;
+
+                    const toggleListening = () => {
+                        if (isListening) {
+                            recognition.stop();
+                        } else {
+                            recognition.start();
+                        }
+                    };
+
+                    micBtn.addEventListener('click', toggleListening);
+
+                    recognition.onstart = () => {
+                        isListening = true;
+                        micBtn.style.color = 'var(--primary)';
+                        micBtn.style.background = 'rgba(0, 229, 163, 0.1)';
+                        globalSearch.placeholder = "Listening...";
+                    };
+
+                    recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        globalSearch.value = transcript;
+                        // Trigger input event to show suggestions
+                        globalSearch.dispatchEvent(new Event('input', { bubbles: true }));
+                    };
+
+                    recognition.onend = () => {
+                        isListening = false;
+                        micBtn.style.color = 'var(--text-muted)';
+                        micBtn.style.background = 'none';
+                        globalSearch.placeholder = "Search sections...";
+                    };
+
+                    recognition.onerror = (event) => {
+                        console.error("Speech recognition error:", event.error);
+                        isListening = false;
+                        micBtn.style.color = 'var(--text-muted)';
+                        micBtn.style.background = 'none';
+                        globalSearch.placeholder = "Search sections...";
+                    };
+                } else {
+                    micBtn.style.display = 'none';
+                    console.warn("Speech Recognition API not supported in this browser.");
+                }
+            }
         }
     }
 };
@@ -369,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </button>
             `;
             const readBtn = bubble.querySelector('.bubble-read-btn');
-            readBtn.addEventListener('click', function() {
+            readBtn.addEventListener('click', function () {
                 if (window.speechSynthesis.speaking) {
                     window.speechSynthesis.cancel();
                     readBtn.classList.remove('speaking');
@@ -900,6 +957,61 @@ document.addEventListener('DOMContentLoaded', () => {
     if (reportAskBtn) reportAskBtn.addEventListener('click', handleReportAsk);
     if (reportAskInput) reportAskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleReportAsk(); });
 
+    // Voice Input for Ask Reports
+    const reportAskMicBtn = document.getElementById('report-ask-mic-btn');
+    if (reportAskMicBtn && reportAskInput) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            let isListening = false;
+
+            const toggleListening = () => {
+                if (isListening) {
+                    recognition.stop();
+                } else {
+                    recognition.start();
+                }
+            };
+
+            reportAskMicBtn.addEventListener('click', toggleListening);
+
+            recognition.onstart = () => {
+                isListening = true;
+                reportAskMicBtn.style.color = 'var(--primary)';
+                reportAskMicBtn.style.background = 'rgba(0, 229, 163, 0.1)';
+                reportAskInput.placeholder = "Listening...";
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                reportAskInput.value = transcript;
+                // Automatically submit the question
+                handleReportAsk();
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                reportAskMicBtn.style.color = 'var(--text-muted)';
+                reportAskMicBtn.style.background = 'none';
+                reportAskInput.placeholder = 'e.g. "What\'s my cholesterol trend?" or "Summarize all my reports"';
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Speech recognition error:", event.error);
+                isListening = false;
+                reportAskMicBtn.style.color = 'var(--text-muted)';
+                reportAskMicBtn.style.background = 'none';
+                reportAskInput.placeholder = 'e.g. "What\'s my cholesterol trend?" or "Summarize all my reports"';
+            };
+        } else {
+            reportAskMicBtn.style.display = 'none';
+        }
+    }
+
     // Load reports on page load
     loadReportsList();
 
@@ -1191,6 +1303,60 @@ document.addEventListener('DOMContentLoaded', () => {
     if (hospitalSpecialty) hospitalSpecialty.addEventListener('change', filterHospitals);
     if (hospitalDistance) hospitalDistance.addEventListener('change', filterHospitals);
     if (hospitalRating) hospitalRating.addEventListener('change', filterHospitals);
+
+    // Voice Input for Hospital Search
+    const hospitalSearchMicBtn = document.getElementById('hospital-search-mic-btn');
+    if (hospitalSearchMicBtn && hospitalSearch) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            let isListening = false;
+
+            const toggleListening = () => {
+                if (isListening) {
+                    recognition.stop();
+                } else {
+                    recognition.start();
+                }
+            };
+
+            hospitalSearchMicBtn.addEventListener('click', toggleListening);
+
+            recognition.onstart = () => {
+                isListening = true;
+                hospitalSearchMicBtn.style.color = 'var(--primary)';
+                hospitalSearchMicBtn.style.background = 'rgba(0, 229, 163, 0.1)';
+                hospitalSearch.placeholder = "Listening...";
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                hospitalSearch.value = transcript;
+                filterHospitals();
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                hospitalSearchMicBtn.style.color = 'var(--text-muted)';
+                hospitalSearchMicBtn.style.background = 'none';
+                hospitalSearch.placeholder = "Search hospitals, clinics...";
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Speech recognition error:", event.error);
+                isListening = false;
+                hospitalSearchMicBtn.style.color = 'var(--text-muted)';
+                hospitalSearchMicBtn.style.background = 'none';
+                hospitalSearch.placeholder = "Search hospitals, clinics...";
+            };
+        } else {
+            hospitalSearchMicBtn.style.display = 'none';
+        }
+    }
 
     // --- 7. Daily Health Tips Functionality ---
     const healthTips = [
@@ -1685,12 +1851,97 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="med-timeline-dose">${escMed(slot.dosage)} — ${escMed(slot.timing)}</div>
                     <button class="med-taken-btn">Mark as Taken</button>
                 `;
-                item.querySelector('.med-taken-btn').addEventListener('click', function() {
+                item.querySelector('.med-taken-btn').addEventListener('click', function () {
                     this.classList.add('taken');
                     this.textContent = '✅ Taken';
                     item.classList.add('taken');
                 });
                 scheduleTimeline.appendChild(item);
+            });
+        }
+
+        // --- Prescription Upload ---
+        const prescriptionFileInput = document.getElementById('prescription-file-input');
+        const prescriptionBrowseBtn = document.getElementById('prescription-browse-btn');
+        const prescriptionUploadStatus = document.getElementById('prescription-upload-status');
+        const prescriptionDropZone = document.getElementById('prescription-drop-zone');
+
+        async function handlePrescriptionUpload(file) {
+            const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+            if (!allowed.includes(file.type)) {
+                alert('Only PDF, JPG, PNG, WEBP files are allowed.');
+                prescriptionFileInput.value = '';
+                return;
+            }
+
+            prescriptionBrowseBtn.style.display = 'none';
+            prescriptionUploadStatus.style.display = 'flex';
+
+            const formData = new FormData();
+            formData.append('prescription', file);
+
+            try {
+                const headers = await getAuthHeaders();
+                const resp = await fetch('/api/prescriptions/extract', {
+                    method: 'POST',
+                    headers: { 'Authorization': headers.Authorization || '' },
+                    body: formData
+                });
+
+                const data = await resp.json();
+                if (!resp.ok) throw new Error(data.error || 'Failed to analyze prescription');
+
+                const meds = data.medicines || [];
+                if (meds.length === 0) {
+                    alert('No medicines found in the prescription.');
+                } else {
+                    for (const med of meds) {
+                        await apiAddMedication({
+                            name: med.name,
+                            dosage: med.dosage,
+                            frequency: med.frequency,
+                            timing: med.timing,
+                            duration: med.duration
+                        });
+                    }
+                    await fetchMedications();
+                    alert(`Successfully added ${meds.length} medicine(s) from prescription!`);
+                }
+            } catch (err) {
+                console.error('Prescription analyze error:', err);
+                alert('Failed to analyze prescription: ' + err.message);
+            } finally {
+                prescriptionFileInput.value = '';
+                prescriptionBrowseBtn.style.display = 'inline-block';
+                prescriptionUploadStatus.style.display = 'none';
+            }
+        }
+
+        if (prescriptionBrowseBtn && prescriptionFileInput) {
+            prescriptionBrowseBtn.addEventListener('click', () => prescriptionFileInput.click());
+
+            prescriptionFileInput.addEventListener('change', () => {
+                if (prescriptionFileInput.files.length > 0) {
+                    handlePrescriptionUpload(prescriptionFileInput.files[0]);
+                }
+            });
+        }
+
+        // Drag & Drop for Prescription Planner
+        if (prescriptionDropZone) {
+            prescriptionDropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                prescriptionDropZone.classList.add('drag-over');
+            });
+            prescriptionDropZone.addEventListener('dragleave', () => {
+                prescriptionDropZone.classList.remove('drag-over');
+            });
+            prescriptionDropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                prescriptionDropZone.classList.remove('drag-over');
+                if (e.dataTransfer.files.length > 0) {
+                    handlePrescriptionUpload(e.dataTransfer.files[0]);
+                }
             });
         }
 
@@ -1830,6 +2081,429 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Initial load from Supabase
         fetchMedications();
+    })();
+
+    // ===================== INSURANCE DASHBOARD =====================
+    (function initInsuranceDashboard() {
+        const insTabs = document.querySelectorAll('.ins-tab');
+        const insContents = document.querySelectorAll('.ins-tab-content');
+
+        // Tab switching
+        insTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                insTabs.forEach(t => {
+                    t.classList.remove('active');
+                    t.style.color = 'var(--text-muted)';
+                    t.style.borderBottom = 'none';
+                });
+                tab.classList.add('active');
+                tab.style.color = 'var(--primary)';
+                tab.style.borderBottom = '2px solid var(--primary)';
+
+                insContents.forEach(c => c.style.display = 'none');
+                document.getElementById(tab.dataset.target).style.display = 'block';
+            });
+        });
+
+        // Add Policy logic
+        const savePolBtn = document.getElementById('ins-pol-save-btn');
+        if (savePolBtn) {
+            savePolBtn.addEventListener('click', async () => {
+                const provider = document.getElementById('ins-pol-provider').value;
+                const number = document.getElementById('ins-pol-number').value;
+                const holder = document.getElementById('ins-pol-holder').value;
+                const coverage = document.getElementById('ins-pol-coverage').value;
+                const expiry = document.getElementById('ins-pol-expiry').value;
+                const type = document.getElementById('ins-pol-type').value;
+
+                if (!provider || !number || !coverage || !expiry) {
+                    alert('Please fill out all required fields.');
+                    return;
+                }
+
+                savePolBtn.disabled = true;
+                savePolBtn.textContent = 'Saving...';
+
+                try {
+                    const headers = await getAuthHeaders();
+                    headers['Content-Type'] = 'application/json';
+                    const res = await fetch('/api/insurance/policies', {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify({
+                            provider_name: provider,
+                            policy_number: number,
+                            policy_holder_name: holder,
+                            coverage_amount: coverage,
+                            expiry_date: expiry,
+                            policy_type: type
+                        })
+                    });
+
+                    if (!res.ok) throw new Error(await res.text());
+
+                    document.getElementById('add-policy-modal').style.display = 'none';
+                    alert('Policy saved successfully!');
+                    loadPolicies();
+                } catch (e) {
+                    alert('Error saving policy: ' + e.message);
+                } finally {
+                    savePolBtn.disabled = false;
+                    savePolBtn.textContent = 'Save Policy';
+                }
+            });
+        }
+
+        async function loadPolicies() {
+            try {
+                const headers = await getAuthHeaders();
+                if (!headers.Authorization) return;
+                const res = await fetch('/api/insurance/policies', { headers });
+                if (!res.ok) return;
+                const data = await res.json();
+
+                const list = document.getElementById('ins-policies-list');
+                const noPolicies = document.getElementById('ins-no-policies');
+                const select = document.getElementById('ins-claim-policy-select');
+
+                if (data.policies && data.policies.length > 0) {
+                    if (noPolicies) noPolicies.style.display = 'none';
+                    list.querySelectorAll('.added-policy-card').forEach(c => c.remove());
+                    if (select) select.innerHTML = '<option value="">-- Choose Policy --</option>';
+
+                    data.policies.forEach(p => {
+                        const card = document.createElement('div');
+                        card.className = 'card added-policy-card';
+                        card.innerHTML = `
+                            <div style="display:flex; justify-content:space-between;">
+                                <div>
+                                    <h3 style="margin-bottom:4px;">${p.provider_name}</h3>
+                                    <p style="color:var(--text-muted); font-size:0.85rem;">${p.policy_number}</p>
+                                </div>
+                                <span style="background:rgba(0,229,163,0.1); color:var(--primary); padding:4px 8px; border-radius:12px; font-size:0.8rem;">${p.policy_type}</span>
+                            </div>
+                            <div style="margin-top:16px;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                                    <span style="color:var(--text-muted); font-size:0.85rem;">Coverage</span>
+                                    <span style="font-weight:600;">₹${p.coverage_amount}</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                                    <span style="color:var(--text-muted); font-size:0.85rem;">Expiry</span>
+                                    <span>${p.expiry_date}</span>
+                                </div>
+                            </div>
+                        `;
+                        list.insertBefore(card, noPolicies);
+
+                        if (select) {
+                            const opt = document.createElement('option');
+                            opt.value = p.id;
+                            opt.textContent = `${p.provider_name} (${p.policy_number})`;
+                            opt.dataset.coverage = p.coverage_amount;
+                            select.appendChild(opt);
+                        }
+                    });
+                } else {
+                    if (noPolicies) noPolicies.style.display = 'block';
+                }
+            } catch (e) {
+                console.error('Error loading policies:', e);
+            }
+        }
+
+        // Claim Form Interactions
+        const claimPolicySelect = document.getElementById('ins-claim-policy-select');
+        const coverageInfo = document.getElementById('ins-claim-coverage-info');
+        if (claimPolicySelect) {
+            claimPolicySelect.addEventListener('change', () => {
+                const opt = claimPolicySelect.selectedOptions[0];
+                if (opt && opt.value) {
+                    coverageInfo.style.display = 'block';
+                    coverageInfo.innerHTML = `<strong>Total Coverage:</strong> ₹${opt.dataset.coverage} <br> <span style="font-size:0.85rem; color:var(--text-muted);">Used coverage will be calculated soon.</span>`;
+                } else {
+                    coverageInfo.style.display = 'none';
+                }
+            });
+        }
+
+        // OCR Upload
+        const docDropZone = document.getElementById('ins-doc-drop-zone');
+        const docFileInput = document.getElementById('ins-doc-file-input');
+        const docBrowseBtn = document.getElementById('ins-doc-browse-btn');
+        const docStatus = document.getElementById('ins-doc-upload-status');
+
+        if (docBrowseBtn && docFileInput) {
+            docBrowseBtn.addEventListener('click', () => docFileInput.click());
+
+            const handleDocUpload = async () => {
+                if (docFileInput.files.length === 0) return;
+
+                docBrowseBtn.style.display = 'none';
+                docStatus.style.display = 'flex';
+
+                try {
+                    const formData = new FormData();
+                    formData.append('document', docFileInput.files[0]);
+
+                    const headers = await getAuthHeaders();
+                    const res = await fetch('/api/claims/analyze-document', {
+                        method: 'POST',
+                        headers: { 'Authorization': headers.Authorization || '' },
+                        body: formData
+                    });
+
+                    if (!res.ok) throw new Error(await res.text());
+                    const data = await res.json();
+
+                    if (data.extracted) {
+                        if (data.extracted.hospital_name && !document.getElementById('ins-claim-hospital').value) document.getElementById('ins-claim-hospital').value = data.extracted.hospital_name;
+                        if (data.extracted.bill_amount && !document.getElementById('ins-claim-total-cost').value) {
+                            document.getElementById('ins-claim-total-cost').value = data.extracted.bill_amount;
+                            document.getElementById('ins-claim-requested').value = data.extracted.bill_amount;
+                        }
+                        if (data.extracted.treatment_date && !document.getElementById('ins-claim-admin-date').value) {
+                            // Basic ISO format check
+                            const d = new Date(data.extracted.treatment_date);
+                            if (!isNaN(d)) document.getElementById('ins-claim-admin-date').value = d.toISOString().split('T')[0];
+                        }
+                    }
+
+                    list.innerHTML += `<div style="padding:8px; background:var(--bg-body); border-radius:4px; display:flex; justify-content:space-between; font-size:0.85rem;">
+                        <span>📄 ${docFileInput.files[0].name}</span>
+                        <span style="color:var(--primary);">Analyzed ✅</span>
+                    </div>`;
+
+                } catch (e) {
+                    alert('Error analyzing document: ' + e.message);
+                } finally {
+                    docBrowseBtn.style.display = 'inline-block';
+                    docStatus.style.display = 'none';
+                    docFileInput.value = '';
+                }
+            };
+
+            docBrowseBtn.addEventListener('click', () => docFileInput.click());
+
+            docFileInput.addEventListener('change', () => {
+                if (docFileInput.files.length > 0) handleDocUpload();
+            });
+
+            if (docDropZone) {
+                docDropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    docDropZone.style.borderColor = 'var(--primary)';
+                    docDropZone.style.background = 'rgba(0, 229, 163, 0.05)';
+                });
+                docDropZone.addEventListener('dragleave', () => {
+                    docDropZone.style.borderColor = 'var(--border-color)';
+                    docDropZone.style.background = 'transparent';
+                });
+                docDropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    docDropZone.style.borderColor = 'var(--border-color)';
+                    docDropZone.style.background = 'transparent';
+                    if (e.dataTransfer.files.length > 0) {
+                        docFileInput.files = e.dataTransfer.files;
+                        handleDocUpload();
+                    }
+                });
+            }
+        }
+
+        // Eligibility Check
+        const checkEligBtn = document.getElementById('ins-check-eligibility-btn');
+        if (checkEligBtn) {
+            checkEligBtn.addEventListener('click', async () => {
+                const diagnosis = document.getElementById('ins-claim-diagnosis').value;
+                const requested = document.getElementById('ins-claim-requested').value;
+                const treatmentType = document.getElementById('ins-claim-treatment-type').value;
+                const policyOpt = claimPolicySelect.selectedOptions[0];
+
+                if (!diagnosis || !requested || !policyOpt || !policyOpt.value) {
+                    alert('Please select policy, enter diagnosis and requested amount first.');
+                    return;
+                }
+
+                checkEligBtn.disabled = true;
+                checkEligBtn.innerHTML = '<span class="report-spinner" style="width:14px;height:14px;border-width:2px;margin-right:6px;"></span> Checking...';
+
+                try {
+                    const headers = await getAuthHeaders();
+                    headers['Content-Type'] = 'application/json';
+                    const res = await fetch('/api/claims/eligibility', {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify({
+                            diagnosis,
+                            treatment_type: treatmentType,
+                            requested_amount: requested,
+                            coverage_amount: policyOpt.dataset.coverage
+                        })
+                    });
+
+                    if (!res.ok) throw new Error(await res.text());
+                    const data = await res.json();
+
+                    const resBox = document.getElementById('ins-eligibility-result');
+                    resBox.style.display = 'block';
+
+                    let coverageColor = data.eligibility.coverage_status.toLowerCase().includes('not') ? '#ef4444' : 'var(--primary)';
+
+                    resBox.innerHTML = `
+                        <h4 style="margin-bottom:8px; display:flex; justify-content:space-between;">
+                            <span>Coverage Status: <strong style="color:${coverageColor}">${data.eligibility.coverage_status}</strong></span>
+                            <span style="color:var(--text-muted); font-size:0.85rem;">Confidence: ${data.eligibility.confidence}%</span>
+                        </h4>
+                        <p style="margin-bottom:8px;">Estimated Payable: <strong>₹${data.eligibility.estimated_payable_amount}</strong></p>
+                        ${data.eligibility.missing_requirements && data.eligibility.missing_requirements.length > 0 ?
+                            `<p style="font-size:0.85rem; color:#f59e0b;">Missing requirements: ${data.eligibility.missing_requirements.join(', ')}</p>` : ''}
+                    `;
+                } catch (e) {
+                    alert('Eligibility check failed: ' + e.message);
+                } finally {
+                    checkEligBtn.disabled = false;
+                    checkEligBtn.innerHTML = '<span style="font-size:1.1rem; margin-right:6px;">✨</span> Check AI Eligibility';
+                }
+            });
+        }
+
+        // Claim Submission
+        const submitClaimBtn = document.getElementById('ins-submit-claim-btn');
+        if (submitClaimBtn) {
+            submitClaimBtn.addEventListener('click', async () => {
+                const opt = claimPolicySelect.selectedOptions[0];
+                if (!opt || !opt.value) return alert('Select a policy.');
+
+                submitClaimBtn.disabled = true;
+                submitClaimBtn.textContent = 'Submitting...';
+
+                try {
+                    const headers = await getAuthHeaders();
+                    headers['Content-Type'] = 'application/json';
+                    const res = await fetch('/api/claims/submit', {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify({
+                            policy_id: opt.value,
+                            hospital_name: document.getElementById('ins-claim-hospital').value,
+                            doctor_name: document.getElementById('ins-claim-doctor').value,
+                            diagnosis: document.getElementById('ins-claim-diagnosis').value,
+                            treatment_type: document.getElementById('ins-claim-treatment-type').value,
+                            admission_date: document.getElementById('ins-claim-admin-date').value,
+                            discharge_date: document.getElementById('ins-claim-discharge-date').value,
+                            total_medical_cost: document.getElementById('ins-claim-total-cost').value,
+                            claim_amount: document.getElementById('ins-claim-requested').value
+                        })
+                    });
+                    if (!res.ok) throw new Error(await res.text());
+
+                    alert('Claim Submitted Successfully!');
+                    // Clear form
+                    document.getElementById('ins-claim-hospital').value = '';
+                    document.getElementById('ins-claim-doctor').value = '';
+                    document.getElementById('ins-claim-diagnosis').value = '';
+                    document.getElementById('ins-claim-admin-date').value = '';
+                    document.getElementById('ins-claim-discharge-date').value = '';
+                    document.getElementById('ins-claim-total-cost').value = '';
+                    document.getElementById('ins-claim-requested').value = '';
+                    document.getElementById('ins-eligibility-result').style.display = 'none';
+
+                    // Switch to status tab
+                    insTabs[2].click();
+                    loadClaims();
+                } catch (e) {
+                    alert('Failed to submit claim: ' + e.message);
+                } finally {
+                    submitClaimBtn.disabled = false;
+                    submitClaimBtn.textContent = 'Submit Claim';
+                }
+            });
+        }
+
+        async function loadClaims() {
+            try {
+                const headers = await getAuthHeaders();
+                if (!headers.Authorization) return;
+                const res = await fetch('/api/claims/list', { headers });
+                if (!res.ok) return;
+                const data = await res.json();
+
+                const statusList = document.getElementById('ins-active-claims-list');
+                const historyTbody = document.getElementById('ins-history-tbody');
+                const noStatus = document.getElementById('ins-no-active-claims');
+
+                if (data.claims && data.claims.length > 0) {
+                    statusList.querySelectorAll('.claim-status-card').forEach(c => c.remove());
+                    historyTbody.innerHTML = '';
+
+                    let activeCount = 0;
+                    data.claims.forEach(c => {
+                        // History row
+                        const tr = document.createElement('tr');
+                        tr.style.borderBottom = '1px solid var(--border-color)';
+                        const tsDate = new Date(c.created_at).toLocaleDateString();
+                        tr.innerHTML = `
+                            <td style="padding:16px;">${c.id.split('-')[0].toUpperCase()}</td>
+                            <td style="padding:16px;">${c.hospital_name || 'N/A'}</td>
+                            <td style="padding:16px;">${tsDate}</td>
+                            <td style="padding:16px;">₹${c.claim_amount || 0}</td>
+                            <td style="padding:16px;">₹${c.approved_amount || 0}</td>
+                            <td style="padding:16px;">
+                                <span class="small-tag" style="font-size:0.8rem; background:rgba(0,229,163,0.1); color:var(--primary);">${c.status}</span>
+                            </td>
+                        `;
+                        historyTbody.appendChild(tr);
+
+                        // Active tracker
+                        if (c.status !== 'Paid' && c.status !== 'Rejected') {
+                            activeCount++;
+                            const statusCard = document.createElement('div');
+                            statusCard.className = 'card claim-status-card';
+
+                            // naive visual progress
+                            const steps = ['Submitted', 'Under Review', 'Documents Verified', 'Approved', 'Paid'];
+                            const curIdx = steps.indexOf(c.status) >= 0 ? steps.indexOf(c.status) : 0;
+
+                            let progressHtml = steps.map((s, i) => {
+                                const isDone = i <= curIdx;
+                                const isCur = i === curIdx;
+                                return `<div style="flex:1; text-align:center;">
+                                    <div style="width:20px; height:20px; border-radius:50%; margin:0 auto 8px; background:${isDone ? 'var(--primary)' : 'var(--bg-card)'}; border: 2px solid ${isDone ? 'var(--primary)' : 'var(--border-color)'};"></div>
+                                    <span style="font-size:0.75rem; color:${isCur ? 'var(--primary)' : 'var(--text-muted)'}; white-space:nowrap;">${s}</span>
+                                </div>`;
+                            }).join('<div style="height:2px; flex:1; background:var(--border-color); margin-top:10px;"></div>');
+
+                            statusCard.innerHTML = `
+                                <div style="display:flex; justify-content:space-between; margin-bottom: 20px;">
+                                    <div>
+                                        <h3 style="margin-bottom:4px;">${c.hospital_name || 'Claim'} - ₹${c.claim_amount}</h3>
+                                        <p style="color:var(--text-muted); font-size:0.85rem;">Claim ID: ${c.id.split('-')[0].toUpperCase()}</p>
+                                    </div>
+                                    <span class="small-tag" style="background:rgba(0,229,163,0.1); color:var(--primary);">Status: ${c.status}</span>
+                                </div>
+                                <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-top: 24px; padding: 0 10px;">
+                                    ${progressHtml}
+                                </div>
+                            `;
+                            statusList.appendChild(statusCard);
+                        }
+                    });
+
+                    if (activeCount === 0 && noStatus) noStatus.style.display = 'block';
+                    else if (noStatus) noStatus.style.display = 'none';
+
+                } else {
+                    if (noStatus) noStatus.style.display = 'block';
+                    historyTbody.innerHTML = '<tr><td colspan="6" style="padding:24px; text-align:center; color:var(--text-muted);">No past claims found</td></tr>';
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        setTimeout(() => {
+            loadPolicies();
+            loadClaims();
+        }, 1500);
+
     })();
 
 });

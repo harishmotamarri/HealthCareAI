@@ -5,6 +5,7 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const pdfParse = require('pdf-parse');
 
 dotenv.config();
 
@@ -100,11 +101,9 @@ app.post('/api/reports/upload', requireAuth, upload.single('report'), async (req
         const mimeType = req.file.mimetype;
         const originalName = req.file.originalname;
 
-        // Read file as base64 for Groq vision
         const fileBuffer = fs.readFileSync(filePath);
-        const base64Data = fileBuffer.toString('base64');
 
-        const prompt = `You are MediEase, a medical report analyzer. Analyze this medical report thoroughly.
+        const basePrompt = `You are MediEase, a medical report analyzer. Analyze this medical report thoroughly.
 
 STRICT RULES:
 - Use simple language anyone can understand.
@@ -117,29 +116,55 @@ Provide the response in this EXACT markdown structure:
 What kind of report this is (e.g., Blood Test, X-Ray, MRI, Prescription, etc.)
 
 ### Summary
-A 2-3 sentence plain-English summary of the report's key findings.
+List the plain-English summary of the report's key findings.
 
 ### Key Findings
 - List each important finding as a bullet point
 - Include values and whether they are normal, borderline, or abnormal
 
 ### Health Insights
-- 2-3 bullet points explaining what these findings mean for the patient's health
+- List in bullet points explaining what these findings mean for the patient's health
 
 ### Recommendations
-- 2-3 actionable recommendations based on the findings`;
+- List in bullet points actionable recommendations based on the findings`;
 
-        const result = await groq.chat.completions.create({
-            messages: [{
-                role: "user",
-                content: [
-                    { type: "text", text: prompt },
-                    { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Data}` } }
-                ]
-            }],
-            model: "meta-llama/llama-4-scout-17b-16e-instruct",
-            temperature: 0.3,
-        });
+        let result;
+
+        if (mimeType === 'application/pdf') {
+            // PDF: extract text and send to text model
+            const { PDFParse } = require('pdf-parse');
+            const parser = new PDFParse({ data: fileBuffer });
+            const pdfData = await parser.getText();
+            await parser.destroy();
+            const pdfText = pdfData.text;
+
+            if (!pdfText || pdfText.trim().length === 0) {
+                return res.status(400).json({ error: 'Could not extract text from this PDF. It may be a scanned image PDF — please upload an image (JPG/PNG) instead.' });
+            }
+
+            result = await groq.chat.completions.create({
+                messages: [{
+                    role: "user",
+                    content: `${basePrompt}\n\nHere is the text extracted from the medical report PDF:\n\n${pdfText}`
+                }],
+                model: "llama-3.3-70b-versatile",
+                temperature: 0.3,
+            });
+        } else {
+            // Image: use vision model
+            const base64Data = fileBuffer.toString('base64');
+            result = await groq.chat.completions.create({
+                messages: [{
+                    role: "user",
+                    content: [
+                        { type: "text", text: basePrompt },
+                        { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Data}` } }
+                    ]
+                }],
+                model: "meta-llama/llama-4-scout-17b-16e-instruct",
+                temperature: 0.3,
+            });
+        }
 
         const analysis = result.choices[0].message.content;
 
@@ -282,7 +307,6 @@ STRICT RULES:
 - Answer ONLY based on the data in the reports above.
 - If the question cannot be answered from the reports, say so clearly.
 - Use simple, easy-to-understand language.
-- Maximum 150 words.
 - Use markdown (### headers, - bullets) to organize your answer.
 
 Patient's question: "${question}"`;
@@ -375,15 +399,15 @@ If the image does NOT show an injury or is unrelated, respond with:
         text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
 
         const analysis = JSON.parse(text);
-        
+
         // Clean up the uploaded file after analysis
-        fs.unlink(req.file.path, () => {});
+        fs.unlink(req.file.path, () => { });
 
         console.log('First aid analysis complete:', analysis.injury_type);
         res.json({ analysis });
     } catch (error) {
         console.error('First aid analysis error:', error.message);
-        if (req.file?.path) fs.unlink(req.file.path, () => {});
+        if (req.file?.path) fs.unlink(req.file.path, () => { });
         res.status(500).json({ error: 'Failed to analyze image.', details: error.message });
     }
 });
@@ -436,13 +460,13 @@ If no medicines found, return: []`;
         const medicines = JSON.parse(text);
 
         // Clean up uploaded file
-        fs.unlink(req.file.path, () => {});
+        fs.unlink(req.file.path, () => { });
 
         console.log('Prescription extracted:', medicines.length, 'medicines');
         res.json({ medicines: Array.isArray(medicines) ? medicines : [] });
     } catch (error) {
         console.error('Prescription extract error:', error.message);
-        if (req.file?.path) fs.unlink(req.file.path, () => {});
+        if (req.file?.path) fs.unlink(req.file.path, () => { });
         res.status(500).json({ error: 'Failed to extract medicines.', details: error.message });
     }
 });
@@ -467,7 +491,6 @@ app.post('/api/check-symptoms', async (req, res) => {
                 The user asked a health-related question. Give a clear, helpful, and simple reply.
 
                 STRICT RULES:
-                - Maximum 120 words total.
                 - Use very simple words. No medical jargon.
                 - Use short sentences.
                 - Be warm and conversational like a helpful friend.
@@ -484,7 +507,6 @@ app.post('/api/check-symptoms', async (req, res) => {
                 You are MediEase, a friendly healthcare assistant. Explain symptoms in very easy language.
                 
                 STRICT RULES:
-                - Maximum 100 words total.
                 - Use very simple words. No medical jargon.
                 - Use short sentences.
                 - No medical disclaimer.
@@ -503,10 +525,10 @@ app.post('/api/check-symptoms', async (req, res) => {
                 One short sentence explaining what might be happening.
 
                 ### What You Can Do
-                - 3–4 short bullet points of simple home care.
+                - List in short bullet points of simple home care.
 
                 ### See a Doctor If
-                - 2–3 warning signs.
+                - List in warning signs.
             `;
         }
 
@@ -577,6 +599,189 @@ app.delete('/api/medications/:id', requireAuth, async (req, res) => {
     } catch (err) {
         console.error('Delete medication error:', err.message);
         res.status(500).json({ error: 'Failed to delete medication.' });
+    }
+});
+
+// ===================== INSURANCE APIs =====================
+
+// 1. Get Policies
+app.get('/api/insurance/policies', requireAuth, async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('insurance_policies')
+            .select('*')
+            .eq('user_id', req.userId)
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        res.json({ policies: data || [] });
+    } catch (err) {
+        console.error('Get policies error:', err.message);
+        res.status(500).json({ error: 'Failed to load policies.' });
+    }
+});
+
+// 2. Add Policy
+app.post('/api/insurance/policies', requireAuth, async (req, res) => {
+    try {
+        const { provider_name, policy_number, policy_holder_name, coverage_amount, expiry_date, policy_type } = req.body;
+        if (!provider_name || !policy_number) return res.status(400).json({ error: 'Missing required fields.' });
+
+        const { data, error } = await supabase
+            .from('insurance_policies')
+            .insert({
+                user_id: req.userId,
+                provider_name,
+                policy_number,
+                policy_holder_name,
+                coverage_amount,
+                expiry_date,
+                policy_type
+            })
+            .select()
+            .single();
+        if (error) throw error;
+        res.json({ policy: data });
+    } catch (err) {
+        console.error('Add policy error:', err.message);
+        res.status(500).json({ error: 'Failed to add policy.' });
+    }
+});
+
+// 3. Analyze Claim Document
+app.post('/api/claims/analyze-document', requireAuth, upload.single('document'), async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
+        const fileBuffer = fs.readFileSync(req.file.path);
+        const mimeType = req.file.mimetype;
+        let extractedText = '';
+
+        if (mimeType === 'application/pdf') {
+            const { PDFParse } = require('pdf-parse');
+            const parser = new PDFParse({ data: fileBuffer });
+            const pdfData = await parser.parse();
+            extractedText = pdfData.text;
+        } else {
+            // Image interpretation
+            const base64Data = fileBuffer.toString('base64');
+            const result = await groq.chat.completions.create({
+                messages: [{
+                    role: "user",
+                    content: [
+                        { type: "text", text: "Extract raw text from this medical document." },
+                        { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Data}` } }
+                    ]
+                }],
+                model: "llama-3.2-11b-vision-preview",
+                temperature: 0.1,
+            });
+            extractedText = result.choices[0].message.content;
+        }
+
+        // Send to LLM to extract JSON
+        const prompt = `You are an AI extracting data from medical documents for insurance claims.
+Return ONLY valid JSON with no markdown formatting.
+Extract these exact keys: "hospital_name", "bill_amount" (number), "treatment_date" (YYYY-MM-DD), "patient_name".
+If a field is not found, leave it empty or null.
+
+Document text:
+${extractedText.substring(0, 3000)}`;
+
+        let aiResult = await groq.chat.completions.create({
+            messages: [{ role: "user", content: prompt }],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.1,
+            response_format: { type: "json_object" }
+        });
+
+        let extracted = JSON.parse(aiResult.choices[0].message.content);
+
+        res.json({ extracted });
+
+    } catch (err) {
+        console.error('Analyze doc error:', err.message);
+        res.status(500).json({ error: 'Failed to analyze document.' });
+    }
+});
+
+// 4. Eligibility Check
+app.post('/api/claims/eligibility', requireAuth, async (req, res) => {
+    try {
+        const { diagnosis, treatment_type, requested_amount, coverage_amount } = req.body;
+
+        const prompt = `You are an AI insurance claim evaluator. 
+Evaluate this claim request based on standard insurance rules.
+Input:
+Diagnosis: ${diagnosis}
+Treatment Type: ${treatment_type}
+Requested Amount: ${requested_amount}
+Available Coverage: ${coverage_amount}
+
+Return ONLY valid JSON with these keys:
+"coverage_status" (string: "Covered", "Partially Covered", or "Not Covered"),
+"estimated_payable_amount" (number),
+"confidence" (number 0-100),
+"missing_requirements" (array of strings, e.g. ["Detailed discharge summary", "Itemized hospital bill"])
+
+JSON Rules: No markdown, just raw JSON string.`;
+
+        let aiResult = await groq.chat.completions.create({
+            messages: [{ role: "user", content: prompt }],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.2,
+            response_format: { type: "json_object" }
+        });
+
+        let eligibility = JSON.parse(aiResult.choices[0].message.content);
+        res.json({ eligibility });
+    } catch (err) {
+        console.error('Eligibility error:', err.message);
+        res.status(500).json({ error: 'Eligibility check failed.' });
+    }
+});
+
+// 5. Submit Claim
+app.post('/api/claims/submit', requireAuth, async (req, res) => {
+    try {
+        const { policy_id, hospital_name, doctor_name, diagnosis, treatment_type, admission_date, discharge_date, total_medical_cost, claim_amount } = req.body;
+
+        const { data, error } = await supabase
+            .from('insurance_claims')
+            .insert({
+                user_id: req.userId,
+                policy_id,
+                hospital_name,
+                doctor_name,
+                diagnosis,
+                treatment_type,
+                admission_date: admission_date || null,
+                discharge_date: discharge_date || null,
+                total_medical_cost,
+                claim_amount,
+                status: 'Submitted'
+            })
+            .select()
+            .single();
+        if (error) throw error;
+        res.json({ claim: data });
+    } catch (err) {
+        console.error('Submit claim error:', err.message);
+        res.status(500).json({ error: 'Failed to submit claim.' });
+    }
+});
+
+// 6. List Claims
+app.get('/api/claims/list', requireAuth, async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('insurance_claims')
+            .select('*')
+            .eq('user_id', req.userId)
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        res.json({ claims: data || [] });
+    } catch (err) {
+        console.error('List claims error:', err.message);
+        res.status(500).json({ error: 'Failed to load claims.' });
     }
 });
 
