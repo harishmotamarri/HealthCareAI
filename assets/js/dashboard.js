@@ -36,6 +36,9 @@ const appRouter = {
             targetNav.classList.add('active');
             // Title stays as MediEase, no change needed here
         }
+
+        // Save to localStorage
+        localStorage.setItem('mediease_active_tab', targetViewId);
     },
 
     // 3. Initialize event listeners
@@ -226,6 +229,15 @@ const appRouter = {
                 }
             }
         }
+
+        // Restore active tab from localStorage if available
+        const savedTab = localStorage.getItem('mediease_active_tab');
+        if (savedTab && document.getElementById(savedTab)) {
+            this.navigate(savedTab);
+        } else {
+            // Default to dashboard
+            this.navigate('dashboard');
+        }
     }
 };
 
@@ -268,6 +280,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 0b. Emergency Contact (localStorage) ---
+
+    // Init appointment count from localStorage
+    const savedAppointments = JSON.parse(localStorage.getItem('mediease_appointments') || '[]');
+    const dashApptCount = document.getElementById('dash-appointments-count');
+    if (dashApptCount) dashApptCount.textContent = savedAppointments.length;
+
     const ecName = document.getElementById('emergency-contact-name');
     const ecPhone = document.getElementById('emergency-contact-phone');
     const ecSaveBtn = document.getElementById('emergency-save-btn');
@@ -339,6 +357,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (matchingNav) {
             matchingNav.classList.add('active');
         }
+
+        // Save to localStorage
+        localStorage.setItem('mediease_active_tab', targetId);
 
         // Close mobile sidebar on view switch
         if (window.innerWidth <= 768 && sidebar.classList.contains('sidebar-open')) {
@@ -793,6 +814,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!res.ok) throw new Error(data.error || 'Upload failed');
 
+            loadRecentActivity(); // Refresh activity list after a new report is uploaded
+
             setTimeout(() => {
                 uploadProgress.style.display = 'none';
                 loadReportsList();
@@ -812,6 +835,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const authHeaders = await getAuthHeaders();
             const res = await fetch('/api/reports', { headers: authHeaders });
             const data = await res.json();
+
+            loadRecentActivity(); // Refresh activity list after a new report is uploaded
 
             // Profile references
             const profileContent = document.getElementById('profile-dynamic-content');
@@ -921,6 +946,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const authHeaders = await getAuthHeaders();
             await fetch('/api/reports/' + id, { method: 'DELETE', headers: authHeaders });
             loadReportsList();
+            loadRecentActivity(); // Refresh activity list after deleting a report
         } catch (err) {
             alert('Failed to delete report.');
         }
@@ -1032,62 +1058,84 @@ document.addEventListener('DOMContentLoaded', () => {
     window.openModal = function (cardElement) {
         if (!modal) return;
 
-        // Store current card's phone for "Call Now" button
-        if (cardElement && cardElement.dataset.phone) {
-            modal.dataset.currentPhone = cardElement.dataset.phone;
-        }
-
-        // If a card element was passed, extract its data to populate the modal
         if (cardElement) {
-            const nameEl = cardElement.querySelector('h3');
-            const addressEl = cardElement.querySelector('p:nth-of-type(2)');
-            const ratingReviewsEl = cardElement.querySelector('p:nth-of-type(1)');
-            const distWaitOpenEl = cardElement.querySelector('div:nth-of-type(2)');
-            const tagsContainer = cardElement.querySelector('div:nth-of-type(3)');
+            const d = cardElement.dataset;
 
-            if (nameEl) document.getElementById('modal-hospital-name').innerText = nameEl.innerText;
-            if (addressEl) document.getElementById('modal-hospital-address').innerText = addressEl.innerText;
+            // Store data for modal buttons
+            modal.dataset.currentPhone = d.phone || '';
+            modal.dataset.currentLat = d.lat || '';
+            modal.dataset.currentLon = d.lon || '';
 
-            if (ratingReviewsEl) {
-                const text = ratingReviewsEl.innerText;
-                const ratingMatch = text.match(/★\s*([\d\.]+)/);
-                const reviewsMatch = text.match(/\(([^)]+)\)/);
+            // Name & address
+            document.getElementById('modal-hospital-name').innerText = d.name || 'Hospital';
+            document.getElementById('modal-hospital-address').innerText = d.address || 'Address not available';
 
-                if (ratingMatch) document.getElementById('modal-hospital-rating').innerText = `${ratingMatch[1]} ★`;
-                if (reviewsMatch) document.getElementById('modal-hospital-reviews').innerText = reviewsMatch[1];
+            // Distance
+            document.getElementById('modal-hospital-distance').innerText = d.distance ? `${d.distance} km` : 'N/A';
+
+            // Emergency status in the "rating" slot
+            const ratingEl = document.getElementById('modal-hospital-rating');
+            const reviewsEl = document.getElementById('modal-hospital-reviews');
+            if (d.emergency === 'yes') {
+                ratingEl.innerText = '🚑 Yes';
+                ratingEl.style.color = '#ef4444';
+            } else {
+                ratingEl.innerText = '—';
+                ratingEl.style.color = 'var(--text-muted)';
+            }
+            reviewsEl.innerText = 'Emergency';
+
+            // Opening Hours in the "wait" slot
+            const waitEl = document.getElementById('modal-hospital-wait');
+            waitEl.innerText = d.openHours || 'Not listed';
+
+            // Phone
+            const phoneDisplay = document.getElementById('modal-hospital-phone');
+            if (phoneDisplay) {
+                phoneDisplay.innerText = d.phone || 'Not available';
             }
 
-            if (distWaitOpenEl) {
-                const spans = distWaitOpenEl.querySelectorAll('span');
-                if (spans.length >= 3) {
-                    document.getElementById('modal-hospital-distance').innerText = spans[0].innerText;
-                    document.getElementById('modal-hospital-wait').innerText = spans[1].innerText;
-                    // The 3rd span is opening hours, we'll add it as a tag
-                    const openTag = document.createElement('span');
-                    openTag.className = 'small-tag';
-                    openTag.style.background = 'rgba(0, 229, 163, 0.1)';
-                    openTag.style.color = 'var(--primary)';
-                    openTag.innerText = `Open ${spans[2].innerText}`;
+            // Specialty tags
+            const modalTags = document.getElementById('modal-hospital-tags');
+            if (modalTags) {
+                modalTags.innerHTML = '';
+                let tags = [];
+                try { tags = JSON.parse(d.tags.replace(/&quot;/g, '"')); } catch (e) { tags = []; }
 
-                    const modalTags = document.getElementById('modal-hospital-tags');
-                    if (modalTags) {
-                        modalTags.innerHTML = ''; // clear old tags
-                        modalTags.appendChild(openTag);
-                    }
+                if (d.emergency === 'yes') {
+                    const emergTag = document.createElement('span');
+                    emergTag.className = 'small-tag';
+                    emergTag.style.background = 'rgba(239, 68, 68, 0.1)';
+                    emergTag.style.color = '#ef4444';
+                    emergTag.innerText = 'Emergency';
+                    modalTags.appendChild(emergTag);
                 }
-            }
 
-            if (tagsContainer) {
-                const modalTags = document.getElementById('modal-hospital-tags');
-                if (modalTags) {
-                    // Clone all tags from the card (except the +1 more, we'll just clone them all for now)
-                    const tags = tagsContainer.querySelectorAll('.small-tag');
-                    tags.forEach(tag => {
-                        if (!tag.innerText.includes('+')) {
-                            const newTag = tag.cloneNode(true);
-                            modalTags.appendChild(newTag);
-                        }
-                    });
+                if (d.openHours) {
+                    const hoursTag = document.createElement('span');
+                    hoursTag.className = 'small-tag';
+                    hoursTag.style.background = 'rgba(0, 229, 163, 0.1)';
+                    hoursTag.style.color = 'var(--primary)';
+                    hoursTag.innerText = d.openHours;
+                    modalTags.appendChild(hoursTag);
+                }
+
+                tags.forEach(t => {
+                    const tagEl = document.createElement('span');
+                    tagEl.className = 'small-tag';
+                    tagEl.style.background = 'rgba(59, 130, 246, 0.1)';
+                    tagEl.style.color = '#3b82f6';
+                    tagEl.innerText = t;
+                    modalTags.appendChild(tagEl);
+                });
+
+                if (d.phone) {
+                    const phoneTag = document.createElement('span');
+                    phoneTag.className = 'small-tag';
+                    phoneTag.style.background = 'rgba(168, 85, 247, 0.1)';
+                    phoneTag.style.color = '#a855f7';
+                    phoneTag.innerText = '📞 ' + d.phone;
+                    modalTags.appendChild(phoneTag);
                 }
             }
         }
@@ -1098,35 +1146,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.closeModal = function () {
         if (modal) modal.classList.remove('active');
     }
-
-    // Attach click listeners to all Details buttons, phone buttons, and add directions
-    const allHospitalCards = document.querySelectorAll('.hospital-card');
-    allHospitalCards.forEach(card => {
-        const detailsBtn = card.querySelector('.hospital-details-btn');
-        const phoneBtn = card.querySelector('.hospital-call-btn');
-
-        if (detailsBtn) {
-            detailsBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                openModal(card);
-            });
-        }
-
-        // 📞 button on card → call the hospital
-        if (phoneBtn) {
-            phoneBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const phone = card.dataset.phone;
-                if (phone) window.location.href = 'tel:' + phone;
-            });
-        }
-
-        // Clicking the card body opens modal (but not from buttons)
-        card.addEventListener('click', (e) => {
-            if (e.target.closest('button')) return;
-            openModal(card);
-        });
-    });
 
     // Modal "Call Now" and "Get Directions" buttons
     const modalCallBtn = document.getElementById('modal-call-btn');
@@ -1141,10 +1160,110 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (modalDirBtn) {
         modalDirBtn.addEventListener('click', () => {
-            const address = document.getElementById('modal-hospital-address').innerText;
-            if (address) {
-                window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(address), '_blank');
+            const lat = modal.dataset.currentLat;
+            const lon = modal.dataset.currentLon;
+            if (lat && lon) {
+                window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`, '_blank');
+            } else {
+                const address = document.getElementById('modal-hospital-address').innerText;
+                if (address) {
+                    window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(address), '_blank');
+                }
             }
+        });
+    }
+
+    // Modal "Book Appointment" button
+    const modalBookBtn = document.getElementById('modal-book-btn');
+    if (modalBookBtn) {
+        modalBookBtn.addEventListener('click', () => {
+            const hospitalName = document.getElementById('modal-hospital-name').innerText;
+            closeModal();
+            openBookingModal(hospitalName);
+        });
+    }
+
+    // --- Appointment Booking Modal ---
+    const bookingModal = document.getElementById('bookingModal');
+    const bookingConfirmBtn = document.getElementById('booking-confirm-btn');
+
+    // Set min date to today
+    const bookingDateInput = document.getElementById('booking-date');
+    if (bookingDateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        bookingDateInput.setAttribute('min', today);
+    }
+
+    window.openBookingModal = function (hospitalName) {
+        if (!bookingModal) return;
+        document.getElementById('booking-hospital-name').innerText = hospitalName;
+
+        // Reset form
+        const fields = ['booking-patient-name', 'booking-date', 'booking-time', 'booking-reason', 'booking-notes'];
+        fields.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+        const errEl = document.getElementById('booking-error');
+        const successEl = document.getElementById('booking-success');
+        const actionsEl = document.getElementById('booking-form-actions');
+        if (errEl) errEl.style.display = 'none';
+        if (successEl) successEl.style.display = 'none';
+        if (actionsEl) actionsEl.style.display = 'flex';
+
+        bookingModal.classList.add('active');
+    };
+
+    window.closeBookingModal = function () {
+        if (bookingModal) bookingModal.classList.remove('active');
+    };
+
+    if (bookingModal) {
+        bookingModal.addEventListener('click', (e) => {
+            if (e.target === bookingModal) closeBookingModal();
+        });
+    }
+
+    if (bookingConfirmBtn) {
+        bookingConfirmBtn.addEventListener('click', () => {
+            const name = document.getElementById('booking-patient-name').value.trim();
+            const date = document.getElementById('booking-date').value;
+            const time = document.getElementById('booking-time').value;
+            const reason = document.getElementById('booking-reason').value;
+            const hospital = document.getElementById('booking-hospital-name').innerText;
+            const errEl = document.getElementById('booking-error');
+
+            // Validation
+            if (!name || !date || !time || !reason) {
+                errEl.innerText = 'Please fill in all required fields.';
+                errEl.style.display = 'block';
+                return;
+            }
+            errEl.style.display = 'none';
+
+            // Save appointment to localStorage
+            const appointments = JSON.parse(localStorage.getItem('mediease_appointments') || '[]');
+            const appointment = {
+                id: Date.now(),
+                hospital,
+                patientName: name,
+                date,
+                time,
+                reason,
+                notes: document.getElementById('booking-notes').value.trim(),
+                bookedAt: new Date().toISOString()
+            };
+            appointments.push(appointment);
+            localStorage.setItem('mediease_appointments', JSON.stringify(appointments));
+
+            // Update appointments count on dashboard
+            const dashAppointmentsCount = document.getElementById('dash-appointments-count');
+            if (dashAppointmentsCount) {
+                dashAppointmentsCount.textContent = appointments.length;
+            }
+
+            // Show success
+            const formattedDate = new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            document.getElementById('booking-summary').innerText = `${hospital} \u2022 ${formattedDate} at ${time} \u2022 ${reason}`;
+            document.getElementById('booking-success').style.display = 'block';
+            document.getElementById('booking-form-actions').style.display = 'none';
         });
     }
 
@@ -1175,51 +1294,287 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 5. Locate Me Functionality ---
+    // --- 5. Locate Me & Dynamic Hospital Finder ---
     const locateMeBtn = document.getElementById('locate-me-btn');
     const locationDisplay = document.getElementById('user-location-display');
     const locationText = document.getElementById('location-text');
+    let userLat = null;
+    let userLon = null;
+
+    // Haversine distance in km
+    function haversineDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    // Build a hospital card HTML string from data
+    function createHospitalCardHTML(hospital) {
+        const phoneSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>`;
+        const viewSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+
+        const tags = (hospital.tags || ['General Medicine']).map(t =>
+            `<span class="small-tag">${t}</span>`
+        ).join('');
+
+        const phone = hospital.phone || '';
+        const safeAddr = (hospital.address || '').replace(/"/g, '&quot;');
+        const safeName = (hospital.name || '').replace(/"/g, '&quot;');
+        const safeTags = JSON.stringify(hospital.tags || []).replace(/"/g, '&quot;');
+        const safeHours = (hospital.openHours || '').replace(/"/g, '&quot;');
+
+        return `
+            <div class="card hospital-card"
+                data-name="${safeName}"
+                data-address="${safeAddr}"
+                data-phone="${phone}"
+                data-distance="${hospital.distance}"
+                data-emergency="${hospital.emergency ? 'yes' : 'no'}"
+                data-open-hours="${safeHours}"
+                data-tags="${safeTags}"
+                data-lat="${hospital.lat || ''}"
+                data-lon="${hospital.lon || ''}">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="color: var(--primary);">📍</span>
+                        <h3 style="font-size: 1rem; font-weight: 600;">${hospital.name}</h3>
+                    </div>
+                    <span style="color: var(--text-muted); cursor:pointer;">♡</span>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">${hospital.address}</p>
+                <div style="display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 16px;">
+                    <span style="color: var(--primary);">${hospital.distance} km</span>
+                    ${hospital.emergency ? '<span style="color: #ef4444;">Emergency</span>' : ''}
+                    ${hospital.openHours ? `<span style="color: #3b82f6;">${hospital.openHours}</span>` : ''}
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;">
+                    ${tags}
+                </div>
+                <div class="hospital-btn-row">
+                    <button class="btn btn-outline hospital-call-btn">${phoneSvg} Call</button>
+                    <button class="btn btn-primary hospital-details-btn">${viewSvg} View Details</button>
+                    <button class="btn btn-outline hospital-book-btn" style="border-color: #a855f7; color: #a855f7;">📅 Book</button>
+                </div>
+            </div>`;
+    }
+
+    // Attach event listeners to dynamically created hospital cards
+    function attachHospitalCardListeners() {
+        const cards = document.querySelectorAll('.hospital-card');
+        cards.forEach(card => {
+            const detailsBtn = card.querySelector('.hospital-details-btn');
+            const phoneBtn = card.querySelector('.hospital-call-btn');
+
+            if (detailsBtn) {
+                detailsBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openModal(card);
+                });
+            }
+
+            const bookBtn = card.querySelector('.hospital-book-btn');
+            if (bookBtn) {
+                bookBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openBookingModal(card.dataset.name || 'Hospital');
+                });
+            }
+
+            if (phoneBtn) {
+                phoneBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const phone = card.dataset.phone;
+                    if (phone) window.location.href = 'tel:' + phone;
+                });
+            }
+
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('button')) return;
+                openModal(card);
+            });
+        });
+    }
+
+    // Determine specialty tags from OSM tags
+    function getHospitalTags(element) {
+        const osmTags = element.tags || {};
+        const specialties = [];
+
+        const typeMap = {
+            'hospital': 'Hospital',
+            'clinic': 'Clinic',
+            'doctors': 'Doctor',
+            'dentist': 'Dentistry',
+            'pharmacy': 'Pharmacy'
+        };
+
+        if (osmTags.amenity && typeMap[osmTags.amenity]) {
+            specialties.push(typeMap[osmTags.amenity]);
+        }
+
+        if (osmTags['healthcare:speciality']) {
+            osmTags['healthcare:speciality'].split(';').forEach(s => {
+                const formatted = s.trim().replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                if (!specialties.includes(formatted)) specialties.push(formatted);
+            });
+        }
+
+        if (osmTags.emergency === 'yes') specialties.push('Emergency');
+
+        return specialties.length > 0 ? specialties : ['General Medicine'];
+    }
+
+    // Fetch nearby hospitals using Overpass API
+    async function fetchNearbyHospitals(lat, lon, radiusMeters = 10000) {
+        const query = `
+            [out:json][timeout:25];
+            (
+                node["amenity"="hospital"](around:${radiusMeters},${lat},${lon});
+                way["amenity"="hospital"](around:${radiusMeters},${lat},${lon});
+                node["amenity"="clinic"](around:${radiusMeters},${lat},${lon});
+                way["amenity"="clinic"](around:${radiusMeters},${lat},${lon});
+            );
+            out center body;
+        `;
+
+        const response = await fetch('https://overpass-api.de/api/interpreter', {
+            method: 'POST',
+            body: 'data=' + encodeURIComponent(query),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+
+        if (!response.ok) throw new Error('Overpass API error');
+        const data = await response.json();
+
+        return data.elements.filter(el => {
+            const t = el.tags || {};
+            return t.name; // only include named hospitals
+        }).map(el => {
+            const elLat = el.lat || (el.center && el.center.lat);
+            const elLon = el.lon || (el.center && el.center.lon);
+            const dist = haversineDistance(lat, lon, elLat, elLon);
+            const t = el.tags || {};
+
+            // Build address
+            const addrParts = [t['addr:street'], t['addr:city'], t['addr:state'], t['addr:postcode']].filter(Boolean);
+            const address = addrParts.length > 0 ? addrParts.join(', ') : (t['addr:full'] || 'Address not available');
+
+            return {
+                name: t.name,
+                address: address,
+                phone: t.phone || t['contact:phone'] || '',
+                distance: dist.toFixed(1),
+                distanceNum: dist,
+                emergency: t.emergency === 'yes',
+                openHours: t.opening_hours || '',
+                tags: getHospitalTags(el),
+                lat: elLat,
+                lon: elLon
+            };
+        }).sort((a, b) => a.distanceNum - b.distanceNum);
+    }
+
+    // Render hospital cards into the grid
+    function renderHospitalCards(hospitals) {
+        const grid = document.getElementById('hospital-cards-grid');
+        const hospitalsCount = document.getElementById('hospitals-count');
+
+        if (hospitals.length === 0) {
+            grid.innerHTML = `
+                <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 48px 24px; color: var(--text-muted);">
+                    <div style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
+                    <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; color: var(--text-light);">No Hospitals Found</h3>
+                    <p style="font-size: 0.9rem;">Try increasing the search radius or changing filters.</p>
+                </div>`;
+            if (hospitalsCount) hospitalsCount.innerText = '0 hospitals found';
+            return;
+        }
+
+        grid.innerHTML = hospitals.map(h => createHospitalCardHTML(h)).join('');
+
+        if (hospitalsCount) {
+            hospitalsCount.innerText = `${hospitals.length} hospital${hospitals.length !== 1 ? 's' : ''} found near you`;
+        }
+
+        attachHospitalCardListeners();
+    }
+
+    // Store fetched hospitals for filtering
+    let allFetchedHospitals = [];
+
+    // Main: locate user and load nearby hospitals
+    async function locateAndLoadHospitals() {
+        if (!navigator.geolocation) {
+            locationDisplay.style.display = 'flex';
+            locationText.innerText = 'Geolocation is not supported by your browser.';
+            return;
+        }
+
+        locationDisplay.style.display = 'flex';
+        locationText.innerText = 'Fetching location...';
+        locateMeBtn.disabled = true;
+        locateMeBtn.innerHTML = '⏳ Locating...';
+
+        const grid = document.getElementById('hospital-cards-grid');
+        grid.innerHTML = `
+            <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 48px 24px; color: var(--text-muted);">
+                <div style="font-size: 2rem; margin-bottom: 16px; animation: pulse 1.5s infinite;">🔍</div>
+                <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; color: var(--text-light);">Searching for hospitals near you...</h3>
+                <p style="font-size: 0.9rem;">Please wait while we find healthcare facilities in your area.</p>
+            </div>`;
+
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            userLat = position.coords.latitude;
+            userLon = position.coords.longitude;
+
+            try {
+                // Get location name
+                const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${userLat}&lon=${userLon}`);
+                const geoData = await geoRes.json();
+                let locationName = 'Your Location';
+                if (geoData && geoData.address) {
+                    locationName = geoData.address.suburb || geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.county || 'Your Location';
+                }
+                locationText.innerText = `📍 ${locationName} (${userLat.toFixed(4)}, ${userLon.toFixed(4)})`;
+
+                // Fetch hospitals
+                allFetchedHospitals = await fetchNearbyHospitals(userLat, userLon, 10000);
+                renderHospitalCards(allFetchedHospitals);
+
+            } catch (err) {
+                console.error('Error fetching hospitals:', err);
+                locationText.innerText = `Located at (${userLat.toFixed(4)}, ${userLon.toFixed(4)})`;
+                grid.innerHTML = `
+                    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 48px 24px; color: var(--text-muted);">
+                        <div style="font-size: 3rem; margin-bottom: 16px;">⚠️</div>
+                        <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; color: var(--text-light);">Could not load hospitals</h3>
+                        <p style="font-size: 0.9rem;">Please check your internet connection and try again.</p>
+                    </div>`;
+            } finally {
+                locateMeBtn.disabled = false;
+                locateMeBtn.innerHTML = '📍 Find my location';
+            }
+        }, (error) => {
+            let errMsg = 'Failed to get location.';
+            if (error.code === 1) errMsg = 'Location access denied. Please allow location access in your browser settings.';
+            else if (error.code === 2) errMsg = 'Position unavailable.';
+            else if (error.code === 3) errMsg = 'Location request timed out.';
+            locationText.innerText = errMsg;
+            locateMeBtn.disabled = false;
+            locateMeBtn.innerHTML = '📍 Find my location';
+            grid.innerHTML = `
+                <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 48px 24px; color: var(--text-muted);">
+                    <div style="font-size: 3rem; margin-bottom: 16px;">📍</div>
+                    <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; color: var(--text-light);">Location Access Required</h3>
+                    <p style="font-size: 0.9rem;">${errMsg}</p>
+                </div>`;
+        });
+    }
 
     if (locateMeBtn) {
-        locateMeBtn.addEventListener('click', () => {
-            if (navigator.geolocation) {
-                locationDisplay.style.display = 'flex';
-                locationText.innerText = 'Fetching location...';
-                locateMeBtn.disabled = true;
-
-                navigator.geolocation.getCurrentPosition(async (position) => {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-
-                    try {
-                        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-                        const data = await response.json();
-
-                        let locationName = 'Unknown Location';
-                        if (data && data.address) {
-                            locationName = data.address.city || data.address.town || data.address.village || data.address.county || 'Your Location';
-                        }
-                        locationText.innerText = `Current Location: ${locationName} (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
-                    } catch (err) {
-                        console.error('Error fetching location name:', err);
-                        locationText.innerText = `Current Location: Coordinates (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
-                    } finally {
-                        locateMeBtn.disabled = false;
-                    }
-                }, (error) => {
-                    console.error('Geolocation error:', error);
-                    let errMsg = 'Failed to get location.';
-                    if (error.code === 1) errMsg = 'Location access denied by user.';
-                    else if (error.code === 2) errMsg = 'Position unavailable.';
-                    else if (error.code === 3) errMsg = 'Location request timed out.';
-                    locationText.innerText = errMsg;
-                    locateMeBtn.disabled = false;
-                });
-            } else {
-                locationDisplay.style.display = 'flex';
-                locationText.innerText = 'Geolocation is not supported by your browser.';
-            }
-        });
+        locateMeBtn.addEventListener('click', locateAndLoadHospitals);
     }
 
     // --- 6. Hospital Filtering Functionality ---
@@ -1227,76 +1582,42 @@ document.addEventListener('DOMContentLoaded', () => {
     const hospitalSpecialty = document.getElementById('hospital-specialty');
     const hospitalDistance = document.getElementById('hospital-distance');
     const hospitalRating = document.getElementById('hospital-rating');
-    // Using allHospitalCards declared earlier
     const hospitalsCount = document.getElementById('hospitals-count');
 
-    function getCardDistance(card) {
-        const match = card.innerText.match(/([\d\.]+)\s*(mi|km)/);
-        return match ? parseFloat(match[1]) : 9999;
-    }
-
     function filterHospitals() {
-        if (!allHospitalCards) return;
+        if (!allFetchedHospitals || allFetchedHospitals.length === 0) return;
 
         const query = hospitalSearch ? hospitalSearch.value.toLowerCase() : '';
         const specialty = hospitalSpecialty ? hospitalSpecialty.value : 'All Specialties';
         const distanceFilter = hospitalDistance ? hospitalDistance.value : 'Any Distance';
         const ratingFilter = hospitalRating ? hospitalRating.value : 'Any Rating';
 
-        let visibleCount = 0;
-
-        allHospitalCards.forEach(card => {
-            let isVisible = true;
-
+        let filtered = allFetchedHospitals.filter(h => {
             // 1. Search Filter
             if (query) {
-                const cardText = card.innerText.toLowerCase();
-                if (!cardText.includes(query)) isVisible = false;
+                const searchText = (h.name + ' ' + h.address + ' ' + (h.tags || []).join(' ')).toLowerCase();
+                if (!searchText.includes(query)) return false;
             }
 
             // 2. Specialty Filter
-            if (isVisible && specialty !== 'All Specialties') {
-                const tags = Array.from(card.querySelectorAll('.small-tag')).map(t => t.innerText.toLowerCase());
-                if (!tags.includes(specialty.toLowerCase())) isVisible = false;
+            if (specialty !== 'All Specialties') {
+                const tags = (h.tags || []).map(t => t.toLowerCase());
+                if (!tags.includes(specialty.toLowerCase())) return false;
             }
 
             // 3. Distance Filter
-            if (isVisible && distanceFilter === 'Within 5 km') {
-                if (getCardDistance(card) > 5) isVisible = false;
-            } else if (isVisible && distanceFilter === 'Within 10 km') {
-                if (getCardDistance(card) > 10) isVisible = false;
-            }
+            if (distanceFilter === 'Within 5 km' && h.distanceNum > 5) return false;
+            if (distanceFilter === 'Within 10 km' && h.distanceNum > 10) return false;
 
-            // 4. Rating Filter
-            if (isVisible && ratingFilter !== 'Any Rating') {
-                const ratingMatch = card.innerText.match(/★\s*([\d\.]+)/);
-                if (ratingMatch) {
-                    const rating = parseFloat(ratingMatch[1]);
-                    if (ratingFilter === '4+ Stars' && rating < 4.0) isVisible = false;
-                    if (ratingFilter === '3.5+ Stars' && rating < 3.5) isVisible = false;
-                }
-            }
-
-            if (isVisible) {
-                card.style.display = 'block';
-                visibleCount++;
-            } else {
-                card.style.display = 'none';
-            }
+            return true;
         });
 
-        // Sort by distance (ascending) when selected
+        // Sort by distance
         if (distanceFilter === 'Sort by Distance') {
-            const grid = document.getElementById('hospital-cards-grid');
-            const cards = Array.from(allHospitalCards);
-            cards.sort((a, b) => getCardDistance(a) - getCardDistance(b));
-            cards.forEach(card => grid.appendChild(card));
+            filtered.sort((a, b) => a.distanceNum - b.distanceNum);
         }
 
-        // Update hospitals found count text
-        if (hospitalsCount) {
-            hospitalsCount.innerText = `${visibleCount} hospital${visibleCount !== 1 ? 's' : ''} found`;
-        }
+        renderHospitalCards(filtered);
     }
 
     if (hospitalSearch) hospitalSearch.addEventListener('input', filterHospitals);
@@ -1412,6 +1733,121 @@ document.addEventListener('DOMContentLoaded', () => {
                 dot.style.background = 'rgba(255,255,255,0.2)';
             }
         });
+    }
+
+    // --- Dynamic Recent Activity ---
+    async function loadRecentActivity() {
+        const activityList = document.getElementById('recent-activity-list');
+        if (!activityList) return;
+
+        try {
+            const headers = await getAuthHeaders();
+            if (!headers.Authorization) return;
+
+            // Fetch data from three different endpoints
+            const [reportsRes, medsRes, claimsRes] = await Promise.all([
+                fetch('/api/reports', { headers }).catch(() => null),
+                fetch('/api/medications', { headers }).catch(() => null),
+                fetch('/api/claims/list', { headers }).catch(() => null)
+            ]);
+
+            let activities = [];
+
+            // Process Reports
+            if (reportsRes && reportsRes.ok) {
+                const reportsData = await reportsRes.json();
+                if (reportsData.reports) {
+                    activities.push(...reportsData.reports.map(r => ({
+                        type: 'report',
+                        title: 'Medical Report Uploaded',
+                        desc: r.reportType || r.fileName,
+                        date: new Date(r.uploadedAt),
+                        icon: '📄'
+                    })));
+                }
+            }
+
+            // Process Medications
+            if (medsRes && medsRes.ok) {
+                const medsData = await medsRes.json();
+                if (medsData.medications) {
+                    activities.push(...medsData.medications.map(m => ({
+                        type: 'medication',
+                        title: 'Medication Added',
+                        desc: `${m.name} - ${m.dosage}`,
+                        date: new Date(m.created_at),
+                        icon: '💊'
+                    })));
+                }
+            }
+
+            // Process Claims
+            if (claimsRes && claimsRes.ok) {
+                const claimsData = await claimsRes.json();
+                if (claimsData.claims) {
+                    activities.push(...claimsData.claims.map(c => ({
+                        type: 'claim',
+                        title: `Claim ${c.status}`,
+                        desc: `${c.hospital_name} - ₹${c.claim_amount}`,
+                        date: new Date(c.created_at),
+                        icon: '🛡️'
+                    })));
+                }
+            }
+
+            // Sort by date descending
+            activities.sort((a, b) => b.date - a.date);
+
+            // Take top 4 recent activities
+            const recentActivities = activities.slice(0, 4);
+
+            activityList.innerHTML = ''; // Clear previous/static items
+
+            if (recentActivities.length === 0) {
+                activityList.innerHTML = '<p style="color:var(--text-muted); text-align:center;">No recent activity</p>';
+                return;
+            }
+
+            recentActivities.forEach(act => {
+                const item = document.createElement('div');
+                item.className = 'activity-item';
+                
+                // Format relative time (e.g., "Just now", "2 hours ago")
+                const diffMs = Date.now() - act.date.getTime();
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMins / 60);
+                const diffDays = Math.floor(diffHours / 24);
+                
+                let timeStr = 'Just now';
+                if (diffDays > 0) timeStr = `${diffDays}d ago`;
+                else if (diffHours > 0) timeStr = `${diffHours}h ago`;
+                else if (diffMins > 0) timeStr = `${diffMins}m ago`;
+
+                item.innerHTML = `
+                    <div class="activity-icon">${act.icon}</div>
+                    <div class="activity-details">
+                        <div class="activity-title">${escHtmlDashboard(act.title)}</div>
+                        <div class="activity-time">${timeStr} • ${escHtmlDashboard(act.desc)}</div>
+                    </div>
+                `;
+                activityList.appendChild(item);
+            });
+
+        } catch (err) {
+            console.error('Failed to load recent activity:', err);
+            activityList.innerHTML = '<p style="color:#ef4444; text-align:center;">Failed to load activity.</p>';
+        }
+    }
+
+    // Ensure it runs once on load
+    loadRecentActivity();
+
+    // Helper to escape HTML to prevent XSS
+    function escHtmlDashboard(str) {
+        if (!str) return '';
+        const d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
     }
 
     if (tipDots.length > 0) {

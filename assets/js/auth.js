@@ -92,7 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 // Handle common auth errors
                 let errorMsg = error.message;
-                if (error.message.includes('User already registered') || error.status === 400) {
+                if (error.status === 429) {
+                    errorMsg = 'Too many signups from this location right now. Please wait a while before trying again.';
+                } else if (error.message.includes('User already registered') || error.status === 400) {
                     errorMsg = 'This email address is already registered. Please use a different email or log in.';
                 }
 
@@ -157,7 +159,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = 'dashboard.html';
 
             } catch (error) {
-                showMessage('auth-message', error.message, true);
+                let errorMsg = error.message;
+                if (error.status === 429) {
+                    errorMsg = 'Too many login attempts. Please wait a while before trying again.';
+                }
+                showMessage('auth-message', errorMsg, true);
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Login';
             }
@@ -196,7 +202,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     showMessage('auth-message', 'Password reset link sent! Please check your inbox.', false);
                 }
             } catch (error) {
-                showMessage('auth-message', `Error: ${error.message}`, true);
+                let errorMsg = error.message;
+                if (error.status === 429) {
+                    errorMsg = 'Too many requests. Please wait a while before trying again.';
+                }
+                showMessage('auth-message', `Error: ${errorMsg}`, true);
             }
         });
     }
