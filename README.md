@@ -1,154 +1,149 @@
-# MediEase — AI-Powered Healthcare Dashboard
-
-MediEase is a full-stack healthcare web app that uses AI to analyze medical reports, check symptoms, provide first aid guidance, and manage medications — all in a clean, modern dashboard.
-
+# MediEase
+AI-powered healthcare assistant that translates complex medical reports, prescriptions, and symptoms into clear, actionable health insights.
+![Dashboard](assets/img/dashboard.png)
+## Demo
+Live: [https://mediease-sgek.onrender.com/](https://mediease-ai.vercel.app)
+## Overview
+- **What problem it solves:** Medical jargon in lab reports, prescriptions, and symptoms can be incredibly confusing and stressful. MediEase simplifies this information so users can understand their health better.
+- **Who it is for:** Patients, caregivers, and individuals seeking preliminary, AI-guided health context and clean medication tracking.
+- **Key idea behind the project:** Leveraging vision-capable and text-based Large Language Models (via Groq API) integrated with a secure Supabase backend to offer private, instant health reports summaries and symptom insights.
 ## Features
-
-- **Medical Report Analyzer** — Upload reports (PDF, images) and get AI-powered plain-English summaries
-- **Symptom Checker** — Describe symptoms via text or voice and get health insights
-- **First Aid Guide** — Take a photo of an injury for instant AI first aid instructions
-- **Medication Planner** — Track medicines, set reminders, and view daily schedules
-- **Find Healthcare** — Browse nearby hospitals and specialists
-- **Light/Dark Mode** — Full theme support across all pages
-
+- **AI Medical Report Analyzer:** Upload PDFs or images of medical reports to receive clear, plain-English summaries.
+- **Symptom Checker:** Chat via text or voice to get preliminary medical context, guidelines, and home care tips.
+- **First Aid Guidance:** Upload injury photos to get step-by-step emergency care instructions.
+- **Prescription Meds Extractor:** Scan prescription sheets to extract dosages and schedule tables automatically.
+- **Medication Schedule Tracker:** Track timings, dosages, and maintain daily medication schedules in an interactive calendar interface.
+- **Healthcare Locator:** Quickly locate nearby hospitals, clinics, and pharmacies.
 ## Tech Stack
+### Frontend
+- HTML5
+- Vanilla JavaScript
+- CSS3 (Custom Glassmorphic styles)
+### Backend
+- Node.js
+- Express.js (v5)
+### Database
+- Supabase (PostgreSQL + Supabase Auth)
+### Tools
+- Groq SDK (Llama 3.2 Vision, Llama 3.3 70B)
+- Multer (Multipart form/file uploads)
+- PDF-parse (Server-side document reading)
+- Git
+## Screenshots
+### Home Page
+![Home](assets/img/home.png)
+### Dashboard
+![Dashboard](assets/img/dashboard.png)
+## Architecture
+```text
+Client (HTML/JS/CSS)
+      ↓ (Supabase JWT Bearer Auth)
+Backend API (Express.js)
+      ↓ (Groq SDK)
+Supabase (Postgres) & Llama LLMs (Groq)
+Project Structure
+text
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | HTML, CSS (custom), Vanilla JS |
-| Backend | Node.js, Express 5 |
-| AI | Groq API (Llama 4 Scout vision, Llama 3.3 70B text) |
-| Database | Supabase (PostgreSQL + Auth) |
-| File Uploads | Multer |
 
-## Project Structure
-
-```
-├── server.js              # Express API server
-├── supabase.js            # Supabase client (server-side)
-├── package.json
-├── .env.example           # Environment variable template
-├── .gitignore
-│
-├── index.html             # Landing page
-├── login.html             # Login page
-├── signup.html            # Signup page
-├── dashboard.html         # Main app dashboard
-│
+MediEase/
 ├── assets/
 │   ├── css/
-│   │   ├── shared.css     # CSS variables & common styles
-│   │   ├── landing.css    # Landing page styles
-│   │   ├── auth.css       # Login/signup styles
-│   │   └── dashboard.css  # Dashboard styles
+│   │   ├── auth.css
+│   │   ├── dashboard.css
+│   │   ├── landing.css
+│   │   └── shared.css
 │   ├── js/
-│   │   ├── supabase-client.js  # Supabase client (browser-side)
-│   │   ├── landing.js     # Landing page logic
-│   │   ├── auth.js        # Auth flow logic
-│   │   └── dashboard.js   # Dashboard app logic
-│   └── img/               # Static images
-│
-└── uploads/               # Temporary file uploads (gitignored)
-```
+│   │   ├── auth.js
+│   │   ├── dashboard.js
+│   │   ├── landing.js
+│   │   └── supabase-client.js
+│   └── img/
+│       ├── favicon.ico
+│       └── images.jpg
+├── uploads/
+├── .env.example
+├── .gitignore
+├── dashboard.html
+├── index.html
+├── login.html
+├── signup.html
+├── package.json
+├── server.js
+└── supabase.js
+Installation
+Clone Repository
+bash
 
-## Setup
 
-### Prerequisites
-
-- Node.js 18+
-- A [Supabase](https://supabase.com) project
-- A [Groq](https://console.groq.com) API key
-
-### 1. Clone & Install
-
-```bash
 git clone https://github.com/harishmotamarri/HealthCareAI.git
 cd HealthCareAI
+Install Dependencies
+bash
+
+
 npm install
-```
+Run
+bash
 
-### 2. Configure Environment
 
-```bash
-cp .env.example .env
-```
-
-Fill in your `.env`:
-
-```
-GROQ_API_KEY=gsk_your_key_here
-PORT=3000
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-```
-
-### 3. Set Up Supabase Tables
-
-Run this SQL in your Supabase Dashboard → SQL Editor:
-
-```sql
--- Medical reports table
-CREATE TABLE IF NOT EXISTS medical_reports (
-    id BIGSERIAL PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-    file_name TEXT,
-    stored_name TEXT,
-    report_type TEXT DEFAULT 'Medical Report',
-    analysis TEXT,
-    file_size INTEGER,
-    mime_type TEXT,
-    created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Medications table
-CREATE TABLE IF NOT EXISTS medications (
-    id BIGSERIAL PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
-    dosage TEXT DEFAULT '1 tablet',
-    frequency TEXT DEFAULT 'Once daily',
-    timing TEXT DEFAULT 'After food',
-    duration TEXT DEFAULT '',
-    created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Enable RLS
-ALTER TABLE medical_reports ENABLE ROW LEVEL SECURITY;
-ALTER TABLE medications ENABLE ROW LEVEL SECURITY;
-```
-
-### 4. Run
-
-```bash
 npm start
-```
+Environment Variables
+env
 
-Open `http://localhost:3000`
 
-## Deployment (Render / Railway / VPS)
+PORT=3000
+GROQ_API_KEY=your_groq_api_key
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+API Documentation
+Example Endpoint: Check Symptoms
+http
 
-1. Push your code to GitHub (`.env` is gitignored)
-2. Set all env vars from `.env.example` in your hosting platform's settings
-3. Set **Build Command**: `npm install`
-4. Set **Start Command**: `npm start`
-5. Ensure Node.js 18+ runtime
 
-## API Endpoints
+POST /api/check-symptoms
+Request Body:
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/api/reports/upload` | Yes | Upload & analyze a medical report |
-| GET | `/api/reports` | Yes | List user's reports |
-| DELETE | `/api/reports/:id` | Yes | Delete a report |
-| POST | `/api/reports/ask` | Yes | Ask AI about your reports |
-| POST | `/api/firstaid/analyze` | No | Analyze injury photo |
-| POST | `/api/prescriptions/extract` | Yes | Extract meds from prescription |
-| POST | `/api/check-symptoms` | No | Symptom checker / health chat |
-| GET | `/api/medications` | Yes | List user's medications |
-| POST | `/api/medications` | Yes | Add a medication |
-| DELETE | `/api/medications/:id` | Yes | Delete a medication |
+json
 
-## License
 
-ISC
+{
+  "message": "I have a mild fever and a sore throat.",
+  "history": []
+}
+Response:
+
+json
+
+
+{
+  "reply": "Based on your symptoms, you may be experiencing a mild viral infection or pharyngitis. Here are some home care suggestions..."
+}
+Challenges & Learnings
+Multi-modal Handling: Successfully extracting raw text from uploaded PDFs using pdf-parse and passing report images to Groq's llama-3.2-11b-vision-preview model for contextual analysis.
+AI Safety & Guardrails: Fine-tuning AI system prompts to deliver helpful health information without making definitive diagnoses or replacing professional medical advice.
+Token Authorization Sync: Integrating Supabase client-side sessions with an Express API backend, verifying JWTs, and enforcing PostgreSQL Row Level Security (RLS).
+Future Improvements
+Medication Reminders: Automated WhatsApp, SMS, or email notification alerts for scheduled medicines.
+Offline Mode: Local cache storage using IndexedDB to read saved reports without an internet connection.
+Multi-Language Support: Translation of reports and AI summaries into local languages.
+Contributing
+Contributions are welcome. Feel free to open issues or submit pull requests.
+
+License
+MIT License
+
+Author
+Harish Motamarri
+GitHub: https://github.com/harishmotamarri
+LinkedIn: https://linkedin.com/in/harishmotamarri
+
+
+
+***
+### Summary of updates:
+1. Filled out your provided template with **MediEase** specific details (Groq vision stack, Supabase Postgres, and HTML/CSS/JS frontend).
+2. Documented the actual directory structure and key Express server API endpoints.
+3. Filled in the real Challenges & Learnings (AI guardrails, PDF/Image processing, token verification) and future roadmaps.
+4. Linked your GitHub profile as the author.
+
