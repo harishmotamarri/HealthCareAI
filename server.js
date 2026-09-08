@@ -161,7 +161,7 @@ List the plain-English summary of the report's key findings.
                         { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Data}` } }
                     ]
                 }],
-                model: "meta-llama/llama-4-scout-17b-16e-instruct",
+                model: "qwen/qwen3.6-27b",
                 temperature: 0.3,
             });
         }
@@ -390,13 +390,18 @@ If the image does NOT show an injury or is unrelated, respond with:
                     { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Data}` } }
                 ]
             }],
-            model: "meta-llama/llama-4-scout-17b-16e-instruct",
+            model: "qwen/qwen3.6-27b",
             temperature: 0.2,
         });
 
         let text = result.choices[0].message.content.trim();
-        // Strip code fences if model wraps it
+        // Remove Qwen reasoning and code fences before parsing the JSON response.
+        text = text.replace(/^<think>[\s\S]*?(?:<\/think>|(?=\{))/i, '').trim();
         text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
+        const jsonStart = text.indexOf('{');
+        const jsonEnd = text.lastIndexOf('}');
+        if (jsonStart === -1 || jsonEnd === -1) throw new Error('Model did not return valid JSON.');
+        text = text.slice(jsonStart, jsonEnd + 1);
 
         const analysis = JSON.parse(text);
 
@@ -450,7 +455,7 @@ If no medicines found, return: []`;
                     { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Data}` } }
                 ]
             }],
-            model: "meta-llama/llama-4-scout-17b-16e-instruct",
+            model: "qwen/qwen3.6-27b",
             temperature: 0.2,
         });
 
@@ -535,7 +540,8 @@ app.post('/api/check-symptoms', async (req, res) => {
         console.log('Calling Groq API...');
         const result = await groq.chat.completions.create({
             messages: [{ role: "user", content: prompt }],
-            model: "llama-3.3-70b-versatile",
+            model: "qwen/qwen3.6-27b",
+            max_tokens: 800,
             temperature: 0.3,
         });
         const text = result.choices[0].message.content;
@@ -671,7 +677,7 @@ app.post('/api/claims/analyze-document', requireAuth, upload.single('document'),
                         { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Data}` } }
                     ]
                 }],
-                model: "llama-3.2-11b-vision-preview",
+                model: "qwen/qwen3.6-27b",
                 temperature: 0.1,
             });
             extractedText = result.choices[0].message.content;

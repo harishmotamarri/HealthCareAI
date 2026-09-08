@@ -7,7 +7,7 @@ Live: [https://mediease-sgek.onrender.com/](https://mediease-ai.vercel.app)
 - **What problem it solves:** Medical jargon in lab reports, prescriptions, and symptoms can be incredibly confusing and stressful. MediEase simplifies this information so users can understand their health better.
 - **Who it is for:** Patients, caregivers, and individuals seeking preliminary, AI-guided health context and clean medication tracking.
 - **Key idea behind the project:** Leveraging vision-capable and text-based Large Language Models (via Groq API) integrated with a secure Supabase backend to offer private, instant health reports summaries and symptom insights.
-## Features
+# Features
 - **AI Medical Report Analyzer:** Upload PDFs or images of medical reports to receive clear, plain-English summaries.
 - **Symptom Checker:** Chat via text or voice to get preliminary medical context, guidelines, and home care tips.
 - **First Aid Guidance:** Upload injury photos to get step-by-step emergency care instructions.
